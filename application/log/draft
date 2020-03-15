@@ -1,0 +1,43 @@
+<!-- Modal -->
+<div class="modal fade" id="modal-item-remove" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center p-top-40 p-bottom-50">
+                <span class="la la-exclamation-circle color-warning"></span>
+                <h1 class="display-3 m-bottom-10">Are you sure?</h1>
+                <p class="m-bottom-30">Do you really want to delete this item?</p>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-secondary m-right-15" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger">Yes, Delete it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tag -->
+<div class="widget-wrapper">
+    <div class="widget-default">
+        <div class="widget-header">
+            <h6 class="widget-title aviny">برچسب‌ها</h6>
+        </div>
+        <div class="widget-content">
+            <div class="tags-widget">
+                <ul>
+                    <li><a href="">Business</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div><!-- ends: .widget-wrapper -->
+
+<!-- Share blog -->
+<div class="social-share d-flex align-items-center">
+    <span class="m-right-15">Share Post: </span>
+    <ul class="social-share list-unstyled">
+        <li><a href=""><i class="fab fa-facebook-f"></i></a></li>
+        <li><a href=""><i class="fab fa-twitter"></i></a></li>
+        <li><a href=""><i class="fab fa-linkedin-in"></i></a></li>
+        <li><a href=""><i class="fab fa-google-plus-g"></i></a></li>
+    </ul>
+</div>
