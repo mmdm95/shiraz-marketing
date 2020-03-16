@@ -6,9 +6,9 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
     <div class="header-top-shadow"></div>
     <div class="container">
         <div class="row">
-            <a href="javascript:void(0);" class="menu-btn">
+            <button type="button" id="menuBtn" class="menu-icon menu-btn btn">
                 <i class="la la-bars" aria-hidden="true"></i>
-            </a>
+            </button>
             <div class="logo-container">
                 <a href="<?= base_url('index'); ?>" class="logo-wrapper">
                     <img src="<?= asset_url('fe/images/logo.png'); ?>" alt="لوگو">
@@ -17,17 +17,22 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     </h1>
                 </a>
             </div>
-            <form class="search-container col" method="get" action="<?= base_url('search'); ?>">
-                <button type="submit" class="btn btn-primary-main search-button">
-                    جستجو
-                </button>
-                <div class="search-input">
-                    <span class="search-icon">
-                        <i class="la la-search" aria-hidden="true"></i>
-                    </span>
-                    <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
-                </div>
-            </form>
+            <div class="search-container col">
+                <form class="search-form" method="get" action="<?= base_url('search'); ?>">
+                    <button class="menu-icon search-form-close btn" type="button">
+                        <i class="la la-times"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary-main search-button">
+                        جستجو
+                    </button>
+                    <div class="search-input">
+                        <span class="search-icon">
+                            <i class="la la-search" aria-hidden="true"></i>
+                        </span>
+                        <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
+                    </div>
+                </form>
+            </div>
             <div class="extra-container">
                 <div class="login-register">
                     <a href="<?= base_url('login'); ?>" class="btn login">
@@ -38,7 +43,10 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     </a>
                 </div>
                 <div class="basket-container">
-                    <div class="basket-icon dropdown-toggle" id="shoppingCart" data-toggle="dropdown"
+                    <div class="menu-icon mobile-search-icon">
+                        <i class="la la-search" id="cart"></i>
+                    </div>
+                    <div class="menu-icon basket-icon dropdown-toggle" id="shoppingCart" data-toggle="dropdown"
                          aria-haspopup="true" aria-expanded="false" data-target="basketDropdown">
                         <i class="la la-shopping-cart" id="cart"></i>
                         <span class="basket-number badge">۰</span>

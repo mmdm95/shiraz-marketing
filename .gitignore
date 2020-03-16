@@ -217,7 +217,7 @@ public/audio/
 public/users
 public/uploads
 framework/core/config.json
-application/config/dbConfig.php
+#application/config/dbConfig.php
 
 # Created by https://www.gitignore.io/api/visualstudiocode
 

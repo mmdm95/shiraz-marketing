@@ -313,6 +313,13 @@ a {
     padding-top: 20px;
 }
 
+.header-main .menu-icon {
+    position: relative;
+    font-size: 2.5rem;
+    color: #fff;
+    cursor: pointer;
+}
+
 .header-main .logo-container {
     margin-left: 25px;
 }
@@ -345,7 +352,11 @@ a {
 
 /**********/
 
-.search-container {
+.search-container .search-form-close {
+    display: none;
+}
+
+.search-container .search-form {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -359,7 +370,7 @@ a {
     padding: 0;
 }
 
-.search-container .search-button {
+.search-container .search-form .search-button {
     position: absolute;
     font-size: 1.25rem;
     height: 40px;
@@ -375,11 +386,11 @@ a {
     border-radius: 50rem;
 }
 
-.search-container .search-input {
+.search-container .search-form .search-input {
     width: 100%;
 }
 
-.search-container .search-input .search-icon {
+.search-container .search-form .search-input .search-icon {
     position: absolute;
     font-size: 1.75rem;
     color: var(--icon-disable-color);
@@ -393,7 +404,7 @@ a {
     transform: translate(0, -50%);
 }
 
-.search-container .search-input input {
+.search-container .search-form .search-input input {
     padding-left: 9.5rem;
     padding-right: 3.5rem;
     height: 100%;
@@ -401,7 +412,7 @@ a {
     background-color: var(--darker-bg);
 }
 
-.search-container .search-input input:focus {
+.search-container .search-form .search-input input:focus {
     border-color: #fff;
     background-color: #fff;
 }
@@ -452,22 +463,29 @@ a {
 }
 
 .basket-container {
-    margin-right: 15px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: flex;
     margin-top: 10px;
 }
 
 .header-main .menu-btn {
+    padding: 0;
     margin-left: 15px;
     margin-top: 12px;
     display: none;
 }
 
-.header-main .menu-btn,
+.basket-container .mobile-search-icon {
+    display: none;
+}
+
+.basket-container .mobile-search-icon,
 .basket-container .basket-icon {
-    position: relative;
-    font-size: 2.5rem;
-    color: #fff;
-    cursor: pointer;
+    margin-right: 25px;
 }
 
 .basket-container .basket-icon.dropdown-toggle::after {
@@ -596,8 +614,34 @@ a {
         display: inline-block;
     }
 
+    .header-main .logo-container {
+        margin-left: 0;
+    }
+
+    .header-main .logo-container .logo-wrapper img {
+        height: 50px;
+        margin-left: 10px;
+    }
+
     .header-main .logo-container .logo-wrapper h1 {
+        margin-top: 15px;
+        font-size: 1.75rem;
+    }
+
+    /**********/
+
+    .search-container .search-form-close {
+        display: inline-block;
+    }
+
+    .search-container .search-form {
         display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--primary-color);
     }
 
     /**********/
@@ -610,12 +654,12 @@ a {
         width: 96%;
     }
 
-    .basket-container .basket-icon {
-        margin-right: 15px;
+    .basket-container .mobile-search-icon {
+        display: inline-block;
+        margin-right: 0;
     }
 
     /**********/
-
     .sms-number-container {
         display: none;
     }
@@ -626,13 +670,8 @@ a {
 *****************************************/
 
 .nav-main-mobile {
-    position: fixed;
+    visibility: hidden;
     background-color: #fff;
-    width: 300px;
-    right: 0;
-    top: 0;
-    z-index: 9999;
-    height: 100vh;
     overflow: auto;
     -webkit-box-shadow: -1px 0 12px 0 var(--dark-color-shadow);
     -moz-box-shadow: -2px 0 12px 0 var(--dark-color-shadow);
@@ -652,7 +691,6 @@ a {
 }
 
 .nav-main-mobile .nav-main-mobile-header .menu-btn {
-    margin-left: 15px;
     margin-top: 12px;
     position: relative;
     font-size: 2.5rem;
@@ -660,10 +698,14 @@ a {
     cursor: pointer;
 }
 
+.nav-main-mobile .nav-main-mobile-header .menu-btn:hover {
+    color: var(--primary-color);
+}
+
 /**********/
 
 .nav-main-mobile .login-register {
-    padding: 1rem 1rem;
+    padding: 0;
     background-color: var(--light-bg);
 }
 
@@ -672,8 +714,7 @@ a {
     position: relative;
     color: var(--secondary-color);
     font-size: 1.25rem;
-    padding-right: 1.25rem;
-    padding-left: 1.25rem;
+    padding: 1.25rem 1.25rem;
 }
 
 .nav-main-mobile .login-register .login:hover,
@@ -699,7 +740,39 @@ a {
 /**********/
 
 .nav-main-mobile .nav-main-mobile-items .nav-item {
+    position: relative;
+    padding: 1.25rem 4rem 1.25rem 1.25rem;
+    font-size: 1.1rem;
+    color: #666;
+    border-right: 3px solid transparent;
+    -webkit-transition: all ease-in-out 0.2s;
+    -moz-transition: all ease-in-out 0.2s;
+    -ms-transition: all ease-in-out 0.2s;
+    -o-transition: all ease-in-out 0.2s;
+    transition: all ease-in-out 0.2s;
+}
 
+.nav-main-mobile .nav-main-mobile-items .nav-item:hover {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    -webkit-transition: all ease-in-out 0.2s;
+    -moz-transition: all ease-in-out 0.2s;
+    -ms-transition: all ease-in-out 0.2s;
+    -o-transition: all ease-in-out 0.2s;
+    transition: all ease-in-out 0.2s;
+}
+
+.nav-main-mobile .nav-main-mobile-items .nav-item .nav-item-icon {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    height: 28px;
+    font-size: 2rem;
+    -webkit-transform: translate(0, -50%);
+    -moz-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    -o-transform: translate(0, -50%);
+    transform: translate(0, -50%);
 }
 
 /****************************************
@@ -711,8 +784,10 @@ a {
 }
 
 .nav-main .nav-item {
+    white-space: nowrap;
     color: var(--secondary-color);
     padding: 1rem 1rem;
+    border-bottom: 3px solid transparent;
     -webkit-transition: all ease-in-out 0.2s;
     -moz-transition: all ease-in-out 0.2s;
     -ms-transition: all ease-in-out 0.2s;
@@ -725,7 +800,8 @@ a {
 }
 
 .nav-main .nav-item:hover {
-    color: #fff;
+    /*color: #fff;*/
+    border-color: 2px solid var(--secondary-color);
     -webkit-transition: all ease-in-out 0.2s;
     -moz-transition: all ease-in-out 0.2s;
     -ms-transition: all ease-in-out 0.2s;
@@ -742,4 +818,18 @@ a {
 
 .nav-main .nav-item .nav-item-text {
     font-size: 1.15rem;
+}
+
+/*++++++++++++++
+-Responsiveness-
++++++++++++++++*/
+
+@media (max-width: 991.98px) {
+    .nav-main .nav-item .nav-item-icon {
+        font-size: 1.75rem;
+    }
+
+    .nav-main .nav-item .nav-item-text {
+        font-size: .875rem;
+    }
 }

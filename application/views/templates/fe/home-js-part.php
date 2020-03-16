@@ -10,7 +10,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 <!-- mCustomScrollbar Js -->
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- off-canvas Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.min.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.js"></script>
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/main.js"></script>
 <!-- endinject-->
 

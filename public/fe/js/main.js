@@ -433,5 +433,11 @@
         $('.dropdown-menu').on('click', function (e) {
             e.stopPropagation();
         });
+
+        // Off-canvas menu
+        $('#offCanvasMenu').offcanvas({
+            modifiers: "right,overlay",
+            triggerButton: '#menuBtn',
+        });
     });
 })(jQuery);
