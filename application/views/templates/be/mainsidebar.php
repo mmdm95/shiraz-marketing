@@ -17,7 +17,7 @@
                     <div class="media-body">
                         <a href="<?= base_url() . 'admin/editUser/' . @$identity->id; ?>"
                            class="media-heading text-semibold">
-                            <?= set_value($identity->first_name ?? '', '', null, $identity->username); ?>
+                            <?= set_value($identity->first_name ?? '', '', null, $identity->mobile); ?>
                         </a>
                         <div class="text-size-mini text-muted">
                             <div class="text-size-mini text-muted">
@@ -50,7 +50,7 @@
                             <span>داشبورد</span>
                         </a>
                     </li>
-                    <?php if ($auth->isAllow('user', 2)): ?>
+
                         <li>
                             <a>
                                 <i class="icon-users4"></i>
@@ -58,16 +58,23 @@
                             </a>
                             <ul>
                                 <li>
-                                    <a href="<?= base_url(); ?>admin/manageUser">
+                                    <a href="<?= base_url(); ?>admin/user/manageUser">
                                         <i class="icon-users" style="font-size: 13px;"></i>
                                         <small>
-                                            مشاهده کاربران
+                                            مشاهده کاربران عادی
+                                        </small>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?= base_url(); ?>admin/manageMarketer">
+                                        <i class="icon-users" style="font-size: 13px;"></i>
+                                        <small>
+                                            مشاهده بازاریابان
                                         </small>
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                    <?php endif; ?>
                     <li>
                         <a>
                             <i class="icon-user-block"></i>

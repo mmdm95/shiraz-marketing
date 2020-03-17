@@ -14,8 +14,24 @@ use voku\helper\AntiXSS;
 
 include_once 'AbstractController.class.php';
 
+
+
 class UserController extends AbstractController
 {
+    public function manageUserAction(){
+
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/manageUser');
+    }
+
     public function editUserAction($param)
     {
         if (!$this->auth->isLoggedIn()) {
@@ -141,42 +157,6 @@ class UserController extends AbstractController
         $this->_render_page('pages/be/User/editUser');
     }
 
-    public function manageUserAction()
-    {
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
-        }
-
-        try {
-            if (!$this->auth->isAllow('user', 2)) {
-                $this->error->access_denied();
-            }
-        } catch (HAException $e) {
-            echo $e;
-        }
-
-        $model = new Model();
-        $where = '';
-        if ($this->data['identity']->role_id != AUTH_ROLE_SUPER_USER) {
-            $where = 'r.role_id>:id AND ';
-        }
-        $this->data['users'] = $model->join_it(null, 'users AS u', 'users_roles AS r',
-            ['u.id', 'u.username', 'u.full_name', 'u.created_on', 'u.active'], 'u.id=r.user_id',
-            $where . 'u.id!=:curId', [
-                'id' => $this->data['identity']->role_id,
-                'curId' => $this->data['identity']->id,
-            ], null, 'u.id DESC', null, null, false, 'LEFT');
-
-        // Base configuration
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران');
-
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
-
-        $this->_render_page('pages/be/User/manageUser');
-    }
 
     public function deleteUserAction()
     {

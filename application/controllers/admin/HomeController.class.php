@@ -18,27 +18,15 @@ class HomeController extends AbstractController
 {
     public function indexAction()
     {
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
-        }
+//        if (!$this->auth->isLoggedIn()) {
+//            $this->redirect(base_url('admin/login'));
+//        }
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
         $this->data['todayDate'] = jDateTime::date('l d F Y') . ' - ' . date('d F');
 
         $model = new Model();
-        // Unread contact us
-        $this->data['unreadContacts'] = $model->it_count('contact_us', 'status=:stat', ['stat' => 0]);
-        // Static pages count
-        $this->data['staticPages'] = $model->it_count('static_pages');
-        // Users count
-        $this->data['usersCount'] = $model->it_count('users');
-        // Factors count
-        $this->data['factorsCount'] = $model->it_count('factors');
-        // Categories count
-        $this->data['catsCount'] = $model->it_count('categories');
-        // Comments count
-        $this->data['commentsCount'] = $model->it_count('comments');
 
         $this->_render_page('pages/be/index');
     }

@@ -31,12 +31,12 @@
                                    class="text-white p-10 label bg-orange-600">
                                     <h6 class="no-margin">
                                         <i class="icon-envelop5 position-left" aria-hidden="true"></i>
-                                        <?php if ($unreadContacts != 0): ?>
-                                            <?= convertNumbersToPersian($unreadContacts); ?>
-                                            عدد
-                                        <?php else: ?>
-                                            ندارید
-                                        <?php endif; ?>
+                                        <!--                                        --><?php //if ($unreadContacts != 0): ?>
+                                        <!--                                            --><? //= convertNumbersToPersian($unreadContacts); ?>
+                                        <!--                                            عدد-->
+                                        <!--                                        --><?php //else: ?>
+                                        <!--                                            ندارید-->
+                                        <!--                                        --><?php //endif; ?>
                                     </h6>
                                 </a>
                             </label>
@@ -64,12 +64,22 @@
                                             </li>
                                         <?php endif; ?>
                                         <li class="col-xs-6 col-sm-4 col-md-3">
-                                            <a href="<?= base_url(); ?>admin/manageCategory" style="min-width: 130px;"
+                                            <a href="<?= base_url(); ?>admin/manageFactors" style="min-width: 130px;"
+                                               class="btn btn-info btn-float btn-float-lg border-left border-grey-300
+                                        border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
+                                                <i class="icon-basket" aria-hidden="true"></i>
+                                                <span>
+                                                    مشاهده فاکتور‌ها
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li class="col-xs-6 col-sm-4 col-md-3">
+                                            <a href="<?= base_url(); ?>admin/manageFactors" style="min-width: 130px;"
                                                class="btn btn-info btn-float btn-float-lg border-left border-grey-300
                                         border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
                                                 <i class="icon-hash" aria-hidden="true"></i>
                                                 <span>
-                                                    مشاهده دسته‌بندی‌ها
+                                                    مشاهده فاکتور‌ها
                                                 </span>
                                             </a>
                                         </li>
@@ -132,60 +142,152 @@
                                     دید کلی
                                 </h5>
                             </div>
+                            <div class="col-lg-12">
+                                <?php if ($identity->role_id <= AUTH_ROLE_ADMIN): ?>
+                                    <div class="col-sm-6 col-md-3 col-lg-2">
+                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
 
-                            <?php if($identity->role_id <= AUTH_ROLE_ADMIN): ?>
-                            <div class="col-sm-6 col-md-3 col-lg-2">
-                                <div class="panel text-pink-400 border-top-lg border-top-pink-400">
-                                    <div class="panel-body">
-                                        <h3 class="no-margin">
-                                            <?= convertNumbersToPersian($usersCount); ?>
-                                        </h3>
-                                        کاربر
+                                                </h3>
+                                                کاربر
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3 col-lg-2">
+                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+
+                                                </h3>
+                                                کاربر عادی
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3 col-lg-2">
+                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+
+                                                </h3>
+                                                کاربر بازاریاب
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3 col-lg-2">
+                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+
+                                                </h3>
+                                                کاربر غیرفعال
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            نوشته‌ ثابت
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            فاکتور‌های امروز
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            دسته‌بندی
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-purple-600 border-top-lg border-top-purple-600">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            نظر
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <?php endif; ?>
-
-                            <div class="col-sm-6 col-md-3 col-lg-2">
-                                <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
-                                    <div class="panel-body">
-                                        <h3 class="no-margin">
-                                            <?= convertNumbersToPersian($staticPages); ?>
-                                        </h3>
-                                        نوشته‌ ثابت
+                            <div class="col-lg-12">
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            کل سفارش‌ها
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-sm-6 col-md-3 col-lg-2">
-                                <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
-                                    <div class="panel-body">
-                                        <h3 class="no-margin">
-                                            <?= convertNumbersToPersian($factorsCount); ?>
-                                        </h3>
-                                        فاکتور
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            سفارش‌های امروز امروز
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-sm-6 col-md-3 col-lg-2">
-                                <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
-                                    <div class="panel-body">
-                                        <h3 class="no-margin">
-                                            <?= convertNumbersToPersian($catsCount); ?>
-                                        </h3>
-                                        دسته‌بندی
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            سفارش‌های انجام ‌نشده
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-sm-6 col-md-3 col-lg-2">
-                                <div class="panel text-purple-600 border-top-lg border-top-purple-600">
-                                    <div class="panel-body">
-                                        <h3 class="no-margin">
-                                            <?= convertNumbersToPersian($commentsCount); ?>
-                                        </h3>
-                                        نظر
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            سفارش‌های انجام شده
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            سفارش‌های مرجوع شده
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-2">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                            </h3>
+                                            پرداختی‌ها تا کنون
+                                        </div>
                                     </div>
                                 </div>
                             </div>
