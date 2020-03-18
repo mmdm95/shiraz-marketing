@@ -238,25 +238,6 @@ abstract class AbstractController extends AbstractPaymentController
 
     //-----
 
-    protected function _render_page($pages, $loadHeaderAndFooter = true)
-    {
-        if ($loadHeaderAndFooter) {
-            $this->load->view('templates/fe/home-header-part', $this->data);
-        }
-
-        $allPages = is_string($pages) ? [$pages] : (is_array($pages) ? $pages : []);
-        foreach ($allPages as $page) {
-            $this->load->view($page, $this->data);
-        }
-
-        if ($loadHeaderAndFooter) {
-            $this->load->view('templates/fe/home-js-part', $this->data);
-            $this->load->view('templates/fe/home-end-part', $this->data);
-        }
-    }
-
-    //-----
-
     public function cartAction()
     {
         // Check cart and cart items
@@ -1302,5 +1283,24 @@ abstract class AbstractController extends AbstractPaymentController
             $model->delete_it('factors_reserved', 'factor_time<=:ft', ['ft' => $reservedTime]);
         }
         //-----
+    }
+
+    //-----
+
+    protected function _render_page($pages, $loadHeaderAndFooter = true)
+    {
+        if ($loadHeaderAndFooter) {
+            $this->load->view('templates/fe/home-header-part', $this->data);
+        }
+
+        $allPages = is_string($pages) ? [$pages] : (is_array($pages) ? $pages : []);
+        foreach ($allPages as $page) {
+            $this->load->view($page, $this->data);
+        }
+
+        if ($loadHeaderAndFooter) {
+            $this->load->view('templates/fe/home-js-part', $this->data);
+            $this->load->view('templates/fe/home-end-part', $this->data);
+        }
     }
 }

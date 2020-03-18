@@ -184,14 +184,15 @@
                 $(this).remove()
             });
         };
-        _this.scrollToElement = function (el, distance) {
+        _this.scrollToElement = function (el, distance, duration) {
             var top;
+            duration = typeof duration === typeof 1 ? Math.abs(duration) : 300;
             el = el && $(el).length ? $(el) : 'html, body';
             top = el === 'html, body' ? 0 : el.offset().top;
             top += typeof distance === typeof 1 ? distance : 0;
             $('html, body').stop().animate({
                 scrollTop: top
-            }, 300);
+            }, duration);
         };
         _this.showMessage = function (message, title, type, icon, theme, overlay, position, draggable) {
             message = message ? message : '';
@@ -326,11 +327,16 @@
         $('[data-toggle="tooltip"]').tooltip();
 
         // testimonial-carousel
-        $(".main-carousel").owlCarousel({
+        $(".main-slider-carousel").owlCarousel({
             items: 1,
-            dots: false,
+            dots: true,
             nav: true,
-            navText: ['<span class="i la la-long-arrow-right"></span>', '<span class="i la la-long-arrow-left"></span>']
+            loop: true,
+            autoplay: true,
+            autoplayTimeout: 10000,
+            autoplayHoverPause: true,
+            rtl: true,
+            navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
         });
 
         // logo carousel
@@ -355,14 +361,17 @@
             }
         });
 
-        //setting css bg image as inline in html
-        $(".bg_image_holder").each(function () {
-            var $this = $(this);
-            var imgLink = $this.children().attr("src");
-            $this.css({
-                "background-image": "url(" + imgLink + ")",
-                "opacity": "1"
-            }).children().attr('alt', imgLink)
+        // footer namad carousel
+        $(".namad-carousel").owlCarousel({
+            items: 1,
+            dots: false,
+            nav: false,
+            loop: true,
+            autoplay: true,
+            autoplayTimeout: 10000,
+            autoplayHoverPause: true,
+            rtl: true,
+            margin: 100,
         });
 
         /* custom upload file name */
@@ -372,25 +381,21 @@
         // });
 
         //custom scrollbar
-        $(".custom-scrollbar").mCustomScrollbar({
+        $(".custom-scrollbar-y").mCustomScrollbar({
             axis: "y",
             scrollInertia: 200,
             scrollEasing: "easeIn",
-            // alwaysShowScrollbar: 1,
-            theme:"dark",
+            theme: "dark",
         });
 
-        /* offcanvas menu */
-        // var oc_menu = $(".offcanvas-menu__contents");
-        // $(".offcanvas-menu__user").on("click", function (e) {
-        //     oc_menu.addClass("active");
-        //     e.preventDefault();
-        // });
-        // $(".offcanvas-menu__close").on("click", function (e) {
-        //     oc_menu.removeClass("active");
-        //     e.preventDefault();
-        // });
-
+        //custom scrollbar
+        $(".custom-scrollbar-x").mCustomScrollbar({
+            axis: "x",
+            scrollInertia: 200,
+            scrollEasing: "easeIn",
+            autoHideScrollbar: true,
+            theme: "dark",
+        });
 
         // Reload captcha
         $('.form-captcha').on('click', function () {
@@ -429,6 +434,25 @@
 
         //------------------------------------------------
 
+        // Back to top
+        var backToTop = $('#backToTop');
+        var checkBTTBtnVisibility = function () {
+            if ($(window).scrollTop() > 300) {
+                backToTop.fadeIn(300);
+            } else {
+                backToTop.stop().fadeOut(300);
+            }
+        };
+        //-----
+        checkBTTBtnVisibility();
+        $(window).on('scroll.' + namespc, function () {
+            checkBTTBtnVisibility();
+        });
+
+        backToTop.on('click.' + namespc, function () {
+            $.shm().scrollToElement('body', 0, 500);
+        });
+
         // Refine bootstrap dropdown inside click issue
         $('.dropdown-menu').on('click', function (e) {
             e.stopPropagation();
@@ -438,6 +462,15 @@
         $('#offCanvasMenu').offcanvas({
             modifiers: "right,overlay",
             triggerButton: '#menuBtn',
+        });
+
+        // Show/Hide mobile search aria
+        var searchForm = $('#mobileSearchForm');
+        $('#mobileSearchIcon').on('click.' + namespc, function () {
+            searchForm.addClass('d-flex show in');
+        });
+        $('#closeMobileSearchForm').on('click.' + namespc, function () {
+            searchForm.removeClass('d-flex show in');
         });
     });
 })(jQuery);

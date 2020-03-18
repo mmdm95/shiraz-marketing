@@ -50,7 +50,7 @@ return array(
                 'column' => 'subset_of',
                 'type' => 'VARCHAR(8)'
             ],
-            'mobile' => [
+            'username' => [
                 'column' => 'mobile',
                 'type' => 'VARCHAR(11)'
             ],

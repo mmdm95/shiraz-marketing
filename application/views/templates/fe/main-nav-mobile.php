@@ -2,7 +2,7 @@
 defined('BASE_PATH') OR exit('No direct script access allowed');
 ?>
 
-<nav class="nav-main-mobile custom-scrollbar js-offcanvas" id="offCanvasMenu">
+<nav class="nav-main-mobile custom-scrollbar-y js-offcanvas" id="offCanvasMenu">
     <div class="nav-main-mobile-header ltr">
         <button type="button" class="menu-icon menu-btn btn js-offcanvas-close">
             <i class="la la-times" aria-hidden="true"></i>

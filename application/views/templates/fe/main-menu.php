@@ -18,10 +18,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                 </a>
             </div>
             <div class="search-container col">
-                <form class="search-form" method="get" action="<?= base_url('search'); ?>">
-                    <button class="menu-icon search-form-close btn" type="button">
-                        <i class="la la-times"></i>
-                    </button>
+                <form class="search-form" id="mobileSearchForm" method="get" action="<?= base_url('search'); ?>">
                     <button type="submit" class="btn btn-primary-main search-button">
                         جستجو
                     </button>
@@ -31,6 +28,9 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                         </span>
                         <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
                     </div>
+                    <button class="menu-icon search-form-close btn" id="closeMobileSearchForm" type="button">
+                        <i class="la la-times"></i>
+                    </button>
                 </form>
             </div>
             <div class="extra-container">
@@ -43,7 +43,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     </a>
                 </div>
                 <div class="basket-container">
-                    <div class="menu-icon mobile-search-icon">
+                    <div class="menu-icon mobile-search-icon" id="mobileSearchIcon">
                         <i class="la la-search" id="cart"></i>
                     </div>
                     <div class="menu-icon basket-icon dropdown-toggle" id="shoppingCart" data-toggle="dropdown"
@@ -70,7 +70,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                 </a>
                             </div>
                         </div>
-                        <ul class="basket-items custom-scrollbar">
+                        <ul class="basket-items custom-scrollbar-y">
                             <li class="basket-item">
                                 <a href="#" class="basket-item-img">
                                     <img src="<?= asset_url('fe/images/desk.jpg'); ?>" alt="">

@@ -4,8 +4,22 @@ use HForm\Form;
 
 include_once 'AbstractController.class.php';
 
-class EventController extends AbstractController
+class ProductController extends AbstractController
 {
+    public function indexAction($param)
+    {
+        var_dump($param);
+
+        $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
+        $this->data['page_title'] = 'محصولات';
+
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'محصولات');
+
+        $this->_render_page([
+            'pages/fe/products',
+        ]);
+    }
+
     public function eventsAction($param)
     {
         $model = new Model();

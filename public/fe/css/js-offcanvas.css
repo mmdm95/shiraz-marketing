@@ -37,6 +37,11 @@
   background: #fff;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-transition: all ease-in-out 0.2s;
+  -moz-transition: all ease-in-out 0.2s;
+  -ms-transition: all ease-in-out 0.2s;
+  -o-transition: all ease-in-out 0.2s;
+  transition: all ease-in-out 0.2s;
 }
 /* line 35, ../../src/js-offcanvas.scss */
 .c-offcanvas--opening {

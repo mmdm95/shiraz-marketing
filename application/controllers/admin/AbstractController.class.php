@@ -1,4 +1,9 @@
 <?php
+
+use HAuthentication\Auth;
+use HAuthentication\HAException;
+use HForm\Form;
+
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 

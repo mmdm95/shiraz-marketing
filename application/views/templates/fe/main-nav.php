@@ -5,7 +5,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 <div class="nav-main">
     <div class="container">
         <div class="row">
-            <nav class="nav">
+            <nav class="nav nav-items">
                 <a class="nav-item" href="#">
                     <i class="la la-building-o nav-item-icon"></i>
                     <span class="nav-item-text">

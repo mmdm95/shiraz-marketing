@@ -12,8 +12,6 @@ class HomeController extends AbstractController
     {
         $model = new Model();
 
-
-
         // Newsletter submission
         $this->_newsletter();
 
@@ -48,8 +46,11 @@ class HomeController extends AbstractController
 
     public function faqAction()
     {
-        $model = new Model();
-        $this->data['faq'] = $model->select_it(null, 'faq');
+//        $model = new Model();
+//        $this->data['faq'] = $model->select_it(null, 'faq');
+
+        $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
+        $this->data['page_title'] = 'سؤالات متداول پرسیده شده';
         //-----
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'سؤالات متداول');
 
