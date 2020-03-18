@@ -6,7 +6,6 @@
     <!-- Page content -->
     <div class="page-content">
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
-
         <!-- Main sidebar -->
         <?php $this->view("templates/be/mainsidebar", $data); ?>
         <!-- /main sidebar -->
@@ -18,7 +17,8 @@
                 <div class="page-header-content border-bottom border-bottom-success">
                     <div class="page-title">
                         <h5>
-                            <i class="icon-circle position-left"></i> <span class="text-semibold">افزودن عضو</span>
+                            <i class="icon-circle position-left"></i> <span
+                                    class="text-semibold">افزودن کاربر جدید</span>
                         </h5>
                     </div>
                 </div>
@@ -30,21 +30,21 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مدیریت کاربران</li>
+
                         <li class="active">افزودن کاربر</li>
                     </ul>
 
                 </div>
             </div>
             <!-- /page header -->
-
             <!-- Content area -->
             <div class="content">
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/addUser" method="post" class="validation-form">
-                            <?= $data['form_token']; ?>
+                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
+                              class="validation-form">
+                            <!--                            --><? //= $data['form_token']; ?>
 
                             <div class="row">
                                 <div class="col-md-12">
@@ -58,80 +58,176 @@
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <div class="panel-body">
-                                            <?php if (isset($data['errors']) && count($data['errors'])): ?>
-                                                <div class="alert alert-danger">
-                                                    <ul>
-                                                        <?php foreach ($data['errors'] as $err): ?>
-                                                            <li><?= $err; ?></li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php elseif (isset($data['success'])): ?>
-                                                <div class="alert alert-success">
-                                                    <p>
-                                                        <?= $data['success']; ?>
-                                                    </p>
-                                                </div>
-                                            <?php endif; ?>
-                                            <div class="alert alert-info alert-styled-left alert-bordered">
-                                                <p>
-                                                    ۱- وارد کردن نام کاربری و پسورد الزامی می‌باشد.
-                                                </p>
-                                                <p>
-                                                    ۲- نام کاربری باید فقط حروف و اعداد انگلیسی باشد.
-                                                </p>
-                                                <p>
-                                                    ۳- رمز عبور باید حداقل ۸ کاراکتر و فقط شامل
-                                                    حروف و اعداد انگلیسی باشد.
-                                                </p>
-                                            </div>
+                                            <!--                                            --><?php //if (isset($data['errors']) && count($data['errors'])): ?>
+                                            <!--                                                <div class="alert alert-danger">-->
+                                            <!--                                                    <ul>-->
+                                            <!--                                                        --><?php //foreach ($data['errors'] as $err): ?>
+                                            <!--                                                            <li>-->
+                                            <? //= $err; ?><!--</li>-->
+                                            <!--                                                        --><?php //endforeach; ?>
+                                            <!--                                                    </ul>-->
+                                            <!--                                                </div>-->
+                                            <!--                                            --><?php //elseif (isset($data['success'])): ?>
+                                            <!--                                                <div class="alert alert-success">-->
+                                            <!--                                                    <p>-->
+                                            <!--                                                        --><? //= $data['success']; ?>
+                                            <!--                                                    </p>-->
+                                            <!--                                                </div>-->
+                                            <!--                                            --><?php //endif; ?>
+                                            <!--                                            <div class="alert alert-info alert-styled-left alert-bordered">-->
+                                            <!--                                                <p>-->
+                                            <!--                                                    <i class="icon-dash"></i>-->
+                                            <!--                                                    در صورت عدم تغییر رمز عبور، این مقدار تغییر نخواهد کرد.-->
+                                            <!--                                                </p>-->
+                                            <!--                                            </div>-->
                                             <div class="form-group col-lg-4">
-                                                <label>نام و نام خانوادگی:</label>
-                                                <input name="name" type="text"
-                                                       class="form-control" placeholder="اجباری"
-                                                       value="<?= isset($data['userVals']['name']) ? $data['userVals']['name'] : ''; ?>">
-                                            </div>
-                                            <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>نام کاربری:</label>
-                                                <input name="username" type="text" required
-                                                       class="form-control"
-                                                       placeholder="مثال: Heeva"
-                                                       value="<?= isset($data['userVals']['username']) ? $data['userVals']['username'] : ''; ?>">
-                                            </div>
-                                            <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>انتخاب نقش:</label>
-                                                <select class="select" name="role">
+                                                <label>بازاریاب معرف:</label>
+                                                <select class="select"
+                                                        name="subset_of">
                                                     <option value="-1">انتخاب کنید</option>
-                                                    <?php foreach ($data['roles'] as $role): ?>
-                                                        <option value="<?= $role['id']; ?>"
-                                                            <?= isset($data['userVals']['role']) && $role['id'] == $data['userVals']['role'] ? 'selected' : ''; ?>>
-                                                            <?= $role['name']; ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                    <option value="1">پر کردن دیتا</option>
                                                 </select>
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>رمز عبور:</label>
-                                                <input name="password" type="password" required
-                                                       class="form-control required pass-format"
-                                                       placeholder="حداقل ۸ کاراکتر و شامل اعداد و حروف انگلیسی"
-                                                       data-popup="popover"
-                                                       data-placement="top" data-trigger="focus"
-                                                       data-content="حداقل ۸ کاراکتر و شامل اعداد و حروف انگلیسی">
+                                                <input name="password" type="text"
+                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
+                                                       value=""">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>تکرار رمز عبور:</label>
-                                                <input name="rePassword" type="password" required
-                                                       class="form-control" placeholder="اجباری">
+                                                <input name="re_password" type="text"
+                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
+                                                       value=""">
                                             </div>
 
+                                            <div class="form-group col-lg-4">
+                                                <label>کد ملی:</label>
+                                                <input name="n_code" type="text"
+                                                       class="form-control" placeholder="غیرقابل تغییر"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>نام:</label>
+                                                <input name="first_name" type="text"
+                                                       class="form-control" placeholder="حروف"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>نام خانوادگی:</label>
+                                                <input name="last_name" type="text"
+                                                       class="form-control" placeholder="حروف"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>نام پدر:</label>
+                                                <input name="father_name" type="text"
+                                                       class="form-control" placeholder="حروف"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>شماره شناسنامه:</label>
+                                                <input name="birth_certificate_code" type="text"
+                                                       class="form-control" placeholder="عدد"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>محل صدور شناسنامه:</label>
+                                                <input name="birth_certificate_code_place" type="text"
+                                                       class="form-control" placeholder="شهر محل صدور شناسنامه"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>تاریخ تولد:</label>
+                                                <input type="hidden" name="" id="altDateFieldExpire">
+                                                <input type="text" class="form-control range-to"
+                                                       placeholder="تاریخ انقضا" readonly data-time="true"
+                                                       data-alt-field="#altDateFieldExpire" data-format="YYYY/MM/DD - HH:mm"
+                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>شمار تلفن همراه:</label>
+                                                <input name="mobile" type="text" required
+                                                       class="form-control"
+                                                       placeholder="مثال: 0913XXXXXXX"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>ایمیل:</label>
+                                                <input name="email" type="text" required
+                                                       class="form-control"
+                                                       placeholder="مثال: user@example.com"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>استان:</label>
+                                                <select class="select"
+                                                        name="province">
+                                                    <option value="-1">انتخاب کنید</option>
+                                                    <option value=""
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>شهر:</label>
+                                                <input name="city" type="text" required
+                                                       class="form-control"
+                                                       placeholder=""
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-8">
+                                                <label>آدرس:</label>
+                                                <input name="address" type="text" required
+                                                       class="form-control"
+                                                       placeholder="اینجا وارد کنید ..."
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>کدپستی:</label>
+                                                <input name="postal_code" type="text" required
+                                                       class="form-control"
+                                                       placeholder="کد پستی ۱۰ رقمی"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <label>شماره کارت:</label>
+                                                <input name="credit_card_number" type="text" required
+                                                       class="form-control"
+                                                       placeholder="شماره کارت ۱۶ رقمی"
+                                                       value="">
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>جنسیت:</label>
+                                                <select class="select"
+                                                        name="gender">
+                                                    <option value="-1">انتخاب کنید</option>
+                                                    <option value="1"> مرد</option>
+                                                    <option value="2"> زن</option>
+                                                    <option value="2"> زن</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>وضعیت سربازی:</label>
+                                                <select class="select"
+                                                        name="military_status">
+                                                    <option value="-1">انتخاب کنید</option>
+                                                    <option value="1"> مرد</option>
+                                                    <option value="2"> زن</option>
+                                                </select>
+                                            </div>
                                             <div class="text-right col-md-12">
+                                                <a href="<?= base_url('admin/manageUser'); ?>"
+                                                   class="btn btn-default mr-5">
+                                                    بازگشت
+                                                </a>
                                                 <button type="submit"
                                                         class="btn btn-primary submit-button submit-button">
                                                     ذخیره

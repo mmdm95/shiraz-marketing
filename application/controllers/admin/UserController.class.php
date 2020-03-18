@@ -18,8 +18,32 @@ include_once 'AbstractController.class.php';
 
 class UserController extends AbstractController
 {
-    public function manageUserAction(){
+    public function addUserAction(){
 
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن کاربر جدید');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/addUser');
+    }
+
+    public function userProfileAction(){
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربر');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/userProfile');
+    }
+
+    public function manageUserAction(){
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران');
@@ -32,129 +56,36 @@ class UserController extends AbstractController
         $this->_render_page('pages/be/User/manageUser');
     }
 
+    public function manageMarketerAction(){
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده بازاریابان');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/manageMarketer');
+    }
+
+
     public function editUserAction($param)
     {
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
-        }
-
-        $model = new Model();
-
-        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist('users', 'id=:id', ['id' => $param[0]])) {
-            $this->redirect(base_url('admin/manageUser'));
-        }
-
-        if ($this->data['identity']->id != $param[0]) {
-            try {
-                if (!$this->auth->isAllow('user', 3)) {
-                    $this->error->access_denied();
-                }
-
-                // Prevent users with same or less graded id, access superior or equally graded of them
-                $uRole = $model->select_it(null, 'users_roles', 'role_id', 'user_id=:uId', ['uId' => $param[0]]);
-                if (!count($uRole) || ($uRole[0]['role_id'] <= $this->data['identity']->role_id)) {
-                    $this->error->access_denied();
-                }
-            } catch (HAException $e) {
-                echo $e;
-            }
-        }
-
-        $this->data['param'] = $param;
-
-        $this->data['errors'] = [];
-        $this->data['userVals'] = [];
-
-        $this->data['userVals'] = $model->join_it(null, 'users AS u', 'users_roles AS r',
-            '*', 'u.id=r.user_id',
-            'u.id=:id', [
-                'id' => $param[0],
-            ], null, 'u.id DESC', null, null, false, 'LEFT')[0];
-
-        $this->data['roles'] = $model->select_it(null, 'roles', '*', 'id>:id AND id!=:id2', ['id' => $this->data['identity']->role_id, 'id2' => AUTH_ROLE_GUEST]);
-
-        $this->load->library('HForm/Form');
-        $form = new Form();
-        $this->data['form_token'] = $form->csrfToken('editUser');
-        $form->setFieldsName(['name', 'username', 'password', 'rePassword'])->setMethod('post');
-        try {
-            $form->beforeCheckCallback(function ($values) use ($model, $form) {
-                $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
-                $form->validate('!numeric|string', 'name', 'نام و نام خانوادگی باید از نوع رشته باشد.');
-
-                if (isset($_POST['role'])) {
-                    if ($this->data['identity']->role_id <= AUTH_ROLE_ADMIN) {
-                        if (!in_array($_POST['role'], array_column($this->data['roles'], 'id'))) {
-                            $form->setError('نقش انتخاب شده وجود ندارد.');
-                        }
-                    }
-                }
-
-                if ((trim($values['password']) != '' || trim($values['rePassword']) != '') && $values['password'] != $values['rePassword']) {
-                    $form->setError('رمز عبور با تکرار آن مغایرت دارد.');
-                }
-
-                if (trim($values['password']) != '') {
-                    $form->isLengthInRange('password', 8, 16, 'پسورد باید حداقل ۸ و حداکثر ۱۶ رقم باشد.');
-                    $form->validatePassword('password', 2, 'پسورد باید شامل حروف و اعداد انگلیسی باشد.');
-                }
-
-                if ($this->data['userVals']['username'] != $values['username'] &&
-                    $model->is_exist('users', 'username=:username', ['username' => $values['username']])) {
-                    $form->setError('این نام کاربری وجود دارد. لطفا دوباره تلاش کنید.');
-                }
-            })->afterCheckCallback(function ($values) use ($model, $form) {
-                $model->transactionBegin();
-                $res1 = $model->update_it('users', [
-                    'username' => trim($values['username']),
-                    'password' => trim($values['password']) != '' ? password_hash($values['password'], PASSWORD_BCRYPT) : $this->data['userVals']['password'],
-                    'full_name' => trim($values['name'])
-                ], 'id=:id', ['id' => $this->data['userVals']['id']]);
-
-                if (isset($_POST['role'])) {
-                    if ($this->data['identity']->role_id < 3) {
-                        $res2 = $model->update_it('users_roles', [
-                            'role_id' => $_POST['role']
-                        ], 'user_id=:id', ['id' => $this->data['userVals']['id']]);
-                    } else {
-                        $res2 = true;
-                    }
-                } else {
-                    $res2 = true;
-                }
-
-                if (!$res1 || !$res2) {
-                    $model->transactionRollback();
-                    $form->setError('خطا در انجام عملیات!');
-                } else {
-                    $model->transactionComplete();
-                }
-            });
-        } catch (Exception $e) {
-            die($e->getMessage());
-        }
-
-        $res = $form->checkForm()->isSuccess();
-        if ($form->isSubmit()) {
-            if ($res) {
-                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
-            } else {
-                $this->data['errors'] = $form->getError();
-            }
-        }
-
-        $this->data['userVals'] = $model->join_it(null, 'users AS u', 'users_roles AS ur',
-            '*', 'u.id=ur.user_id', 'u.id=:id', ['id' => $param[0]]);
-        if (!count($this->data['userVals'])) {
-            $this->data['errors'][] = 'خطا در یافتن کاربر';
-        } else {
-            $this->data['userVals'] = $this->data['userVals'][0];
-        }
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش کاربر');
 
         $this->_render_page('pages/be/User/editUser');
+    }
+
+    public function changePasswordAction($param)
+    {
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'تغییر رمز عبور');
+
+        $this->_render_page('pages/be/User/changePassword');
     }
 
 
@@ -199,6 +130,20 @@ class UserController extends AbstractController
         } catch (Exception $e) {
             message('error', 200, 'امکان حذف کاربر وجود ندارد.');
         }
+    }
+
+    public function userUpgradeAction(){
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/userUpgrade');
+
     }
 
     public function activeDeactiveAction()

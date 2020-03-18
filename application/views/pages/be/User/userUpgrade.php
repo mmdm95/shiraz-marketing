@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مدیریت بازاریابان</span>
+                                    class="text-semibold">درخواست‌های ارتقاء کابران</span>
                         </h5>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مدیریت بازاریابان</li>
+                        <li class="active">مدیریت درخواست‌ها</li>
                     </ul>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                             <div class="col-sm-12 col-lg-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">لیست بازاریابان</h6>
+                                        <h6 class="panel-title">لیست درخواست‌ها</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -59,10 +59,8 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>نام و نام خانوادگی</th>
-                                                    <th>نام کاربری</th>
+                                                    <th>شماره موبایل</th>
                                                     <th>معرف</th>
-                                                    <th>تاریخ ثبت</th>
-                                                    <th>فعال/غیرفعال</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
@@ -86,24 +84,10 @@
                                                     </td>
                                                     <td style="width: 115px;" class="text-center">
                                                         <ul class="icons-list">
-                                                            <li class="text-black-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/changePassword"
-                                                                   title="تغییر رمز عبور" data-popup="tooltip">
-                                                                    <i class="icon-key"></i>
-                                                                </a>
-                                                            </li>
                                                             <li class="text-primary-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/editUser"
+                                                                <a href="<?= base_url(); ?>/admin/user/userUpgradeRequest"
                                                                    title="ویرایش" data-popup="tooltip">
                                                                     <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
                                                                 </a>
                                                             </li>
                                                         </ul>

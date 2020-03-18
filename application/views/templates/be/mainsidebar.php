@@ -50,82 +50,42 @@
                             <span>داشبورد</span>
                         </a>
                     </li>
-
-                        <li>
-                            <a>
-                                <i class="icon-users4"></i>
-                                <span>کاربران</span>
-                            </a>
-                            <ul>
-                                <li>
-                                    <a href="<?= base_url(); ?>admin/user/manageUser">
-                                        <i class="icon-users" style="font-size: 13px;"></i>
-                                        <small>
-                                            مشاهده کاربران عادی
-                                        </small>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="<?= base_url(); ?>admin/manageMarketer">
-                                        <i class="icon-users" style="font-size: 13px;"></i>
-                                        <small>
-                                            مشاهده بازاریابان
-                                        </small>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/user/addUser">
+                            <i class="icon-user-plus"></i>
+                            <span>افزودن کاربر</span>
+                        </a>
+                    </li>
                     <li>
                         <a>
-                            <i class="icon-user-block"></i>
-                            <span>
-                                بلاک لیست
-                            </span>
+                            <i class="icon-users4"></i>
+                            <span>کاربران</span>
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addBlockedUser">
-                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                <a href="<?= base_url(); ?>admin/user/manageUser">
+                                    <i class="icon-users" style="font-size: 13px;"></i>
                                     <small>
-                                        افزودن
+                                        مدیریت کاربران
                                     </small>
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageBlockedUser">
-                                    <i class="icon-blocked" style="font-size: 13px;"></i>
+                                <a href="<?= base_url(); ?>admin/user/manageMarketer">
+                                    <i class="icon-users" style="font-size: 13px;"></i>
                                     <small>
-                                        مشاهده
+                                        مدیریت بازاریابان
                                     </small>
                                 </a>
                             </li>
                         </ul>
                     </li>
+
                     <li>
-                        <a>
-                            <i class="icon-enter6"></i>
-                            <span>
-                                بازخورد
-                            </span>
+                        <a href="<?= base_url(); ?>admin/user/userUpgrade">
+                            <i class="icon-user-check"></i>
+                            <span>درخواست ارتقاء کاربران به بازاریاب</span>
                         </a>
-                        <ul>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/addFeedback">
-                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
-                                    <small>
-                                        افزودن
-                                    </small>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/manageFeedback">
-                                    <i class="icon-table2" style="font-size: 13px;"></i>
-                                    <small>
-                                        مشاهده
-                                    </small>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     <li>
                         <a href="<?= base_url(); ?>admin/manageNewsletter">
