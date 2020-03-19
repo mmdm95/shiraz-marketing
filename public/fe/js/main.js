@@ -319,7 +319,10 @@
                 multiple: false,
                 width: "100%",
                 placeholder: "انتخاب کنید",
-                containerCssClass: "form-control"
+                containerCssClass: "form-control",
+                minimumResultsForSearch: 12,
+                dir: 'rtl',
+                // theme: "classic",
             });
         });
 
@@ -471,6 +474,28 @@
         });
         $('#closeMobileSearchForm').on('click.' + namespc, function () {
             searchForm.removeClass('d-flex show in');
+        });
+
+        // Clear text from form-control
+        var triggerClearInputIcon = function (selector) {
+            var clearIcon = $(selector).parent().find('.clear-icon');
+            console.log(clearIcon);
+            if (clearIcon.length) {
+                if ($(selector).val().trim() !== '') {
+                    clearIcon.addClass('show');
+                } else {
+                    clearIcon.removeClass('show');
+                }
+            }
+        };
+        $('.form-control').on('input.' + namespc, function () {
+            triggerClearInputIcon(this);
+        }).on('focus.' + namespc, function () {
+            triggerClearInputIcon(this);
+        });
+        $('.clear-icon').on('click.' + namespc, function () {
+            var formControl = $(this).parent().find('.form-control');
+            formControl.val('').focus();
         });
     });
 })(jQuery);

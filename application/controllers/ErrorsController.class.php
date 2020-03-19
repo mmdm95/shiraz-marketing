@@ -3,6 +3,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use HAuthentication\Auth;
 use HAuthentication\HAException;
+use Home\AbstractController\AbstractController;
 
 require_once CONTROLLER_PATH . "home/AbstractController.class.php";
 

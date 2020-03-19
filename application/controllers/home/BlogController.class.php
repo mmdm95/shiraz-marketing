@@ -1,11 +1,25 @@
 <?php
+defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 
 include_once 'AbstractController.class.php';
 
 class BlogController extends AbstractController
 {
+    public function allAction($param)
+    {
+        $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
+        $this->data['page_title'] = 'اخبار و اطلاعیه‌ها';
+
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اخبار و اطلاعیه‌ها');
+
+        $this->_render_page([
+            'pages/fe/blog',
+        ]);
+    }
+
     public function allBlogAction($param)
     {
         $model = new Model();
@@ -43,73 +57,35 @@ class BlogController extends AbstractController
     {
         $model = new Model();
         //-----
-        if (!isset($param[0]) || !$model->is_exist('blog', 'slug=:slug AND publish=:pub', ['slug' => $param[0], 'pub' => 1])) {
-            $_SESSION['blog-detail-err'] = 'پارامترهای ارسالی برای مشاهده بلاگ نادرست هستند!';
-            $this->redirect(base_url('blog/allBlog'));
-        }
+//        if (!isset($param[0]) || !$model->is_exist('blog', 'slug=:slug AND publish=:pub', ['slug' => $param[0], 'pub' => 1])) {
+//            $_SESSION['blog-detail-err'] = 'پارامترهای ارسالی برای مشاهده بلاگ نادرست هستند!';
+//            $this->redirect(base_url('blog/allBlog'));
+//        }
         //-----
-        $blog = new BlogModel();
-        $this->data['blog'] = $blog->getBlogDetail(['slug' => $param[0]]);
-        $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
-        $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id ASC']);
+//        $blog = new BlogModel();
+//        $this->data['blog'] = $blog->getBlogDetail(['slug' => $param[0]]);
+//        $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
+//        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
+//        $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
+//        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id ASC']);
         //-----
-        $this->data['lastPosts'] = $model->select_it(null, 'blog', [
-            'image', 'title', 'slug', 'writer', 'created_at', 'updated_at'
-        ], 'publish=:pub', ['pub' => 1], null, ['id DESC'], 5);
+//        $this->data['lastPosts'] = $model->select_it(null, 'blog', [
+//            'image', 'title', 'slug', 'writer', 'created_at', 'updated_at'
+//        ], 'publish=:pub', ['pub' => 1], null, ['id DESC'], 5);
         //-----
-        $this->data['comments'] = $blog->getBlogComments('c.blog_id=:bId AND c.publish=:pub',
-            ['bId' => $this->data['blog']['id'], 'pub' => 2], ['c.id DESC'], 5);
-        $this->data['commentsCount'] = $model->it_count('comments',
-            'blog_id=:bId AND publish=:pub', ['bId' => $this->data['blog']['id'], 'pub' => 2]);
+//        $this->data['categories'] = $model->select_it(null, 'categories', ['id', 'category_name'],
+//            'publish=:pub', ['pub' => 1]);
         //-----
-        $this->data['categories'] = $model->select_it(null, 'categories', ['id', 'category_name'],
-            'publish=:pub', ['pub' => 1]);
-        //-----
-        $this->data['related'] = $blog->getRelatedBlog($this->data['blog'], 3);
-
-        // Comment form submit
-        $this->_commentSubmit(['captcha' => ACTION]);
-
-        // Register & Login actions
-        $this->_register(['captcha' => ACTION]);
-        $this->_login(['captcha' => ACTION]);
+//        $this->data['related'] = $blog->getRelatedBlog($this->data['blog'], 3);
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'بلاگ');
 
         // Extra js
-        $this->data['js'][] = $this->asset->script('fe/js/blogJs.js');
+//        $this->data['js'][] = $this->asset->script('fe/js/blogJs.js');
 
         $this->_render_page([
-            'pages/fe/blog-details-standard',
+            'pages/fe/blog-detail',
         ]);
-    }
-
-    public function ajaxLoadMoreCommentsAction()
-    {
-        if (!is_ajax()) {
-            message('error', 200, 'دسترسی غیر مجاز');
-        }
-
-        if (empty($_POST['blogId']) || empty($_POST['page']) || !is_numeric($_POST['blogId'])) {
-            message('error', 200, 'پارامترهای وارد شده نامعتبر است.');
-        }
-        $page = is_numeric($_POST['page']) ? $_POST['page'] : 2;
-        $page = $page < 2 ? 2 : $page;
-
-        //-----
-        $blog = new BlogModel();
-        $offset = ($page - 1) * 5;
-        $data['comments'] = $blog->getBlogComments('c.blog_id=:bId AND c.publish=:pub',
-            ['bId' => $_POST['blogId'], 'pub' => 2], ['c.id DESC'], 5, $offset);
-
-        $model = new Model();
-        $commentsCount = $model->it_count('comments',
-            'blog_id=:bId AND publish=:pub', ['bId' => $_POST['blogId'], 'pub' => 2]);
-
-        message('success', 200,
-            [$this->load->view('templates/fe/comments/blog-comment', $data, true), $commentsCount > ($page * 5)]);
     }
 
     //-----
@@ -226,71 +202,5 @@ class BlogController extends AbstractController
         $this->_render_page([
             'pages/fe/blog-search',
         ]);
-    }
-
-    //-----
-
-    protected function _commentSubmit($param)
-    {
-        $model = new Model();
-        $this->data['blogCommentErrors'] = [];
-        $this->load->library('HForm/Form');
-        $form = new Form();
-        $this->data['form_token_blog_comment'] = $form->csrfToken('blogComment');
-        $form->setFieldsName([
-            'blog-name', 'blog-mobile', 'blog-body', 'blogCaptcha'
-        ])->setMethod('post');
-        try {
-            $form->beforeCheckCallback(function ($values) use ($model, $form, $param) {
-                $form->isRequired(['blog-name', 'blog-body', 'blogCaptcha'], 'فیلدهای اجباری را خالی نگذارید.');
-
-                if (!count($form->getError())) {
-                    if ($model->is_exist('comments', 'ip_address=:ip AND created_on>:t',
-                        ['ip' => get_client_ip_env(), 't' => (strtotime(date('Y/m/d', time())) - 86400)])) { // 86400 ==> 1 day
-                        $form->setError('دیدگاه شما ثبت شده است.');
-                    } else {
-                        $form->validatePersianName('blog-name', 'نام باید حروف فارسی باشد.');
-                        //-----
-                        if (!empty($values['mobile'])) {
-                            $form->validatePersianMobile('blog-mobile');
-                        }
-                        //-----
-                        $config = getConfig('config');
-                        if (!isset($config['captcha_session_name']) ||
-                            !isset($_SESSION[$config['captcha_session_name']][$param['captcha']]) ||
-                            !isset($param['captcha']) ||
-                            encryption_decryption(ED_DECRYPT, $_SESSION[$config['captcha_session_name']][$param['captcha']]) != strtolower($values['blogCaptcha'])) {
-                            $form->setError('کد وارد شده با کد تصویر مغایرت دارد. دوباره تلاش کنید.');
-                        }
-                    }
-                }
-            })->afterCheckCallback(function ($values) use ($model, $form) {
-                $res = $model->insert_it('comments', [
-                    'blog_id' => $this->data['blog']['id'],
-                    'name' => trim($values['blog-name']),
-                    'mobile' => convertNumbersToPersian(trim($values['blog-mobile']), true),
-                    'body' => trim($values['blog-body']),
-                    'publish' => 0,
-                    'ip_address' => get_client_ip_env(),
-                    'created_on' => time(),
-                ]);
-
-                if (!$res) {
-                    $form->setError('خطا در انجام عملیات!');
-                }
-            });
-        } catch (Exception $e) {
-            die($e->getMessage());
-        }
-
-        $res = $form->checkForm()->isSuccess();
-        if ($form->isSubmit()) {
-            if ($res) {
-                $this->data['blogCommentSuccess'] = 'دیدگاه شما ثبت شد.پس از تأیید، دیدگاه در سایت نمایش داده می‌شود.';
-            } else {
-                $this->data['blogCommentErrors'] = $form->getError();
-                $this->data['blogCommentValues'] = $form->getValues();
-            }
-        }
     }
 }

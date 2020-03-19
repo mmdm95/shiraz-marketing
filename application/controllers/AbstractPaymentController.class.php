@@ -43,6 +43,7 @@ abstract class AbstractPaymentController extends HController
 
     // Define all tables' name for convenient
     const TBL_BLOG = 'blog';
+    const TBL_BLOG_CATEGORY = 'blog_categories';
     const TBL_CATEGORY = 'categories';
     const TBL_COMPLAINT = 'complaints';
     const TBL_CONTACT_US = 'contact_us';

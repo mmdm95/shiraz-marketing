@@ -22,6 +22,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/jquery.mCustomScrollbar.css">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/js-offcanvas.css">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/select2.css">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/main.css">
     <!-- endinject -->
 

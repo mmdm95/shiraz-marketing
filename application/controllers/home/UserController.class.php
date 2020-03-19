@@ -1,6 +1,8 @@
 <?php
+defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 use HPayment\Payment;
 use HPayment\PaymentClasses\PaymentZarinPal;
 use HPayment\PaymentException;

@@ -1,6 +1,7 @@
 <?php
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
+use Admin\AbstractController\AbstractController;
 use Apfelbox\FileDownload\FileDownload;
 use HAuthentication\Auth;
 use HAuthentication\HAException;

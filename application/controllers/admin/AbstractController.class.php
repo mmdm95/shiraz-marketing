@@ -1,8 +1,12 @@
 <?php
 
+namespace Admin\AbstractController;
+
+use AbstractPaymentController;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use Model;
 
 defined('BASE_PATH') OR exit('No direct script access allowed');
 

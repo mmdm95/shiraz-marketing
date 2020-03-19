@@ -1,22 +1,22 @@
 <?php
+defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 
 include_once 'AbstractController.class.php';
 
 class ProductController extends AbstractController
 {
-    public function indexAction($param)
+    public function allAction($param)
     {
-        var_dump($param);
-
         $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
         $this->data['page_title'] = 'محصولات';
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'محصولات');
 
         $this->_render_page([
-            'pages/fe/products',
+            'pages/fe/product',
         ]);
     }
 
@@ -52,92 +52,25 @@ class ProductController extends AbstractController
     public function detailAction($param)
     {
         $model = new Model();
-
-        if (!isset($param[0]) || !$model->is_exist('plans', 'slug=:slug', ['slug' => $param[0]])) {
-            $this->redirect(base_url('event/events'));
-        }
-
-        $this->data['param'] = $param;
-        $this->data['event'] = $model->select_it(null, 'plans', '*', 'slug=:slug', ['slug' => $param[0]])[0];
-        $this->data['event']['options'] = json_decode($this->data['event']['options'], true);
         //-----
-        $this->data['event']['filled'] = count($model->select_it(null, 'factors', 'id',
-            'plan_id=:pId AND payed_amount IS NOT NULL AND payed_amount>:pa', ['pId' => $this->data['event']['id'], 'pa' => 0]));
+//        if (!isset($param[0]) || !$model->is_exist('plans', 'slug=:slug', ['slug' => $param[0]])) {
+//            $this->redirect(base_url('event/events'));
+//        }
         //-----
-        $this->data['event']['brochure'] = $model->select_it(null, 'plan_brochure', ['image'], 'plan_id=:pId', ['pId' => $this->data['event']['id']]);
+//        $this->data['param'] = $param;
+//        $this->data['event'] = $model->select_it(null, 'plans', '*', 'slug=:slug', ['slug' => $param[0]])[0];
+//        $this->data['event']['options'] = json_decode($this->data['event']['options'], true);
         //-----
-        $this->data['event']['gallery'] = $model->select_it(null, 'plan_images', ['image'], 'plan_id=:pId', ['pId' => $this->data['event']['id']]);
+//        $this->data['event']['gallery'] = $model->select_it(null, 'plan_images', ['image'], 'plan_id=:pId', ['pId' => $this->data['event']['id']]);
         //-----
-        $this->data['event']['videos'] = $model->select_it(null, 'plan_videos', ['video'], 'plan_id=:pId', ['pId' => $this->data['event']['id']]);
-        //-----
-        $event = new EventModel();
-        $this->data['comments'] = $event->getEventComments('pc.plan_id=:pId AND pc.publish=:pub',
-            ['pId' => $this->data['event']['id'], 'pub' => 2], ['pc.id DESC'], 5);
-        $this->data['commentsCount'] = $model->it_count('plan_comments',
-            'plan_id=:pId AND publish=:pub', ['pId' => $this->data['event']['id'], 'pub' => 2]);
-        //-----
-        $this->data['isPayed'] = false;
-        if ($this->auth->isLoggedIn()) {
-            $this->data['isPayed'] = $model->is_exist('factors', 'user_id=:uId AND plan_id=:pId',
-                ['uId' => $this->data['identity']->id, 'pId' => $this->data['event']['id']]);
-        }
 
-        // Comment form submit
-        $this->_commentSubmit(['captcha' => ACTION]);
-
-        // Event submission
-        $this->_eventSubmit();
-        //-----
-        $generalWhere = 'id!=:id';
-        $generalWhereParam = ['id' => $this->data['event']['id']];
-        //=====
-        $pieces = explode(',', $this->data['event']['contact']);
-        $tmpLastIdx = count($pieces) - 1;
-        $audienceTitle = '';
-        $audienceTitleParam = [];
-        foreach ($pieces as $k => $au) {
-            $audienceTitle .= 'contact REGEXP :c' . $k;
-            $audienceTitleParam['c' . $k] = '^' . trim($au) . '$';
-            if ($k != $tmpLastIdx) {
-                $audienceTitle .= ' OR ';
-            }
-        }
-        //=====
-        $pieces = explode(' ', $this->data['event']['title']);
-        $tmpLastIdx = count($pieces) - 1;
-        $relatedTitle = '';
-        $relatedTitleParam = [];
-        foreach ($pieces as $k => $title) {
-            $relatedTitle .= 'title LIKE :t' . $k;
-            $relatedTitleParam['t' . $k] = '%' . trim($title) . '%';
-            if ($k != $tmpLastIdx) {
-                $relatedTitle .= ' OR ';
-            }
-        }
-        if (empty($audienceTitle) && empty($relatedTitle)) {
-            $audienceTitle = '1';
-        } elseif (!empty($audienceTitle) && !empty($relatedTitle)) {
-            $relatedTitle = ' OR ' . $relatedTitle;
-        }
-        //=====
-        $this->data['relatedEvents'] = $model->select_it(null, 'plans', ['title', 'slug', 'image', 'total_price', 'contact'],
-            $generalWhere . ' AND (' . $audienceTitle . $relatedTitle . ')',
-            array_merge($generalWhereParam, $audienceTitleParam, $relatedTitleParam),
-            null, ['id DESC'], 5);
-
-        // Register & Login actions
-        $this->_register(['captcha' => ACTION]);
-        $this->_login(['captcha' => ACTION]);
-
-//        var_dump($this->data['event']['options']);
-
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات طرح', $this->data['event']['title']);
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات محصول', @$this->data['event']['title']);
 
         // Extra js
-        $this->data['js'][] = $this->asset->script('fe/js/eventJs.js');
+//        $this->data['js'][] = $this->asset->script('fe/js/eventJs.js');
 
         $this->_render_page([
-            'pages/fe/event-detail',
+            'pages/fe/product-detail',
         ]);
     }
 
