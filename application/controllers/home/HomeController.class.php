@@ -2,6 +2,7 @@
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 
 
 include_once 'AbstractController.class.php';

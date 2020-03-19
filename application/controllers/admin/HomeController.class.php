@@ -1,6 +1,7 @@
 <?php
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
+use Admin\AbstractController\AbstractController;
 use Apfelbox\FileDownload\FileDownload;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
@@ -29,6 +30,48 @@ class HomeController extends AbstractController
         $model = new Model();
 
         $this->_render_page('pages/be/index');
+    }
+
+    public function manageStaticPageAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت مطالب ثابت');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/StaticPage/manageStaticPage');
+
+    }
+
+    public function addStaticPageAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش مطالب ثابت');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/StaticPage/addStaticPage');
+
+    }
+
+    public function editStaticPageAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش مطالب ثابت');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/StaticPage/editStaticPage');
+
     }
 
     public function fileUploadAction($params)

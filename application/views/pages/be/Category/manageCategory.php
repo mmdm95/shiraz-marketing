@@ -67,27 +67,26 @@
                                                 </thead>
                                                 <tbody>
                                                 <!-- Load categories data -->
-                                                <?php foreach ($categories as $key => $category): ?>
                                                     <tr>
                                                         <td width="50px">
-                                                            <?= convertNumbersToPersian($key + 1); ?>
+
                                                         </td>
                                                         <td>
-                                                            <?= $category['category_name']; ?>
+
                                                         </td>
                                                         <td>
-                                                            <?php if ($category['publish'] == 1): ?>
+<!--                                                            --><?php //if ($category['publish'] == 1): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-success">فعال</span>
-                                                            <?php else: ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
-                                                                 border-left-lg border-left-danger">غیر فعال</span>
-                                                            <?php endif; ?>
+<!--                                                            --><?php //else: ?>
+<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
+<!--                                                                 border-left-lg border-left-danger">غیر فعال</span>-->
+<!--                                                            --><?php //endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-primary-600">
-                                                                    <a href="<?= base_url(); ?>admin/editCategory/<?= $category['id']; ?>"
+                                                                    <a href="<?= base_url() ; ?>/admin/blog/editCategory"
                                                                        title="ویرایش" data-popup="tooltip">
                                                                         <i class="icon-pencil7"></i>
                                                                     </a>
@@ -96,14 +95,13 @@
                                                                     <a class="deleteCategoryBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="<?= $category['id']; ?>">
+                                                                               value="">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
-                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

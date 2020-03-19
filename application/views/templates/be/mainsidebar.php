@@ -87,14 +87,6 @@
                             <span>درخواست ارتقاء کاربران به بازاریاب</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="<?= base_url(); ?>admin/manageNewsletter">
-                            <i class="icon-envelop5"></i>
-                            <span>
-                                خبرنامه
-                            </span>
-                        </a>
-                    </li>
                     <li class="navigation-header"><span>نوشته‌ها</span> <i class="icon-menu"></i></li>
                     <li>
                         <a>
@@ -105,7 +97,7 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addCategory">
+                                <a href="<?= base_url(); ?>admin/blog/addCategory">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
                                         افزودن دسته‌بندی
@@ -113,7 +105,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageCategory">
+                                <a href="<?= base_url(); ?>admin/blog/manageCategory">
                                     <i class="icon-table2" style="font-size: 13px;"></i>
                                     <small>
                                         مشاهده دسته‌بندی‌ها
@@ -131,7 +123,7 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addBlog">
+                                <a href="<?= base_url(); ?>admin/blog/addBlog">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
                                         افزودن نوشته
@@ -139,7 +131,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageBlog">
+                                <a href="<?= base_url(); ?>admin/blog/manageBlog">
                                     <i class="icon-pencil7" style="font-size: 13px;"></i>
                                     <small>
                                         مشاهده نوشته‌ها

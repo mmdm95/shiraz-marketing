@@ -84,7 +84,7 @@
                                                     <td style="width: 115px;" class="text-center">
                                                         <ul class="icons-list">
                                                             <li class="text-green-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/viewProfile"
+                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
                                                                    title="مشاهده" data-popup="tooltip">
                                                                     <i class="icon-eye"></i>
                                                                 </a>

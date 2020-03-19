@@ -67,30 +67,29 @@
                                                 </thead>
                                                 <tbody>
                                                 <!-- Load categories data -->
-                                                <?php foreach ($blog as $key => $blg): ?>
                                                     <tr>
                                                         <td width="50px">
-                                                            <?= convertNumbersToPersian($key + 1); ?>
+
                                                         </td>
                                                         <td width="100px">
-                                                            <a data-url="<?= base_url() . $blg['image']; ?>"
+                                                            <a data-url=""
                                                                data-popup="lightbox">
                                                                 <img src=""
-                                                                     data-src="<?= base_url() . $blg['image']; ?>"
-                                                                     alt="<?= $blg['title']; ?>"
+                                                                     data-src=""
+                                                                     alt=""
                                                                      class="img-rounded img-preview lazy">
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <a href="<?= base_url('blog/detail/' . $blg['slug']); ?>"
+                                                            <a href=""
                                                                target="_blank">
-                                                                <?= $blg['title']; ?>
+
                                                             </a>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-primary-600">
-                                                                    <a href="<?= base_url(); ?>admin/editBlog/<?= $blg['id']; ?>"
+                                                                    <a href="<?= base_url(); ?>admin/blog/editBlog/"
                                                                        title="ویرایش" data-popup="tooltip">
                                                                         <i class="icon-pencil7"></i>
                                                                     </a>
@@ -99,14 +98,13 @@
                                                                     <a class="deleteBlogBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="<?= $blg['id']; ?>">
+                                                                               value="">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
-                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

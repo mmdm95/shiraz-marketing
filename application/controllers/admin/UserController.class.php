@@ -1,6 +1,7 @@
 <?php
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
+use Admin\AbstractController\AbstractController;
 use Apfelbox\FileDownload\FileDownload;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
@@ -69,7 +70,6 @@ class UserController extends AbstractController
         $this->_render_page('pages/be/User/manageMarketer');
     }
 
-
     public function editUserAction($param)
     {
 
@@ -87,7 +87,6 @@ class UserController extends AbstractController
 
         $this->_render_page('pages/be/User/changePassword');
     }
-
 
     public function deleteUserAction()
     {
@@ -143,6 +142,20 @@ class UserController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
         $this->_render_page('pages/be/User/userUpgrade');
+
+    }
+
+    public function manageNewsletterAction(){
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/manageNewsletter');
 
     }
 

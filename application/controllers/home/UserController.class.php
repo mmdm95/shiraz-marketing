@@ -1,6 +1,7 @@
 <?php
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 use HPayment\Payment;
 use HPayment\PaymentClasses\PaymentZarinPal;
 use HPayment\PaymentException;

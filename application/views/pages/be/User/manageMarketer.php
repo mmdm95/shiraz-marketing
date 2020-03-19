@@ -86,13 +86,21 @@
                                                     </td>
                                                     <td style="width: 115px;" class="text-center">
                                                         <ul class="icons-list">
+                                                            <li class="text-green-800 mr-5">
+                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
+                                                                   title="مشاهده" data-popup="tooltip">
+                                                                    <i class="icon-eye"></i>
+                                                                </a>
+                                                            </li>
                                                             <li class="text-black-600">
                                                                 <a href="<?= base_url(); ?>/admin/user/changePassword"
                                                                    title="تغییر رمز عبور" data-popup="tooltip">
                                                                     <i class="icon-key"></i>
                                                                 </a>
                                                             </li>
-                                                            <li class="text-primary-600">
+                                                        </ul>
+                                                        <ul class="icons-list mt-10">
+                                                            <li class="text-primary-600 mr-5">
                                                                 <a href="<?= base_url(); ?>/admin/user/editUser"
                                                                    title="ویرایش" data-popup="tooltip">
                                                                     <i class="icon-pencil7"></i>

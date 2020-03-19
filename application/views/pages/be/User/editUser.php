@@ -215,10 +215,6 @@
                                                 </select>
                                             </div>
                                             <div class="text-right col-md-12">
-                                                <a href="<?= base_url('admin/manageUser'); ?>"
-                                                   class="btn btn-default mr-5">
-                                                    بازگشت
-                                                </a>
                                                 <button type="submit"
                                                         class="btn btn-primary submit-button submit-button">
                                                     ذخیره

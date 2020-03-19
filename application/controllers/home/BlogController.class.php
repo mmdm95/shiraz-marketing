@@ -1,6 +1,7 @@
 <?php
 
 use HForm\Form;
+use Home\AbstractController\AbstractController;
 
 include_once 'AbstractController.class.php';
 
