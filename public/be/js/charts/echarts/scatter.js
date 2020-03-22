@@ -615,7 +615,7 @@ $(function () {
 
 
             //
-            // Category scatter options
+            // BlogCategory scatter options
             //
 
             category_scatter_options = {
@@ -690,7 +690,7 @@ $(function () {
                         tooltip: {
                             trigger: 'item',
                             formatter: function (params) {
-                                return params.seriesName + ' （'  + 'Category' + params.value[0] + '）<br/>'
+                                return params.seriesName + ' （'  + 'BlogCategory' + params.value[0] + '）<br/>'
                                 + params.value[1] + ', ' 
                                 + params.value[2]; 
                             },
@@ -722,7 +722,7 @@ $(function () {
                         tooltip: {
                             trigger: 'item',
                             formatter: function (params) {
-                                return params.seriesName + ' （'  + 'Category' + params.value[0] + '）<br/>'
+                                return params.seriesName + ' （'  + 'BlogCategory' + params.value[0] + '）<br/>'
                                 + params.value[1] + ', ' 
                                 + params.value[2]; 
                             },

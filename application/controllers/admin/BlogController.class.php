@@ -27,7 +27,7 @@ class BlogController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
-        $this->_render_page('pages/be/Category/manageCategory');
+        $this->_render_page('pages/be/blogCategory/manageCategory');
     }
 
     public function addCategoryAction()
@@ -40,7 +40,7 @@ class BlogController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
-        $this->_render_page('pages/be/Category/addCategory');
+        $this->_render_page('pages/be/blogCategory/addCategory');
     }
 
     public function editCategoryAction()
@@ -53,7 +53,7 @@ class BlogController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
-        $this->_render_page('pages/be/Category/editCategory');
+        $this->_render_page('pages/be/blogCategory/editCategory');
     }
 
     public function manageBlogAction()

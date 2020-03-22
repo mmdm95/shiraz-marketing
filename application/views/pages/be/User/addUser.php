@@ -223,6 +223,14 @@
                                                     <option value="2"> زن</option>
                                                 </select>
                                             </div>
+                                            <div class="form-group col-lg-6">
+                                                <label class="display-block">
+                                                    <span class="text-danger">*</span>
+                                                    تصویر را انتخاب کنید:
+                                                </label>
+                                                <input type="file" class="file-styled" name="image">
+                                                <span class="help-block">فایل‌های مجاز: png, jpg, jpeg. حداکثر تا ۴ مگابایت</span>
+                                            </div>
                                             <div class="text-right col-md-12">
                                                 <button type="submit"
                                                         class="btn btn-primary submit-button submit-button">

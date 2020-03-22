@@ -51,6 +51,25 @@
                             <!--                            --><? //= $data['form_token']; ?>
 
                             <div class="row">
+                                <div class="col-lg-3 col-sm-6">
+                                    <div class="thumbnail">
+                                        <div class="thumb">
+                                            <img src="assets/images/placeholder.jpg" alt="">
+                                            <div class="caption-overflow">
+										<span>
+											<a href="<?= base_url(); ?>admin/user/userProfile"
+                                               class="btn border-white text-white btn-flat btn-icon btn-rounded ml-5"><i
+                                                        class="icon-link2"></i></a>
+										</span>
+                                            </div>
+                                        </div>
+                                        <div class="caption">
+                                            <a href="<?= base_url(); ?>admin/user/userProfile"
+                                                                     class="text-default">اسم کاربر لینک
+                                                    اینجا</a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">
@@ -137,7 +156,8 @@
                                                 <input type="hidden" name="" id="altDateFieldExpire">
                                                 <input type="text" class="form-control range-to"
                                                        placeholder="تاریخ انقضا" readonly data-time="true"
-                                                       data-alt-field="#altDateFieldExpire" data-format="YYYY/MM/DD - HH:mm"
+                                                       data-alt-field="#altDateFieldExpire"
+                                                       data-format="YYYY/MM/DD - HH:mm"
                                                        value="<?= set_value($fesVals['expire'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
@@ -213,6 +233,14 @@
                                                     <option value="1"> مرد</option>
                                                     <option value="2"> زن</option>
                                                 </select>
+                                            </div>
+                                            <div class="form-group col-lg-6">
+                                                <label class="display-block">
+                                                    <span class="text-danger">*</span>
+                                                    تصویر را انتخاب کنید:
+                                                </label>
+                                                <input type="file" class="file-styled" name="image">
+                                                <span class="help-block">فایل‌های مجاز: png, jpg, jpeg. حداکثر تا ۴ مگابایت</span>
                                             </div>
                                             <div class="text-right col-md-12">
                                                 <button type="submit"

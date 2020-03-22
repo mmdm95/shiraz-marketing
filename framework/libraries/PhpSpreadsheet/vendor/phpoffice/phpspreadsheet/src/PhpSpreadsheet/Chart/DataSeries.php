@@ -83,7 +83,7 @@ class DataSeries
     private $plotLabel = [];
 
     /**
-     * Plot Category.
+     * Plot BlogCategory.
      *
      * @var array of DataSeriesValues
      */
@@ -264,7 +264,7 @@ class DataSeries
     }
 
     /**
-     * Get Plot Category by Index.
+     * Get Plot BlogCategory by Index.
      *
      * @param mixed $index
      *

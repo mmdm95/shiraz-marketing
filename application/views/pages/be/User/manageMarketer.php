@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مدیریت بازاریابان</span>
+                                    class="text-semibold">مدیریت کاربران</span>
                         </h5>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مدیریت بازاریابان</li>
+                        <li class="active">مدیریت کاربران</li>
                     </ul>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                             <div class="col-sm-12 col-lg-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">لیست بازاریابان</h6>
+                                        <h6 class="panel-title">لیست کاربران</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -60,7 +60,6 @@
                                                     <th>#</th>
                                                     <th>نام و نام خانوادگی</th>
                                                     <th>نام کاربری</th>
-                                                    <th>معرف</th>
                                                     <th>تاریخ ثبت</th>
                                                     <th>فعال/غیرفعال</th>
                                                     <th>عملیات</th>
@@ -69,8 +68,6 @@
                                                 <tbody>
                                                 <!-- Load users data -->
                                                 <tr>
-                                                    <td>
-                                                    </td>
                                                     <td>
                                                     </td>
                                                     <td>
