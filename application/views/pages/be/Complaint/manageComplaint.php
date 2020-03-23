@@ -21,7 +21,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">پیام‌ها</span>
+                                    class="text-semibold">شکایات</span>
                         </h5>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">پیام‌ها</li>
+                        <li class="active">شکایات</li>
                     </ul>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                             <div class="col-sm-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">پیام‌ها</h6>
+                                        <h6 class="panel-title">لیست شکایات</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -62,8 +62,8 @@
                                                     <th>#</th>
                                                     <th>فرستنده</th>
                                                     <th>عنوان</th>
-                                                    <th>تاریخ ارسال نظر</th>
-                                                    <th>وضعیت نظر</th>
+                                                    <th>تاریخ ارسال شکایت</th>
+                                                    <th>وضعیت مشاهده</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
@@ -90,7 +90,7 @@
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-black">
-                                                                    <a href="<?= base_url(); ?>/admin/viewContact/"
+                                                                    <a href="<?= base_url(); ?>/admin/viewComplaint/"
                                                                        title="مشاهده" data-popup="tooltip">
                                                                         <i class="icon-eye"></i>
                                                                     </a>

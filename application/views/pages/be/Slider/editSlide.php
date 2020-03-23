@@ -21,7 +21,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i>
-                            <span class="text-semibold">مشاهده محصولات</span>
+                            <span class="text-semibold">مشاهده اسلاید‌ها</span>
                         </h5>
                     </div>
                 </div>
@@ -33,7 +33,12 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مشاهده محصولات</li>
+                        <li>
+                            <a href="<?= base_url(); ?>admin/manageSlider">
+                                مدیریت اسلاید‌ها
+                            </a>
+                        </li>
+                        <li class="active">ویرایش اسلاید</li>
                     </ul>
                 </div>
             </div>
@@ -49,7 +54,7 @@
 
                                     <div class="panel panel-body border-top-primary">
                                         <h6 class="no-margin text-semibold text-center">
-                                            افزودن اسلاید
+                                            ویرایش اسلاید
                                         </h6>
                                         <p class="text-muted content-group-sm text-center">
                                         </p>
@@ -101,26 +106,6 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12"></div>
-                                            <div class="form-group col-md-4 mt-10">
-                                                <label>
-                                                    <span class="text-danger">*</span>
-                                                    متن:
-                                                </label>
-                                                <input name="s-text"
-                                                       type="text"
-                                                       class="form-control"
-                                                       value="">
-                                            </div>
-                                            <div class="form-group col-md-3 mt-10">
-                                                <label>
-                                                    نام لینک:
-                                                </label>
-                                                <input name="s-btn-text"
-                                                       type="text"
-                                                       class="form-control"
-                                                       placeholder="مثال: درباره ما"
-                                                       value="">
-                                            </div>
                                             <div class="form-group col-md-5 mt-10">
                                                 <label>
                                                     آدرس لینک:

@@ -19,7 +19,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">پیام‌های دریافتی</span>
+                                    class="text-semibold">شکایت</span>
                         </h5>
                     </div>
                 </div>
@@ -32,11 +32,11 @@
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url(); ?>admin/manageContactUs">
-                                مدیریت پیام‌ها
+                            <a href="<?= base_url(); ?>admin/manageComplaint">
+                                مدیریت شکایات
                             </a>
                         </li>
-                        <li class="active">مشاهده پیام</li>
+                        <li class="active">مشاهده شکایت</li>
                     </ul>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                             <div class="col-lg-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title ">مشاهده پیام</h6>
+                                        <h6 class="panel-title ">مشاهده شکایت</h6>
                                         <div class="heading-elements">
                                             <a id="delContactBtn"
                                                class="btn btn-default btn-rounded heading-btn-group border-danger-600 text-danger-600 p-10"

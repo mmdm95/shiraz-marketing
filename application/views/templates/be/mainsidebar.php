@@ -246,46 +246,69 @@
                     <li class="navigation-header"><span>فرعی</span> <i class="icon-menu"></i></li>
                     <li>
                         <a>
-                            <i class="icon-link"></i>
+                            <i class="icon-question3"></i>
                             <span>
-                                لینک‌های مفید
+                                سؤالات متداول
                             </span>
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addUsefulLink">
+                                <a href="<?= base_url(); ?>admin/addFAQ">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
-                                        افزودن لینک
+                                        افزودن سؤال
                                     </small>
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageUsefulLink">
+                                <a href="<?= base_url(); ?>admin/manageFAQ">
                                     <i class="icon-table2" style="font-size: 13px;"></i>
                                     <small>
-                                        مشاهده لینک‌ها
+                                        مشاهده سؤالات
                                     </small>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="<?= base_url(); ?>admin/manageFAQ">
-                            <i class="icon-question3"></i>
+                        <a>
+                            <i class="icon-images2"></i>
                             <span>
-                                سؤالات متداول
+                                مدیریت اسلایدر
                             </span>
                         </a>
+                        <ul>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/addSlide">
+                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                    <small>
+                                        افزودن اسلاید
+                                    </small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/manageSlider">
+                                    <i class="icon-table2" style="font-size: 13px;"></i>
+                                    <small>
+                                        مشاهده اسلایدها
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <a href="<?= base_url(); ?>admin/manageContactUs">
-                            <i class="icon-phone2"></i>
-                            <span>
-                                تماس با ما
-                            </span>
+                            <i class="icon-envelop"></i>
+                            <span>تماس با ما</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/manageComplaints">
+                            <i class="icon-balance"></i>
+                            <span>شکایات</span>
+                        </a>
+                    </li>
+
                     <li>
                         <a href="<?= base_url(); ?>admin/fileUpload">
                             <i class="icon-stack"></i>
@@ -294,7 +317,6 @@
                             </span>
                         </a>
                     </li>
-                    <?php if ($auth->isAllow('setting', 2)): ?>
                         <li>
                             <a href="<?= base_url(); ?>admin/setting">
                                 <i class="icon-cogs"></i>
@@ -303,7 +325,6 @@
                                 </span>
                             </a>
                         </li>
-                    <?php endif; ?>
                     <li>
                         <a href="<?= base_url(); ?>admin/logout">
                             <i class="icon-switch2"></i>

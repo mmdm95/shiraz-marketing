@@ -150,7 +150,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="form-group col-lg-8 col-md-8 col-sm-12">
+                                            <div class="form-group col-lg-6 col-md-8 col-sm-12">
                                                 <span class="text-danger">*</span>
                                                 <label>عنوان محصول:</label>
                                                 <input name="title" type="text" class="form-control"
@@ -171,6 +171,26 @@
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
+                                            </div>
+                                            <div class="form-group pt-15 col-lg-2 col-md-2 col-sm-12">
+                                                <div class="form-check form-check-right">
+                                                    <label class="form-check-label ltr">
+                                                                <span class="rtl">
+                                                                    خدمات
+                                                                </span>
+                                                        <input type="radio" class="control-custom"
+                                                               name="product_type" value="1">
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-right">
+                                                    <label class="form-check-label ltr">
+                                                                <span class="rtl">
+                                                                    کالا
+                                                                </span>
+                                                        <input type="radio" class="control-custom"
+                                                               name="product_type" value="2">
+                                                    </label>
+                                                </div>
                                             </div>
                                             <div class="form-group col-lg-6 col-md-6 col-sm-12">
                                                 <span class="text-danger">*</span>
@@ -360,6 +380,31 @@
                                                     </div>
                                                 </div>
                                             <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="panel panel-white">
+                                        <div class="panel-heading">
+                                            <h6 class="panel-title">محصولات مرتبط</h6>
+                                            <div class="heading-elements">
+                                                <ul class="icons-list">
+                                                    <li><a data-action="collapse"></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="col-md-12">
+                                                <select class="select-rtl" multiple="multiple"
+                                                        name="related[]" data-placeholder="انتخاب کنید">
+                                                    <?php foreach ($products as $product): ?>
+                                                        <option value="<?= $product['id']; ?>"
+                                                            <?= in_array($product['id'], $pVals['related'] ?? []) ? 'selected' : ''; ?>>
+                                                            <?= $product['product_title']; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

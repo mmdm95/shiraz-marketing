@@ -387,6 +387,31 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <div class="panel panel-white">
+                                        <div class="panel-heading">
+                                            <h6 class="panel-title">محصولات مرتبط</h6>
+                                            <div class="heading-elements">
+                                                <ul class="icons-list">
+                                                    <li><a data-action="collapse"></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="col-md-12">
+                                                <select class="select-rtl" multiple="multiple"
+                                                        name="related[]" data-placeholder="انتخاب کنید">
+                                                    <?php foreach ($products as $product): ?>
+                                                        <option value="<?= $product['id']; ?>"
+                                                            <?= in_array($product['id'], $pVals['related'] ?? []) ? 'selected' : ''; ?>>
+                                                            <?= $product['product_title']; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-lg-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">

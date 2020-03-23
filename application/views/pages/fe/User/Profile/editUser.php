@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">افزودن کاربر جدید</span>
+                                    class="text-semibold">تغییر مشخصات کاربر</span>
                         </h5>
                     </div>
                 </div>
@@ -30,7 +30,12 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">افزودن کاربر</li>
+                        <li>
+                            <a href="<?= base_url(); ?>admin/user/manageUser">
+                                مدیریت کاربران
+                            </a>
+                        </li>
+                        <li class="active">ویرایش کاربر</li>
                     </ul>
 
                 </div>
@@ -43,7 +48,28 @@
                     <div class="col-md-12">
                         <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
                               class="validation-form">
+                            <!--                            --><? //= $data['form_token']; ?>
+
                             <div class="row">
+                                <div class="col-lg-3 col-sm-6">
+                                    <div class="thumbnail">
+                                        <div class="thumb">
+                                            <img src="assets/images/placeholder.jpg" alt="">
+                                            <div class="caption-overflow">
+										<span>
+											<a href="<?= base_url(); ?>admin/user/userProfile"
+                                               class="btn border-white text-white btn-flat btn-icon btn-rounded ml-5"><i
+                                                        class="icon-link2"></i></a>
+										</span>
+                                            </div>
+                                        </div>
+                                        <div class="caption">
+                                            <a href="<?= base_url(); ?>admin/user/userProfile"
+                                                                     class="text-default">اسم کاربر لینک
+                                                    اینجا</a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">
@@ -56,6 +82,28 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
+                                            <!--                                            --><?php //if (isset($data['errors']) && count($data['errors'])): ?>
+                                            <!--                                                <div class="alert alert-danger">-->
+                                            <!--                                                    <ul>-->
+                                            <!--                                                        --><?php //foreach ($data['errors'] as $err): ?>
+                                            <!--                                                            <li>-->
+                                            <? //= $err; ?><!--</li>-->
+                                            <!--                                                        --><?php //endforeach; ?>
+                                            <!--                                                    </ul>-->
+                                            <!--                                                </div>-->
+                                            <!--                                            --><?php //elseif (isset($data['success'])): ?>
+                                            <!--                                                <div class="alert alert-success">-->
+                                            <!--                                                    <p>-->
+                                            <!--                                                        --><? //= $data['success']; ?>
+                                            <!--                                                    </p>-->
+                                            <!--                                                </div>-->
+                                            <!--                                            --><?php //endif; ?>
+                                            <!--                                            <div class="alert alert-info alert-styled-left alert-bordered">-->
+                                            <!--                                                <p>-->
+                                            <!--                                                    <i class="icon-dash"></i>-->
+                                            <!--                                                    در صورت عدم تغییر رمز عبور، این مقدار تغییر نخواهد کرد.-->
+                                            <!--                                                </p>-->
+                                            <!--                                            </div>-->
                                             <div class="form-group col-lg-4">
                                                 <label>بازاریاب معرف:</label>
                                                 <select class="select"
@@ -64,26 +112,13 @@
                                                     <option value="1">پر کردن دیتا</option>
                                                 </select>
                                             </div>
-                                            <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>رمز عبور:</label>
-                                                <input name="password" type="text"
-                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
-                                            </div>
-                                            <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>تکرار رمز عبور:</label>
-                                                <input name="re_password" type="text"
-                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
-                                            </div>
 
+                                            <div class="col-xs-12"></div>
                                             <div class="form-group col-lg-4">
                                                 <label>کد ملی:</label>
-                                                <input name="n_code" type="text"
+                                                <input name="n_code" type="text" disabled
                                                        class="form-control" placeholder="غیرقابل تغییر"
-                                                       value="">
+                                                       value="" disabled="disabled">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>نام:</label>
