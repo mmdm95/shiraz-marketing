@@ -11,7 +11,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
         <div class="text-center">
             <div class="box-header-simple">
                 <h1>
-                    فراموشی کلمه عبور
+                    فعالسازی حساب کاربری
                 </h1>
             </div>
         </div>
