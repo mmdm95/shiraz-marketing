@@ -11,17 +11,10 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="card-gap"></div>
-                <div class="box">
-                    <div class="box-header-simple text-center">
-                        <div class="huge-icon">
-                            <i class="la la-user-plus" aria-hidden="true"></i>
-                        </div>
-                        <h5>
-                            ثبت نام در شیراز مارکتینگ
-                            <small class="text-secondary d-block mt-3 font-size-14px">
-                                حساب کاربری جدید
-                            </small>
-                        </h5>
+                <div class="box overflow-hidden">
+                    <div class="box-header bg-success text-white">
+                        <i class="la la-user-plus" aria-hidden="true"></i>
+                        ثبت نام در شیراز مارکتینگ
                     </div>
                     <div class="box-body">
                         <form action="<?= base_url('login'); ?>" method="post">
@@ -54,34 +47,40 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                 </label>
                                 <div class="clearfix"></div>
                                 <div class="main-input__wrapper">
-                                    <input type="text" id="r-password" class="form-control" name="password"
+                                    <input type="password" id="r-password" class="form-control" name="password"
                                            placeholder="کلمه عبور">
                                     <span class="input-icon right">
-                                    <i class="la la-lock"></i>
-                                </span>
-                                    <span class="input-icon left clear-icon">
-                                    <i class="la la-times"></i>
-                                </span>
+                                        <i class="la la-lock"></i>
+                                    </span>
+                                    <span class="input-icon left-far clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                    <span class="input-icon left password-icon">
+                                        <i class="la la-eye"></i>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="r-rePassword" class="d-inline-block">
                                     تکرار کلمه عبور
                                     <span class="text-danger">
-                                    (اجباری)
-                                </span>
+                                        (اجباری)
+                                    </span>
                                     :
                                 </label>
                                 <div class="clearfix"></div>
                                 <div class="main-input__wrapper">
-                                    <input type="text" id="r-rePassword" class="form-control" name="re_password"
+                                    <input type="password" id="r-rePassword" class="form-control" name="re_password"
                                            placeholder="تکرار کلمه عبور">
                                     <span class="input-icon right">
-                                    <i class="la la-lock"></i>
-                                </span>
-                                    <span class="input-icon left clear-icon">
-                                    <i class="la la-times"></i>
-                                </span>
+                                        <i class="la la-lock"></i>
+                                    </span>
+                                    <span class="input-icon left-far clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                    <span class="input-icon left password-icon">
+                                        <i class="la la-eye"></i>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group text-center">

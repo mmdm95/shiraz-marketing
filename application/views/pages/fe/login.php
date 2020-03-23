@@ -11,17 +11,10 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="card-gap"></div>
-                <div class="box">
-                    <div class="box-header-simple text-center">
-                        <div class="huge-icon">
-                            <i class="la la-user" aria-hidden="true"></i>
-                        </div>
-                        <h5>
-                            ورود به پنل کاربری
-                            <small class="text-secondary d-block mt-3 font-size-14px">
-                                نام کاربری و کلمه عبور را وارد کنید
-                            </small>
-                        </h5>
+                <div class="box overflow-hidden">
+                    <div class="box-header bg-info text-white">
+                        <i class="la la-user" aria-hidden="true"></i>
+                        ورود به پنل کاربری
                     </div>
                     <div class="box-body">
                         <form action="<?= base_url('login'); ?>" method="post">
@@ -29,19 +22,19 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                 <label for="l-username">
                                     نام کاربری
                                     <span class="text-danger">
-                                    (اجباری)
-                                </span>
+                                       (اجباری)
+                                    </span>
                                     :
                                 </label>
                                 <div class="main-input__wrapper">
                                     <input type="text" id="l-username" class="form-control" name="username"
                                            placeholder="نام کاربری">
                                     <span class="input-icon right">
-                                    <i class="la la-user"></i>
-                                </span>
+                                        <i class="la la-user"></i>
+                                    </span>
                                     <span class="input-icon left clear-icon">
-                                    <i class="la la-times"></i>
-                                </span>
+                                        <i class="la la-times"></i>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -58,14 +51,17 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                     </a>
                                 </div>
                                 <div class="main-input__wrapper">
-                                    <input type="text" id="l-password" class="form-control" name="password"
+                                    <input type="password" id="l-password" class="form-control" name="password"
                                            placeholder="کلمه عبور">
                                     <span class="input-icon right">
-                                    <i class="la la-lock"></i>
-                                </span>
-                                    <span class="input-icon left clear-icon">
-                                    <i class="la la-times"></i>
-                                </span>
+                                        <i class="la la-lock"></i>
+                                    </span>
+                                    <span class="input-icon left-far clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                    <span class="input-icon left password-icon">
+                                        <i class="la la-eye"></i>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -95,7 +91,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                 </div>
                             </div>
                             <div class="text-left">
-                                <button type="submit" class="btn btn-primary-main">
+                                <button type="submit" class="btn btn-info">
                                     ورود به پنل
                                     <i class="la la-angle-left float-left font-size-21px mr-3" aria-hidden="true"></i>
                                 </button>

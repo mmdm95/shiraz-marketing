@@ -62,18 +62,18 @@ class HomeController extends AbstractController
 
     public function pagesAction($param)
     {
-        $model = new Model();
-
-        if(!isset($param[0]) || !$model->is_exist('static_pages', 'url_name=:url', ['url' => $param[0]])) {
-            $_SESSION['home-static-page'] = 'صفحه درخواست شده وجود ندارد!';
-            $this->redirect(base_url('index'));
-        }
+//        $model = new Model();
+//
+//        if(!isset($param[0]) || !$model->is_exist('static_pages', 'url_name=:url', ['url' => $param[0]])) {
+//            $_SESSION['home-static-page'] = 'صفحه درخواست شده وجود ندارد!';
+//            $this->redirect(base_url('index'));
+//        }
         //-----
-        $this->data['param'] = $param;
-        $this->data['page'] = $model->select_it(null, 'static_pages', ['title', 'body'], 'url_name=:url', ['url' => $param[0]])[0];
+//        $this->data['param'] = $param;
+//        $this->data['page'] = $model->select_it(null, 'static_pages', ['title', 'body'], 'url_name=:url', ['url' => $param[0]])[0];
         //-----
 
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), $this->data['page']['title']);
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), $this->data['page']['title'] ?? '');
 
         $this->_render_page('pages/fe/page-static');
     }

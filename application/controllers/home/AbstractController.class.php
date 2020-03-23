@@ -1,4 +1,5 @@
 <?php
+
 namespace Home\AbstractController;
 
 defined('BASE_PATH') OR exit('No direct script access allowed');
@@ -22,10 +23,17 @@ abstract class AbstractController extends AbstractPaymentController
         parent::__construct();
 
         $this->load->library('HAuthentication/Auth');
+//        try {
+//            $this->auth = new Auth();
+//            $_SESSION['home_panel_namespace'] = 'home_hva_ms_rhm_7472';
+//            $this->auth->setNamespace($_SESSION['home_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
+//        } catch (HAException $e) {
+//            echo $e;
+//        }
         try {
             $this->auth = new Auth();
-            $_SESSION['home_panel_namespace'] = 'home_hva_ms_rhm_7472';
-            $this->auth->setNamespace($_SESSION['home_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
+            $_SESSION['admin_panel_namespace'] = 'admin_hva_ms_rhm_7472';
+            $this->auth->setNamespace($_SESSION['admin_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
         } catch (HAException $e) {
             echo $e;
         }
@@ -80,6 +88,26 @@ abstract class AbstractController extends AbstractPaymentController
         } else {
             $this->error->show_404();
         }
+    }
+
+    //-----
+
+    public function forgetPasswordAction($param)
+    {
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فراموشی کلمه عبور');
+
+        $this->_render_page([
+            'pages/fe/forget-password',
+        ]);
+    }
+
+    public function activationAction($param)
+    {
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فعالسازی اکانت کاربری');
+
+        $this->_render_page([
+            'pages/fe/activation',
+        ]);
     }
 
     //-------------------------------

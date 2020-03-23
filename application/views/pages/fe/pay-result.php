@@ -63,7 +63,6 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     در صورت کسر شدن مبلغ از حساب شما و عدم بازگشت تا ۷۲ ساعت، به بانک خود مراجعه کنید.
                 </p>
             </div>
-
         </div>
 
         <div class="alert alert-success shadow">
@@ -89,7 +88,6 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     بازگشت به صفحه اصلی
                 </a>
             </div>
-
         </div>
     </div>
 </main>

@@ -539,7 +539,6 @@
         // Clear text from form-control
         var triggerClearInputIcon = function (selector) {
             var clearIcon = $(selector).parent().find('.clear-icon');
-            console.log(clearIcon);
             if (clearIcon.length) {
                 if ($(selector).val().trim() !== '') {
                     clearIcon.addClass('show');
@@ -556,6 +555,22 @@
         $('.clear-icon').on('click.' + namespc, function () {
             var formControl = $(this).parent().find('.form-control');
             formControl.val('').focus();
+        });
+
+        // Password show from form-control
+        $('.password-icon').on('click.' + namespc, function () {
+            var formControl, type, $this;
+            formControl = $(this).parent().find('.form-control');
+            type = formControl.attr('type');
+            $this = $(this);
+            if (type === 'text') {
+                $this.removeClass('text-primary');
+                formControl.attr('type', 'password');
+            } else {
+                $this.addClass('text-primary');
+                formControl.attr('type', 'text');
+            }
+            formControl.focus();
         });
     });
 })(jQuery);

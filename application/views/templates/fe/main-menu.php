@@ -147,13 +147,5 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                 </div>
             </div>
         </div>
-        <div class="row sms-number-container">
-            <div class="col-12 py-2">
-                <span class="text-white">
-                    شماره پیامک:
-                    ۰۹۱۳۹۵۱۸۰۵۵
-                </span>
-            </div>
-        </div>
     </div>
 </header>
