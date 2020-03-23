@@ -4,6 +4,8 @@ namespace Home\AbstractController;
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use AbstractPaymentController;
+use CommonModel;
+use CookieModel;
 use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
@@ -48,7 +50,25 @@ abstract class AbstractController extends AbstractPaymentController
         }
     }
 
-    public function logout()
+    public function loginAction()
+    {
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ورود');
+
+        $this->_render_page([
+            'pages/fe/login',
+        ]);
+    }
+
+    public function registerAction()
+    {
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ثبت نام');
+
+        $this->_render_page([
+            'pages/fe/register',
+        ]);
+    }
+
+    public function logoutAction()
     {
         if ($this->auth->isLoggedIn()) {
             $this->auth->logout();

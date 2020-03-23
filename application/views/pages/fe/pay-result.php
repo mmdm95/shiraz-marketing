@@ -6,7 +6,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 <?php $this->view('templates/fe/main-nav', $data); ?>
 <?php $this->view('templates/fe/main-nav-mobile', $data); ?>
 
-<main class="main-container page-cart">
+<main class="main-container page-pay-result">
     <div class="container">
         <div class="text-center">
             <div class="box-header-simple">

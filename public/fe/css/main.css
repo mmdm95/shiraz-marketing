@@ -202,18 +202,38 @@ a {
     overflow: visible !important;
 }
 
+.font-size-14px {
+    font-size: 14px;
+}
+
 .font-size-21px {
     font-size: 21px;
 }
 
-.font-size-14px {
-    font-size: 14px;
+.font-size-48px {
+    font-size: 48px;
 }
 
 .img-40px-40px {
     width: 40px;
     height: 40px;
     object-fit: cover;
+}
+
+.huge-icon {
+    text-align: center;
+}
+
+.huge-icon > i {
+    display: block;
+    margin: 0 auto 2rem;
+    width: 120px;
+    height: 120px;
+    background-color: var(--light);
+    color: var(--secondary);
+    font-size: 66px;
+    border-radius: 50rem;
+    padding: 25px 0;
 }
 
 /****************************************
