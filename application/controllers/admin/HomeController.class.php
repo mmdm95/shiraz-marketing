@@ -19,9 +19,9 @@ class HomeController extends AbstractController
 {
     public function indexAction()
     {
-//        if (!$this->auth->isLoggedIn()) {
-//            $this->redirect(base_url('admin/login'));
-//        }
+        if (!$this->auth->isLoggedIn()) {
+            $this->redirect(base_url('admin/login'));
+        }
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
