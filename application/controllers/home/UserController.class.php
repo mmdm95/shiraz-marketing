@@ -156,4 +156,23 @@ class UserController extends AbstractController
 
         return true;
     }
+
+    //-----
+
+    protected function _render_page($pages, $loadHeaderAndFooter = true)
+    {
+        if ($loadHeaderAndFooter) {
+            $this->load->view('templates/fe/user/admin-header-part', $this->data);
+            $this->load->view('templates/fe/user/admin-js-part', $this->data);
+        }
+
+        $allPages = is_string($pages) ? [$pages] : (is_array($pages) ? $pages : []);
+        foreach ($allPages as $page) {
+            $this->load->view($page, $this->data);
+        }
+
+        if ($loadHeaderAndFooter) {
+            $this->load->view('templates/fe/user/admin-footer-part', $this->data);
+        }
+    }
 }
