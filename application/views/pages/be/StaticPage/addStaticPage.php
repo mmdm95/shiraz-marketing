@@ -50,7 +50,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <form action="<?= base_url(); ?>admin/addStaticPage" method="post">
-                            <?= $data['form_token']; ?>
+<!--                            --><?//= $data['form_token']; ?>
 
                             <div class="row">
                                 <div class="col-md-9">

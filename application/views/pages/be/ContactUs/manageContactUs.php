@@ -69,33 +69,28 @@
                                                 </thead>
                                                 <tbody>
                                                 <!-- Load categories data -->
-                                                <?php foreach ($cusVals as $key => $contact): ?>
                                                     <tr>
                                                         <td width="50px">
-                                                            <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
-                                                            <?= $contact['full_name']; ?>
                                                         </td>
                                                         <td>
-                                                            <?= $contact['subject']; ?>
                                                         </td>
                                                         <td>
-                                                            <?= jDateTime::date('Y/m/d - H:i', $contact['sent_at']); ?>
                                                         </td>
                                                         <td>
-                                                            <?php if ($contact['status'] == 1): ?>
+<!--                                                            --><?php //if ($contact['status'] == 1): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-info">مشاهده شده</span>
-                                                            <?php else: ?>
+<!--                                                            --><?php //else: ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-danger">مشاهده نشده</span>
-                                                            <?php endif; ?>
+<!--                                                            --><?php //endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-black">
-                                                                    <a href="<?= base_url('admin/viewContact/' . $contact['id']); ?>"
+                                                                    <a href="<?= base_url(); ?>/admin/viewContact/"
                                                                        title="مشاهده" data-popup="tooltip">
                                                                         <i class="icon-eye"></i>
                                                                     </a>
@@ -104,14 +99,13 @@
                                                                     <a class="deleteContactBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="<?= $contact['id']; ?>">
+                                                                               value="">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
-                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

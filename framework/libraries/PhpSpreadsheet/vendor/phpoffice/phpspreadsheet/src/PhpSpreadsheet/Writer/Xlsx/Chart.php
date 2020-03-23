@@ -387,7 +387,7 @@ class Chart extends WriterPart
     }
 
     /**
-     * Write Category Axis.
+     * Write BlogCategory Axis.
      *
      * @param XMLWriter $objWriter XML Writer
      * @param Title $xAxisLabel
@@ -1195,7 +1195,7 @@ class Chart extends WriterPart
                 $objWriter->endElement();
             }
 
-            //    Category Labels
+            //    BlogCategory Labels
             $plotSeriesCategory = $plotGroup->getPlotCategoryByIndex($plotSeriesRef);
             if ($plotSeriesCategory && ($plotSeriesCategory->getPointCount() > 0)) {
                 $catIsMultiLevelSeries = $catIsMultiLevelSeries || $plotSeriesCategory->isMultiLevelSeries();

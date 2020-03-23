@@ -35,7 +35,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url(); ?>admin/manageBlog">
+                            <a href="<?= base_url(); ?>admin/blog/manageBlog">
                                 نوشته‌ها
                             </a>
                         </li>
@@ -51,8 +51,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/addBlog" method="post">
-                            <?= $data['form_token']; ?>
+                        <form action="<?= base_url(); ?>admin/blog/addBlog" method="post">
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -94,17 +93,17 @@
                                                      style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
                                                     <input class="image-file" type="hidden"
                                                            name="image"
-                                                           value="<?= set_value($atcVals['image'] ?? ''); ?>">
+                                                           value="">
                                                     <div class="media stack-media-on-mobile">
                                                         <div class="media-left">
                                                             <div class="thumb">
                                                                 <a class="display-inline-block"
                                                                    style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
                                                                     <img
-                                                                            src="<?= set_value($atcVals['image'] ?? '', '', base_url($atcVals['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
-                                                                            class="img-rounded" alt=""
-                                                                            style="width: 100px; height: 100px; object-fit: contain;"
-                                                                            data-base-url="<?= base_url(); ?>">
+                                                                         src=""
+                                                                         class="img-rounded" alt=""
+                                                                         style="width: 100px; height: 100px; object-fit: contain;"
+                                                                         data-base-url="">
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -115,7 +114,7 @@
                                                                     انتخاب تصویر شاخص:
                                                                 </a>
                                                                 <a class="io-image-name display-block">
-                                                                    <?= basename(set_value($atcVals['image'] ?? '')); ?>
+
                                                                 </a>
                                                             </h6>
                                                         </div>
@@ -132,13 +131,10 @@
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>دسته‌بندی:</label>
-                                                <select class="select-rtl" name="category">
-                                                    <?php foreach ($categories as $key => $category): ?>
-                                                        <option value="<?= $category['id']; ?>"
-                                                            <?= set_value($atcVals['category'] ?? '', $category['id'], 'selected', '', '=='); ?>>
-                                                            <?= $category['category_name']; ?>
+                                                <select class="select-rtl" name="category_id">
+                                                        <option value=""
                                                         </option>
-                                                    <?php endforeach; ?>
+
                                                 </select>
                                             </div>
                                             <div class="form-group col-lg-12">
@@ -147,7 +143,7 @@
                                                 <textarea rows="5" cols="12" class="form-control"
                                                           name="abstract"
                                                           style="min-height: 100px; resize: vertical;"
-                                                          placeholder="خلاصه"><?= $atcVals['abstract'] ?? ''; ?></textarea>
+                                                          placeholder="خلاصه"></textarea>
                                             </div>
                                             <div class="form-group col-lg-12">
                                                 <span class="text-danger">*</span>
@@ -175,7 +171,7 @@
                                             </div>
 
                                             <div class="text-right col-md-12 mt-20">
-                                                <a href="<?= base_url('admin/manageBlog'); ?>"
+                                                <a href="<?= base_url('admin/blog/manageBlog'); ?>"
                                                    class="btn btn-default mr-5">
                                                     بازگشت
                                                 </a>

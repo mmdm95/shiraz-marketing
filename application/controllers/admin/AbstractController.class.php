@@ -1,15 +1,14 @@
 <?php
-
 namespace Admin\AbstractController;
 
+defined('BASE_PATH') OR exit('No direct script access allowed');
+
 use AbstractPaymentController;
+use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
 use Model;
-
-defined('BASE_PATH') OR exit('No direct script access allowed');
-
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 
@@ -44,13 +43,14 @@ abstract class AbstractController extends AbstractPaymentController
 
 //        $model = new Model();
 //        $model->insert_it('users', [
-//            'username' => 'godheeva@gmail.com',
+//            'mobile' => '09139518055',
 //            'password' => password_hash('m9516271', PASSWORD_DEFAULT),
 //            'ip_address' => get_client_ip_server(),
 //            'email' => 'saeedgerami72@gmail.com',
-//            'created_on' => time(),
+//            'created_at' => time(),
 //            'active' => '1',
-//            'full_name' => 'سعید گرامی فر',
+//            'first_name' => 'سعید',
+//            'last_name' => 'گرامی فر',
 //            'image' => 'user-default.png',
 //            'n_code' => '4420440392',
 //        ]);

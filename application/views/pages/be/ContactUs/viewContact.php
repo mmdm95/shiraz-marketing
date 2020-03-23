@@ -55,7 +55,7 @@
                                             <a id="delContactBtn"
                                                class="btn btn-default btn-rounded heading-btn-group border-danger-600 text-danger-600 p-10"
                                                title="حذف" data-popup="tooltip">
-                                                <input type="hidden" value="<?= $cusVals['id']; ?>">
+                                                <input type="hidden" value="">
                                                 <i class="icon-trash" aria-hidden="true"></i>
                                             </a>
                                         </div>
@@ -69,12 +69,10 @@
                                                        style="width: 45px; height: 45px; font-size: 24px;"></i>
                                                     <a href="" class="display-inline-block">
                                                         <div>
-                                                            <?= $cusVals['full_name']; ?>
                                                         </div>
                                                     </a>
                                                     <span class="text-muted text-small display-inline-block">
                                                         <i class="icon-dash" aria-hidden="true"></i>
-                                                        <?= jDateTime::date('j F Y', $cusVals['sent_at']); ?>
                                                     </span>
                                                 </h5>
                                                 <h6>
@@ -84,20 +82,17 @@
                                                         شماره سفارش:
                                                     </small>
                                                     <span class="text-bold text-primary">
-                                                        <?= convertNumbersToPersian($cusVals['order_code']) ?: "<i class='icon-dash text-danger'></i>"; ?>
                                                     </span>
                                                 </h6>
                                             </div>
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="col-lg-12 alert-info p-15">
-                                                    <?= $cusVals['subject'] ?>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="col-lg-12 jumbotron pr-20 pl-20">
                                                     <p class="text-black text-light"
                                                        style="font-size: 15px; line-height: 26px;">
-                                                        <?= nl2br($cusVals['body']); ?>
                                                     </p>
                                                 </div>
                                             </div>

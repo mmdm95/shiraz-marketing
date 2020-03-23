@@ -577,7 +577,7 @@ class Xls extends BaseWriter
         ];
         ++$dataSection_NumProps;
 
-        // GKPIDDSI_CATEGORY : Category
+        // GKPIDDSI_CATEGORY : BlogCategory
         if ($this->spreadsheet->getProperties()->getCategory()) {
             $dataProp = $this->spreadsheet->getProperties()->getCategory();
             $dataSection[] = [

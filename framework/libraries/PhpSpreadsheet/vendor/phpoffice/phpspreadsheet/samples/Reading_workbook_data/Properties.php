@@ -52,7 +52,7 @@ $helper->log('<b>Keywords: </b>' . $keywords);
 
 // Read the workbook category property
 $category = $spreadsheet->getProperties()->getCategory();
-$helper->log('<b>Category: </b>' . $category);
+$helper->log('<b>BlogCategory: </b>' . $category);
 
 // Read the workbook company property
 $company = $spreadsheet->getProperties()->getCompany();
