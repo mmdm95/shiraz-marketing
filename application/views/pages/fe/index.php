@@ -8,6 +8,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 
 <main class="main-container">
     <div class="container">
+        <div class="card-gap"></div>
         <div class="row">
             <div class="col-12">
                 <div class="box">
@@ -48,6 +49,9 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
         <div class="row">
             <div class="card-wrapper col-lg-4 col-md-6 col-12">
                 <div class="card">
+                    <div class="off-label">
+                        ویژه
+                    </div>
                     <div class="card-img">
                         <div class="img-placeholder">
                             <i class="la la-image" aria-hidden="true"></i>
@@ -89,6 +93,9 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
             </div>
             <div class="card-wrapper col-lg-4 col-md-6 col-12">
                 <div class="card">
+                    <div class="off-label">
+                        ویژه
+                    </div>
                     <div class="card-img">
                         <div class="img-placeholder">
                             <i class="la la-image" aria-hidden="true"></i>

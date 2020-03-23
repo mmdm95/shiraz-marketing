@@ -4,9 +4,11 @@ namespace Home\AbstractController;
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use AbstractPaymentController;
+use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use Model;
 
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
@@ -244,26 +246,26 @@ abstract class AbstractController extends AbstractPaymentController
     public function cartAction()
     {
         // Check cart and cart items
-        $cartItems = $this->_fetch_cart_items();
-        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
-        $this->data['items'] = $cartItems['items'];
+//        $cartItems = $this->_fetch_cart_items();
+//        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
+//        $this->data['items'] = $cartItems['items'];
 
 //        var_dump();
         //-----
-        $this->data['totalAmount'] = 0;
-        $this->data['totalDiscountedAmount'] = 0;
-        foreach ($this->data['items'] as $item) {
-            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
-            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
-        }
+//        $this->data['totalAmount'] = 0;
+//        $this->data['totalDiscountedAmount'] = 0;
+//        foreach ($this->data['items'] as $item) {
+//            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
+//            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
+//        }
 
-        $this->data['cart_content'] = $this->load->view('templates/fe/cart/main-cart', $this->data, true);
+//        $this->data['cart_content'] = $this->load->view('templates/fe/cart/main-cart', $this->data, true);
 
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'سبد خرید');
 
         // Extra js
-        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
 
         $this->_render_page(['pages/fe/cart']);
     }

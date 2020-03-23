@@ -342,15 +342,74 @@
             navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
         });
 
-        // logo carousel
-        $(".news-carousel").owlCarousel({
-            items: 3,
-            nav: false,
+        // testimonial-carousel
+        $(".thumbnail-slider-carousel").owlCarousel({
+            items: 1,
             dots: false,
-            margin: 100,
+            nav: true,
+            loop: true,
+            autoplay: true,
+            autoplayTimeout: 10000,
+            autoplayHoverPause: true,
+            rtl: true,
+            navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
+        });
+
+        // testimonial-carousel
+        $(".owl-thumb").owlCarousel({
+            dots: false,
+            nav: false,
+            rtl: true,
+            autoWidth: true,
+            margin: 13,
+        });
+
+        // Owl carousel thumb activation
+        var changeActiveThumb = function (thumb, owl, event) {
+            var items = event.item.count;     // Number of items
+            var item = event.item.index - 1;     // Position of the current item
+            // it loop is true then reset counter from 1
+            if (item > items) {
+                item = item - items
+            } else if (item < 1) {
+                item = items;
+            }
+            var thumbItems = thumb.data('owl.carousel')._items;
+            $(thumbItems).each(function () {
+                $(this).find('img').removeClass('active');
+            });
+            $(thumbItems[item - 1]).find('img').addClass('active');
+        };
+
+        $('[data-owl-carousel-thumb-id]').each(function () {
+            var $this, carousel;
+            $this = $(this);
+            carousel = $('#' + $this.data('owl-carousel-thumb-id'));
+            carousel.on('changed.owl.carousel', function (event) {
+                changeActiveThumb($this, carousel, event);
+            });
+        });
+        var thumbImages = $('.owl-thumb-image');
+        thumbImages.on('click.' + namespc, function () {
+            var $this, thumbs, carousel;
+            $this = $(this);
+            thumbs = $this.closest('[data-owl-carousel-thumb-id]');
+            carousel = $('#' + thumbs.data('owl-carousel-thumb-id'));
+            thumbImages.removeClass('active');
+            $this.addClass('active');
+            carousel.data('owl.carousel').to($this.closest('.owl-item').index());
+        });
+
+        // logo carousel
+        $(".similar-items").owlCarousel({
+            items: 3,
+            nav: true,
+            dots: false,
+            rtl: true,
+            margin: 25,
             responsive: {
                 0: {
-                    items: 2
+                    items: 1
                 },
                 575: {
                     items: 2
@@ -359,9 +418,10 @@
                     items: 2
                 },
                 991: {
-                    items: 3
+                    items: 4
                 }
-            }
+            },
+            navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
         });
 
         // footer namad carousel

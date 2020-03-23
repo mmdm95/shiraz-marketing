@@ -677,6 +677,13 @@ if (!function_exists('base_url')) {
     }
 }
 
+if (!function_exists('app_version')) {
+    function app_version()
+    {
+        return APP_VERSION ?? '0.0.1';
+    }
+}
+
 if (!function_exists('dir_entries')) {
     function dir_entries($path)
     {

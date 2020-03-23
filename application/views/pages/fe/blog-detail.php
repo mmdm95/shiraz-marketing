@@ -6,7 +6,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 <?php $this->view('templates/fe/main-nav', $data); ?>
 <?php $this->view('templates/fe/main-nav-mobile', $data); ?>
 
-<main class="main-container">
+<main class="main-container page-blog-detail">
     <div class="container">
         <div class="card-gap"></div>
         <nav class="page-breadcrumb" aria-label="breadcrumb">
@@ -21,7 +21,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
         </nav>
     </div>
 
-    <div class="container page-blog-detail">
+    <div class="container">
         <div class="row">
             <div class="col-lg-8">
                 <div class="box overflow-hidden">

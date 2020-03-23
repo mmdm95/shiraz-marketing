@@ -4,19 +4,21 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 
 <!-- inject:js-->
 <!-- select2 Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/select2.full.min.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/select2.full.min.js?<?= app_version(); ?>"></script>
 <!-- iziToast Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/iziToast.min.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/iziToast.min.js?<?= app_version(); ?>"></script>
 <!-- mCustomScrollbar Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.mCustomScrollbar.concat.min.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.mCustomScrollbar.concat.min.js?<?= app_version(); ?>"></script>
 <!-- off-canvas Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.js?<?= app_version(); ?>"></script>
 <!-- owl-carousel Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/owl.carousel.min.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/owl.carousel.min.js?<?= app_version(); ?>"></script>
 <!-- jquery.sticky Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.sticky.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.sticky.js?<?= app_version(); ?>"></script>
+<!-- countdown Js -->
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/countdown.min.js?<?= app_version(); ?>"></script>
 <!-- main Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/main.js"></script>
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/main.js?<?= app_version(); ?>"></script>
 <!-- endinject-->
 
 <!-- plugins:js -->

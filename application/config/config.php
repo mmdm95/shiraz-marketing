@@ -1,6 +1,11 @@
 <?php
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
+// App version
+defined('APP_VERSION') OR define('APP_VERSION', '0.0.1');
+
+//===============================================
+
 /** Default page configuration ... */
 
 // DEF_PLATFORM = folder of home page
@@ -43,6 +48,7 @@ defined('SEND_METHOD_EMAIL') OR define('SEND_METHOD_EMAIL', 2);
 defined('PAYMENT_METHOD_WALLET') OR define('PAYMENT_METHOD_WALLET', 1);
 defined('PAYMENT_METHOD_GATEWAY') OR define('PAYMENT_METHOD_GATEWAY', 2);
 defined('PAYMENT_METHOD_IN_PLACE') OR define('PAYMENT_METHOD_IN_PLACE', 3);
+defined('PAYMENT_METHOD_RECEIPT') OR define('PAYMENT_METHOD_RECEIPT', 4);
 
 // ُ Factor exportation type
 defined('FACTOR_EXPORTATION_TYPE_BUY') OR define('FACTOR_EXPORTATION_TYPE_BUY', 1);

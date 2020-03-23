@@ -5,12 +5,12 @@ class Asset
 {
     public function script($path)
     {
-        return "<script src='" . asset_url($path) . "' type='text/javascript'></script>";
+        return "<script src='" . asset_url($path) . "?" .app_version() . "' type='text/javascript'></script>";
     }
 
     public function css($path)
     {
-        return "<link href='" . asset_url($path) . "' rel='stylesheet'>";
+        return "<link href='" . asset_url($path) . "?" .app_version() . "' rel='stylesheet'>";
     }
 
     public function remoteScript($path)

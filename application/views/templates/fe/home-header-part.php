@@ -16,14 +16,14 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
     <title><?= $title ?? ''; ?></title>
 
     <!-- inject:css -->
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/bootstrap.min.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/fontawesome.min.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/line-awesome.min.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/jquery.mCustomScrollbar.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/js-offcanvas.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/select2.css">
-    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/main.css">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/bootstrap.min.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/fontawesome.min.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/line-awesome.min.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/jquery.mCustomScrollbar.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/js-offcanvas.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/owl.carousel.min.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/select2.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/main.css?<?= app_version(); ?>">
     <!-- endinject -->
 
     <!-- plugin css for this page -->
@@ -35,9 +35,9 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
     <!-- End plugin css for this page -->
 
     <!-- inject:js -->
-    <script src="<?= asset_url(); ?>fe/js/jquery-3.4.1.min.js"></script>
-    <script src="<?= asset_url(); ?>fe/js/popper.min.js"></script>
-    <script src="<?= asset_url(); ?>fe/js/bootstrap.min.js"></script>
+    <script src="<?= asset_url(); ?>fe/js/jquery-3.4.1.min.js?<?= app_version(); ?>"></script>
+    <script src="<?= asset_url(); ?>fe/js/popper.min.js?<?= app_version(); ?>"></script>
+    <script src="<?= asset_url(); ?>fe/js/bootstrap.min.js?<?= app_version(); ?>"></script>
     <!-- endinject -->
 </head>
 <body class="rtl-text">

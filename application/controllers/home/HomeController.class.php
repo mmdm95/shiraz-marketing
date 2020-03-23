@@ -27,6 +27,39 @@ class HomeController extends AbstractController
         ]);
     }
 
+    public function shoppingAction()
+    {
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اطلاعات ارسال');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+
+        $this->_render_page(['pages/fe/shopping']);
+    }
+
+    public function prepareToPayAction()
+    {
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'آماده پرداخت');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+
+        $this->_render_page(['pages/fe/payment']);
+    }
+
+    public function payResultAction()
+    {
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+
+        $this->_render_page(['pages/fe/pay-result']);
+    }
+
     public function pagesAction($param)
     {
         $model = new Model();
@@ -62,12 +95,29 @@ class HomeController extends AbstractController
 
     public function contactUsAction()
     {
-        $this->_contactSubmit();
+//        $this->_contactSubmit();
+
+        $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
+        $this->data['page_title'] = 'تماس با ما';
         //-----
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'سؤالات متداول');
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'تماس با ما');
 
         $this->_render_page([
             'pages/fe/contact',
+        ]);
+    }
+
+    public function complaintAction()
+    {
+//        $this->_contactSubmit();
+
+        $this->data['page_image'] = 'fe/images/tmp/pagesHeader.jpg';
+        $this->data['page_title'] = 'ثبت شکایت';
+        //-----
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ثبت شکایت');
+
+        $this->_render_page([
+            'pages/fe/complaint',
         ]);
     }
 

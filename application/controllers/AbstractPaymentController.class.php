@@ -42,19 +42,24 @@ abstract class AbstractPaymentController extends HController
     ];
 
     // Define all tables' name for convenient
+    // 23 table(s)
     const TBL_BLOG = 'blog';
     const TBL_BLOG_CATEGORY = 'blog_categories';
     const TBL_CATEGORY = 'categories';
+    const TBL_CITY = 'cities';
     const TBL_COMPLAINT = 'complaints';
     const TBL_CONTACT_US = 'contact_us';
     const TBL_FAQ = 'faq';
+    const TBL_ICON = 'icons';
     const TBL_MAIN_SLIDER = 'main_sliders';
     const TBL_ORDER = 'orders';
     const TBL_ORDER_ITEM = 'order_item';
     const TBL_ORDER_RESERVED = 'order_reserved';
-    const TBL_PAYMENT_RECEIPTS = 'payment_receipts';
     const TBL_PRODUCT = 'products';
+    const TBL_PRODUCT_GALLERY = 'product_gallery';
+    const TBL_PROVINCE = 'provinces';
     const TBL_RETURN_ORDER = 'return_order';
+    const TBL_SEND_STATUS = 'send_status';
     const TBL_STATIC_PAGES = 'static_pages';
     const TBL_USER = 'users';
     const TBL_USER_ACCOUNT = 'user_accounts';
