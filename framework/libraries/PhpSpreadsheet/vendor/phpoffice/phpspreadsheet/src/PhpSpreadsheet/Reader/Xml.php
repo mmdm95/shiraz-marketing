@@ -349,7 +349,7 @@ class Xml extends BaseReader
                         $docProps->setCompany(self::convertStringEncoding($propertyValue, $this->charSet));
 
                         break;
-                    case 'Category':
+                    case 'BlogCategory':
                         $docProps->setCategory(self::convertStringEncoding($propertyValue, $this->charSet));
 
                         break;

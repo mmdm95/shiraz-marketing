@@ -69,7 +69,7 @@ class Properties
     private $keywords = '';
 
     /**
-     * Category.
+     * BlogCategory.
      *
      * @var string
      */
@@ -320,7 +320,7 @@ class Properties
     }
 
     /**
-     * Get Category.
+     * Get BlogCategory.
      *
      * @return string
      */
@@ -330,7 +330,7 @@ class Properties
     }
 
     /**
-     * Set Category.
+     * Set BlogCategory.
      *
      * @param string $category
      *

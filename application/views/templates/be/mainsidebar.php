@@ -17,7 +17,7 @@
                     <div class="media-body">
                         <a href="<?= base_url() . 'admin/editUser/' . @$identity->id; ?>"
                            class="media-heading text-semibold">
-                            <?= set_value($identity->first_name ?? '', '', null, $identity->username); ?>
+                            <?= set_value($identity->first_name ?? '', '', null, $identity->mobile); ?>
                         </a>
                         <div class="text-size-mini text-muted">
                             <div class="text-size-mini text-muted">
@@ -50,82 +50,41 @@
                             <span>داشبورد</span>
                         </a>
                     </li>
-                    <?php if ($auth->isAllow('user', 2)): ?>
-                        <li>
-                            <a>
-                                <i class="icon-users4"></i>
-                                <span>کاربران</span>
-                            </a>
-                            <ul>
-                                <li>
-                                    <a href="<?= base_url(); ?>admin/manageUser">
-                                        <i class="icon-users" style="font-size: 13px;"></i>
-                                        <small>
-                                            مشاهده کاربران
-                                        </small>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    <?php endif; ?>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/user/addUser">
+                            <i class="icon-user-plus"></i>
+                            <span>افزودن کاربر</span>
+                        </a>
+                    </li>
                     <li>
                         <a>
-                            <i class="icon-user-block"></i>
-                            <span>
-                                بلاک لیست
-                            </span>
+                            <i class="icon-users4"></i>
+                            <span>کاربران</span>
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addBlockedUser">
-                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                <a href="<?= base_url(); ?>admin/user/manageUser">
+                                    <i class="icon-users" style="font-size: 13px;"></i>
                                     <small>
-                                        افزودن
+                                        مدیریت کاربران
                                     </small>
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageBlockedUser">
-                                    <i class="icon-blocked" style="font-size: 13px;"></i>
+                                <a href="<?= base_url(); ?>admin/user/manageMarketer">
+                                    <i class="icon-users" style="font-size: 13px;"></i>
                                     <small>
-                                        مشاهده
+                                        مدیریت بازاریابان
                                     </small>
                                 </a>
                             </li>
                         </ul>
                     </li>
+
                     <li>
-                        <a>
-                            <i class="icon-enter6"></i>
-                            <span>
-                                بازخورد
-                            </span>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/addFeedback">
-                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
-                                    <small>
-                                        افزودن
-                                    </small>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/manageFeedback">
-                                    <i class="icon-table2" style="font-size: 13px;"></i>
-                                    <small>
-                                        مشاهده
-                                    </small>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="<?= base_url(); ?>admin/manageNewsletter">
-                            <i class="icon-envelop5"></i>
-                            <span>
-                                خبرنامه
-                            </span>
+                        <a href="<?= base_url(); ?>admin/user/userUpgrade">
+                            <i class="icon-user-check"></i>
+                            <span>درخواست ارتقاء کاربران به بازاریاب</span>
                         </a>
                     </li>
                     <li class="navigation-header"><span>نوشته‌ها</span> <i class="icon-menu"></i></li>
@@ -138,7 +97,7 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addCategory">
+                                <a href="<?= base_url(); ?>admin/blog/addCategory">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
                                         افزودن دسته‌بندی
@@ -146,7 +105,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageCategory">
+                                <a href="<?= base_url(); ?>admin/blog/manageCategory">
                                     <i class="icon-table2" style="font-size: 13px;"></i>
                                     <small>
                                         مشاهده دسته‌بندی‌ها
@@ -164,7 +123,7 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addBlog">
+                                <a href="<?= base_url(); ?>admin/blog/addBlog">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
                                         افزودن نوشته
@@ -172,7 +131,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/manageBlog">
+                                <a href="<?= base_url(); ?>admin/blog/manageBlog">
                                     <i class="icon-pencil7" style="font-size: 13px;"></i>
                                     <small>
                                         مشاهده نوشته‌ها
@@ -207,102 +166,149 @@
                             </li>
                         </ul>
                     </li>
-                    <li>
-                        <a href="<?= base_url(); ?>admin/manageComment">
-                            <i class="icon-comment-discussion"></i>
-                            <span>
-                                نظرات
-                            </span>
-                        </a>
-                    </li>
-                    <li class="navigation-header"><span>اصلی</span> <i class="icon-menu"></i></li>
+                    <li class="navigation-header"><span>فروشگاه</span> <i class="icon-menu"></i></li>
                     <li>
                         <a>
-                            <i class="icon-map4"></i>
+                            <i class="icon-tree6"></i>
                             <span>
-                                مدیریت طرح
+                                دسته‌بندی
                             </span>
                         </a>
                         <ul>
                             <li>
-                                <a href="<?= base_url(); ?>admin/addPlan">
+                                <a href="<?= base_url(); ?>admin/shop/addCategory">
                                     <i class="icon-add-to-list" style="font-size: 13px;"></i>
                                     <small>
-                                        افزودن طرح
+                                        افزودن دسته‌بندی
                                     </small>
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= base_url(); ?>admin/managePlan">
+                                <a href="<?= base_url(); ?>admin/shop/manageCategory">
                                     <i class="icon-table2" style="font-size: 13px;"></i>
                                     <small>
-                                        مشاهده طرح‌ها
+                                        مشاهده دسته‌بندی‌ها
                                     </small>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="<?= base_url(); ?>admin/manageFactor">
-                            <i class="icon-list2"></i>
+                        <a>
+                            <i class="icon-basket"></i>
                             <span>
-                                مشاهده فاکتورها
+                                محصولات
                             </span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/shop/addProduct">
+                                    <i class="icon-plus2" style="font-size: 13px;"></i>
+                                    <small>
+                                        افزودن محصول
+                                    </small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/shop/manageProduct">
+                                    <i class="icon-table2" style="font-size: 13px;"></i>
+                                    <small>
+                                        مشاهده محصولات
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="<?= base_url(); ?>admin/shop/mangeOrders">
+                            <i class="icon-cart"></i>
+                            <span>مدیریت سفارشات</span>
                         </a>
                     </li>
                     <li>
-                        <a href="<?= base_url(); ?>admin/managePlanComment">
-                            <i class="icon-comment-discussion"></i>
-                            <span>
-                                نظرات
-                            </span>
+                        <a href="<?= base_url(); ?>admin/shop/manageReturnOrders">
+                            <i class="icon-cancel-circle2"></i>
+                            <span>سفارشات مرجوعی</span>
                         </a>
                     </li>
                     <!-- /main -->
-                    <!-- فرعی -->
+                    <!-- Report -->
+                    <li class="navigation-header"><span>گزارش‌ها</span> <i class="icon-menu"></i></li>
+                    <!-- Report -->
+                    <li>
+                        <a href="<?= base_url(); ?>admin/report/orderReport">
+                            <i class="icon-file-excel"></i>
+                            <span>چاپ گزارش</span>
+                        </a>
+                    </li>
+
                     <li class="navigation-header"><span>فرعی</span> <i class="icon-menu"></i></li>
                     <li>
                         <a>
-                            <i class="icon-link"></i>
-                            <span>
-                                لینک‌های مفید
-                            </span>
-                        </a>
-                        <ul>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/addUsefulLink">
-                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
-                                    <small>
-                                        افزودن لینک
-                                    </small>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="<?= base_url(); ?>admin/manageUsefulLink">
-                                    <i class="icon-table2" style="font-size: 13px;"></i>
-                                    <small>
-                                        مشاهده لینک‌ها
-                                    </small>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="<?= base_url(); ?>admin/manageFAQ">
                             <i class="icon-question3"></i>
                             <span>
                                 سؤالات متداول
                             </span>
                         </a>
+                        <ul>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/addFAQ">
+                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                    <small>
+                                        افزودن سؤال
+                                    </small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/manageFAQ">
+                                    <i class="icon-table2" style="font-size: 13px;"></i>
+                                    <small>
+                                        مشاهده سؤالات
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a>
+                            <i class="icon-images2"></i>
+                            <span>
+                                مدیریت اسلایدر
+                            </span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/addSlide">
+                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                    <small>
+                                        افزودن اسلاید
+                                    </small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/manageSlider">
+                                    <i class="icon-table2" style="font-size: 13px;"></i>
+                                    <small>
+                                        مشاهده اسلایدها
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li>
                         <a href="<?= base_url(); ?>admin/manageContactUs">
-                            <i class="icon-phone2"></i>
-                            <span>
-                                تماس با ما
-                            </span>
+                            <i class="icon-envelop"></i>
+                            <span>تماس با ما</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/manageComplaints">
+                            <i class="icon-balance"></i>
+                            <span>شکایات</span>
+                        </a>
+                    </li>
+
                     <li>
                         <a href="<?= base_url(); ?>admin/fileUpload">
                             <i class="icon-stack"></i>
@@ -311,7 +317,6 @@
                             </span>
                         </a>
                     </li>
-                    <?php if ($auth->isAllow('setting', 2)): ?>
                         <li>
                             <a href="<?= base_url(); ?>admin/setting">
                                 <i class="icon-cogs"></i>
@@ -320,7 +325,6 @@
                                 </span>
                             </a>
                         </li>
-                    <?php endif; ?>
                     <li>
                         <a href="<?= base_url(); ?>admin/logout">
                             <i class="icon-switch2"></i>

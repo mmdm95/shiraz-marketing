@@ -38,7 +38,7 @@
                                 نوشته‌های ثابت
                             </a>
                         </li>
-                        <li class="active">افزودن نوشته ثابت</li>
+                        <li class="active">ویرایش نوشته ثابت</li>
                     </ul>
 
                 </div>
@@ -50,8 +50,6 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editStaticPage/<?= $param[0]; ?>" method="post">
-                            <?= $data['form_token']; ?>
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -90,7 +88,7 @@
                                                 <label>عنوان نوشته:</label>
                                                 <input name="title" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="<?= set_value($spgVals['title'] ?? ''); ?>">
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-6">
                                                 <span class="text-danger">*</span>
@@ -99,7 +97,7 @@
                                                     <div class="col-xs-4">
                                                         <input name="url_name" type="text" class="form-control"
                                                                placeholder="اجباری"
-                                                               value="<?= set_value($spgVals['url_name'] ?? ''); ?>">
+                                                               value="">
                                                     </div>
                                                     <div class="col-xs-8 ltr mt-10">
                                                         <span class="text-muted border-bottom border-default display-block pb-5">
