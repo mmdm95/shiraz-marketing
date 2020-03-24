@@ -95,6 +95,12 @@
                                                                     <i class="icon-key"></i>
                                                                 </a>
                                                             </li>
+                                                            <li class="text-warning-800">
+                                                                <a href="<?= base_url(); ?>/admin/user/userDeposit"
+                                                                   title="کیف پول" data-popup="tooltip">
+                                                                    <i class="icon-wallet"></i>
+                                                                </a>
+                                                            </li>
                                                         </ul>
                                                         <ul class="icons-list mt-10">
                                                             <li class="text-primary-600 mr-5">

@@ -195,6 +195,32 @@
                     </li>
                     <li>
                         <a>
+                            <i class="icon-percent"></i>
+                            <span>
+                                کوپن تخفیف
+                            </span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/shop/addCoupon">
+                                    <i class="icon-add-to-list" style="font-size: 13px;"></i>
+                                    <small>
+                                        ایجاد کوپن
+                                    </small>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url(); ?>admin/shop/manageCoupon">
+                                    <i class="icon-table2" style="font-size: 13px;"></i>
+                                    <small>
+                                        مشاهده کوپن‌ها
+                                    </small>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a>
                             <i class="icon-basket"></i>
                             <span>
                                 محصولات

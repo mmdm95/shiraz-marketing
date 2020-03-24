@@ -60,6 +60,7 @@
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
+                                                    <th>تصویر دسته</th>
                                                     <th>آیکون</th>
                                                     <th>عنوان دسته‌بندی</th>
                                                     <th>وضعیت نمایش</th>
@@ -69,6 +70,9 @@
                                                 <tbody>
                                                 <!-- Load categories data -->
                                                     <tr>
+                                                        <td>
+
+                                                        </td>
                                                         <td>
 
                                                         </td>

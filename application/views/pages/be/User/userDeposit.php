@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مشاهده مشخصات کاربر</span>
+                                    class="text-semibold">مشاهده کیف پول کاربر</span>
                         </h5>
                     </div>
                 </div>
@@ -31,11 +31,11 @@
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url(); ?>admin/user/manageUser">
+                            <a href="<?= base_url(); ?>admin/user/userDeposit">
                                 مدیریت کاربران
                             </a>
                         </li>
-                        <li class="active">مشاهده کاربر</li>
+                        <li class="active">کیف پول</li>
                     </ul>
 
                 </div>
@@ -45,289 +45,94 @@
             <div class="content">
                 <!-- Centered forms -->
                 <div class="row">
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="thumbnail">
-                            <div class="thumb">
-                                <img src="assets/images/placeholder.jpg" alt="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-9 col-lg-9">
-                        <div class="panel panel-body border-top-primary text-left">
-                            <h6 class="no-margin text-semibold display-inline-block">
-                                ارتقاء
-                                <small class="text-muted content-group-sm display-block no-margin-bottom">
-                                    اگر کاربر پرچم تمام اطلاعاتش را تکمیل کرده دکمه ارتقا نمایش داده بشود. در غیر اینصورت پیام زیر به همراه دکمه تکمیل اطلاعات نمایش داده شود.
-                                </small>
-                            </h6>
-                            <a href="" type="button" class="btn btn-primary display-inline-block pull-right mt-5">
-                                <i class="icon-statistics position-left"></i>
-                                ارتقاء
-                            </a>
-                            <a href="<?= base_url() ?>admin/user/edituser" type="button" class="btn btn-warning display-inline-block pull-right mt-5">
-                                <i class="icon-database-edit2 position-left"></i>
-                                تکمیل اطلاعات کاربر
-                            </a>
-                        </div>
-                    </div>
                     <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">مشخصات فردی</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>بازاریاب معرف:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
+                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
+                              class="validation-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="panel panel-white">
+                                        <div class="panel-heading">
+                                            <h6 class="panel-title">شارژ کیف پول کاربر</h6>
+                                            <div class="heading-elements">
+                                                <ul class="icons-list">
+                                                    <li><a data-action="collapse"></a></li>
+                                                    <li><a data-action="close"></a></li>
+                                                </ul>
                                             </div>
                                         </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>نام:</strong>
+                                        <div class="panel-body">
+                                            <div class="form-group col-lg-8">
+                                                <span class="text-danger">*</span>
+                                                <label>مبلغ:</label>
+                                                <input name="price" type="text"
+                                                       class="form-control" placeholder="به تومان"
+                                                       value=""">
                                             </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>نام خانوادگی:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>کد ملی:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۴۴۲۰۴۴۰۳۹۲
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>نام پدر:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>شماره شناسنامه:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>محل صدور شناسنامه:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>تاریخ تولد:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۲۴/۱۲/۱۳۹۸
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>شماره تلفن همراه:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۰۹۱۳۹۵۱۸۰۵۵
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>شماره کارت:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۶۰۳۷ ۹۹۱۸ ۹۵۶۹ ۶۲۳۹
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>جنسیت:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۶۰۳۷ ۹۹۱۸ ۹۵۶۹ ۶۲۳۹
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>وضعیت سربازی:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-۶۰۳۷ ۹۹۱۸ ۹۵۶۹ ۶۲۳۹
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>استان:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>شهر:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <div class="col-lg-6">
-                                                <strong>کد پستی:</strong>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <span class="text-primary-600 ltr">
-لورم
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-8">
-                                            <div class="col-lg-3">
-                                                <strong>آدرس:</strong>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <span class="text-primary-600 ltr">
-لورم اپیسوم برای این آدرس
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group col-lg-8">
-                                            <div class="col-lg-3">
-                                                <strong>ایمیل:</strong>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <span class="text-primary-600 ltr">
-saeedgerami72@gmail.com
-                                                </span>
+                                            <div class="text-right col-md-2 pt-20">
+                                                <button type="submit"
+                                                        class="btn btn-primary submit-button submit-button">
+                                                    ذخیره
+                                                    <i class="icon-arrow-left12 position-right"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">سفارش‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>شماره فاکتور</th>
-                                                    <th>تاریخ ثبت سفارش</th>
-                                                    <th>وشعیت سفارش</th>
-                                                    <th>مبلغ سفارش</th>
-                                                    <th>وضعیت پرداخت</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    <td align="center">
-                                                        <!--                                                            --><?php //if (!empty($factor['payed_amount'])): ?>
-                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
-                                                                 border-left-lg border-left-success">
-                                                                    پرداخت شده
-                                                                </span>
-                                                        <!--                                                            --><?php //else: ?>
-                                                        <!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-                                                        <!--                                                                 border-left-lg border-left-danger">-->
-                                                        <!--                                                                    پرداخت نشده-->
-                                                        <!--                                                                </span>-->
-                                                        <!--                                                            --><?php //endif; ?>
-                                                    </td>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-info-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
 
-                                                </tbody>
-                                            </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="panel panel-white">
+                                    <div class="panel-heading">
+                                        <h6 class="panel-title">دید کلی</h6>
+                                        <div class="heading-elements">
+                                            <ul class="icons-list">
+                                                <li><a data-action="collapse"></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row mt-20 mb-20">
+                                            <div class="col-md-6 text-center p-15 border border-grey-300 alert-primary">
+                                                <h6 class="no-margin">
+                                                    <small class="text-grey-800">
+                                                        واریزی:
+                                                    </small>
+                                                    <strong>
+                                                        <?php if (isset($factor['payment_info']['payment_code'])): ?>
+                                                            <?= $factor['payment_info']['payment_code']; ?>
+                                                        <?php else: ?>
+                                                            <i class="icon-dash text-danger"></i>
+                                                        <?php endif; ?>
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                            <div class="col-md-6 text-center p-15 border border-grey-300 alert-danger">
+                                                <h6 class="no-margin">
+                                                    <small class="text-grey-800">
+                                                        برداشت:
+                                                    </small>
+                                                    <strong>
+
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                            <div class="col-md-12 text-center p-15 border border-grey-300"
+                                                 style="background-color: #e7e7e7;">
+                                                <h6 class="no-margin">
+                                                    <small class="text-grey-800">
+                                                        موجودی:
+                                                    </small>
+                                                    <strong>
+                                                        تومان
+                                                    </strong>
+                                                </h6>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -341,7 +146,7 @@ saeedgerami72@gmail.com
                             <div class="col-sm-12 col-lg-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">زیرمجموعه‌ها</h6>
+                                        <h6 class="panel-title">لیست تراکنش‌ها</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -355,12 +160,11 @@ saeedgerami72@gmail.com
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>نام و نام خانوادگی</th>
-                                                    <th>نام کاربری</th>
-                                                    <th>معرف</th>
-                                                    <th>تاریخ ثبت</th>
-                                                    <th>فعال/غیرفعال</th>
-                                                    <th>عملیات</th>
+                                                    <th>کد تراکنش</th>
+                                                    <th>واریز کننده</th>
+                                                    <th>مبلغ تراکنش</th>
+                                                    <th>نوع و توضیح تراکنش</th>
+                                                    <th>تاریخ تراکنش</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -377,44 +181,8 @@ saeedgerami72@gmail.com
                                                     <td>
                                                     </td>
                                                     <td>
-                                                        <input type="hidden" value="">
-                                                        <input type="checkbox"
-                                                               class="switchery uActiveDeactiveBtn"/>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-green-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-black-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/changePassword"
-                                                                   title="تغییر رمز عبور" data-popup="tooltip">
-                                                                    <i class="icon-key"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <ul class="icons-list mt-10">
-                                                            <li class="text-primary-600 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/editUser"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
-
                                                 </tbody>
                                             </table>
                                         </div>

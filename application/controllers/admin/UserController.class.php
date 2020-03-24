@@ -44,6 +44,18 @@ class UserController extends AbstractController
         $this->_render_page('pages/be/User/userProfile');
     }
 
+    public function userDepositAction(){
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کیف پول کاربر');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/userDeposit');
+    }
+
     public function manageUserAction(){
 
         // Base configuration
