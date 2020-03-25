@@ -88,24 +88,18 @@
                                                 </select>
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
                                                 <label>از تاریخ:</label>
-                                                <input type="hidden" name="from_date" id="altDateFieldExpire">
-                                                <input type="text" class="form-control range-to"
-                                                       placeholder="تاریخ انقضا" data-time="true"
-                                                       data-alt-field="#altDateFieldExpire"
-                                                       data-format="YYYY/MM/DD - HH:mm"
-                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
                                                 <label>تا تاریخ:</label>
-                                                <input type="hidden" name="from_date" id="altDateFieldExpire">
-                                                <input type="text" class="form-control range-to"
-                                                       placeholder="تاریخ انقضا" data-time="true"
-                                                       data-alt-field="#altDateFieldExpire"
-                                                       data-format="YYYY/MM/DD - HH:mm"
-                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>

@@ -56,6 +56,59 @@ class ShopController extends AbstractController
         $this->_render_page('pages/be/ShopCategory/editCategory');
     }
 
+    public function manageCouponAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کوپن‌های تخفیف');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/Coupon/manageCoupon');
+    }
+
+    public function addCouponAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن کوپن تخفیف');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/forms/tags/tagsinput.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/propertyJs.js');
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
+        $this->_render_page('pages/be/Coupon/addCoupon');
+    }
+
+    public function editCouponAction()
+    {
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش کوپن تخفبف');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/forms/tags/tagsinput.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/propertyJs.js');
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
+
+        $this->_render_page('pages/be/Coupon/editCoupon');
+    }
+
+
 
     public function manageProductAction()
     {

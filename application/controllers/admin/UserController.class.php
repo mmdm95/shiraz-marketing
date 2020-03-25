@@ -24,10 +24,17 @@ class UserController extends AbstractController
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن کاربر جدید');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/forms/tags/tagsinput.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/propertyJs.js');
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
 
         $this->_render_page('pages/be/User/addUser');
     }
@@ -42,6 +49,18 @@ class UserController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
         $this->_render_page('pages/be/User/userProfile');
+    }
+
+    public function userDepositAction(){
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کیف پول کاربر');
+
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/userDeposit');
     }
 
     public function manageUserAction(){
@@ -75,6 +94,19 @@ class UserController extends AbstractController
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش کاربر');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/forms/tags/tagsinput.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/propertyJs.js');
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
+
 
         $this->_render_page('pages/be/User/editUser');
     }

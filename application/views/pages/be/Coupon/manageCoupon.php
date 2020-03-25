@@ -1,3 +1,5 @@
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
+
 <!-- Main navbar -->
 <?php $this->view("templates/be/mainnavbar", $data); ?>
 <!-- /main navbar -->
@@ -6,6 +8,7 @@
     <!-- Page content -->
     <div class="page-content">
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
+
         <!-- Main sidebar -->
         <?php $this->view("templates/be/mainsidebar", $data); ?>
         <!-- /main sidebar -->
@@ -18,7 +21,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مدیریت کاربران</span>
+                                    class="text-semibold">کوپن‌های تخفیف</span>
                         </h5>
                     </div>
                 </div>
@@ -30,7 +33,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مدیریت کاربران</li>
+                        <li class="active">کوپن‌های تخفیف</li>
                     </ul>
                 </div>
             </div>
@@ -41,14 +44,13 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="row">
-                            <div class="col-sm-12 col-lg-12">
+                            <div class="col-sm-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">لیست کاربران</h6>
+                                        <h6 class="panel-title">کوپن‌های تخفیف</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -58,59 +60,54 @@
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>نام و نام خانوادگی</th>
-                                                    <th>نام کاربری</th>
-                                                    <th>تاریخ ثبت</th>
-                                                    <th>فعال/غیرفعال</th>
+                                                    <th>عنوان</th>
+                                                    <th>کد</th>
+                                                    <th>قیمت تخفیف</th>
+                                                    <th>قیمت کمینه</th>
+                                                    <th>سقف قیمت</th>
+                                                    <th>تاریخ پایان</th>
+                                                    <th>وضعیت فعالسازی</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load users data -->
+                                                <!-- Load categories data -->
                                                 <tr>
-                                                    <td>
+                                                    <td width="50px">
+                                                    </td>
+                                                    <td class="info">
                                                     </td>
                                                     <td>
+                                                        تومان
+                                                        درصد
                                                     </td>
                                                     <td>
+                                                        تومان
                                                     </td>
                                                     <td>
+                                                        تومان
+                                                        <i class="icon-dash text-danger" aria-hidden="true"></i>
                                                     </td>
-                                                    <td>
-                                                        <input type="hidden" value="">
-                                                        <input type="checkbox"
-                                                               class="switchery uActiveDeactiveBtn"/>
+                                                    <td class="success">
+                                                    </td>
+                                                    <td class="danger">
+                                                    </td>
+                                                    <td align="center">
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-success">فعال</span>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">غیر فعال</span>
                                                     </td>
                                                     <td style="width: 115px;" class="text-center">
                                                         <ul class="icons-list">
-                                                            <li class="text-green-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-black-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/changePassword"
-                                                                   title="تغییر رمز عبور" data-popup="tooltip">
-                                                                    <i class="icon-key"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-warning-800">
-                                                                <a href="<?= base_url(); ?>/admin/user/userDeposit"
-                                                                   title="کیف پول" data-popup="tooltip">
-                                                                    <i class="icon-wallet"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <ul class="icons-list mt-10">
-                                                            <li class="text-primary-600 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/editUser"
+                                                            <li class="text-primary-600">
+                                                                <a href="<?= base_url(); ?>admin/shop/editCoupon/"
                                                                    title="ویرایش" data-popup="tooltip">
                                                                     <i class="icon-pencil7"></i>
                                                                 </a>
                                                             </li>
                                                             <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
+                                                                <a class="deleteCouponBtn"
                                                                    title="حذف" data-popup="tooltip">
                                                                     <input type="hidden"
                                                                            value="">
@@ -120,7 +117,6 @@
                                                         </ul>
                                                     </td>
                                                 </tr>
-
                                                 </tbody>
                                             </table>
                                         </div>

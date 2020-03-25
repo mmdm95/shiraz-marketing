@@ -1,7 +1,7 @@
 <?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <!-- Main navbar -->
-<?php $this->view("templates/be/mainnavbar", $data); ?>
+<?php $this->view("templates/fe/user/mainnavbar", $data); ?>
 <!-- /main navbar -->
 <!-- Page container -->
 <div class="page-container">
@@ -10,7 +10,7 @@
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
 
         <!-- Main sidebar -->
-        <?php $this->view("templates/be/mainsidebar", $data); ?>
+        <?php $this->view("templates/fe/user/mainsidebar", $data); ?>
         <!-- /main sidebar -->
         <!-- Main content -->
         <div class="content-wrapper">
@@ -21,19 +21,19 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">دسته‌بندی‌ها</span>
+                                    class="text-semibold">سفارشات مرجوعی</span>
                         </h5>
                     </div>
                 </div>
                 <div class="breadcrumb-line">
                     <ul class="breadcrumb">
                         <li>
-                            <a href="<?= base_url(); ?>admin/index">
+                            <a href="<?= base_url(); ?>user/dashboard">
                                 <i class="icon-home2 position-left"></i>
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">دسته‌بندی‌ها</li>
+                        <li class="active">سفارشات مرجوعی</li>
                     </ul>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                             <div class="col-sm-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">دسته‌بندی‌ها</h6>
+                                        <h6 class="panel-title">لیست درخواست‌های مرجوعی</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -60,47 +60,62 @@
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>تصویر دسته</th>
-                                                    <th>آیکون</th>
-                                                    <th>عنوان دسته‌بندی</th>
-                                                    <th>وضعیت نمایش</th>
+                                                    <th>کد سفارش</th>
+                                                    <th>تاریخ درخواست</th>
+                                                    <th>شماره فاکتور</th>
+                                                    <th>نحوه پرداخت</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
                                                 <!-- Load categories data -->
                                                     <tr>
-                                                        <td>
-
+                                                        <td width="50px">
                                                         </td>
                                                         <td>
-
                                                         </td>
                                                         <td>
-
                                                         </td>
                                                         <td>
-
                                                         </td>
-                                                        <td>
-<!--                                                            --><?php //if ($category['publish'] == 1): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
-                                                                 border-left-lg border-left-success">فعال</span>
+                                                        <td align="center">
+<!--                                                            --><?php //if ($factor['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
+<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
+<!--                                                                 border-left-lg border-left-success">-->
+<!--                                                                    موفق-->
+<!--                                                                </span>-->
+<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
+<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
+<!--                                                                 border-left-lg border-left-danger">-->
+<!--                                                                    ناموفق-->
+<!--                                                                </span>-->
+<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
+<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
+<!--                                                                 border-left-lg border-left-grey-300">-->
+<!--                                                                    در انتظار پرداخت-->
+<!--                                                                </span>-->
+<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
+<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
+<!--                                                                 border-left-lg border-left-info">-->
+<!--                                                                    --><?//= $factor['payment_title']; ?>
+<!--                                                                </span>-->
 <!--                                                            --><?php //else: ?>
 <!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-danger">غیر فعال</span>-->
+<!--                                                                 border-left-lg border-left-grey-800">-->
+<!--                                                                    نامشخص-->
+<!--                                                                </span>-->
 <!--                                                            --><?php //endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
-                                                                <li class="text-primary-600">
-                                                                    <a href="<?= base_url() ; ?>admin/shop/editCategory"
-                                                                       title="ویرایش" data-popup="tooltip">
-                                                                        <i class="icon-pencil7"></i>
+                                                                <li class="text-black">
+                                                                    <a href="<?= base_url(); ?>user/viewReturnOrder/"
+                                                                       title="مشاهده" data-popup="tooltip">
+                                                                        <i class="icon-eye"></i>
                                                                     </a>
                                                                 </li>
                                                                 <li class="text-danger-600">
-                                                                    <a class="deleteCategoryBtn"
+                                                                    <a class="deleteFactorBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
                                                                                value="">
@@ -110,6 +125,7 @@
                                                             </ul>
                                                         </td>
                                                     </tr>
+<!--                                                --><?php //endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

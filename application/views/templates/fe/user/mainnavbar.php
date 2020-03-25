@@ -42,9 +42,9 @@
                         </a>
                     </li>
                     <li class="divider"></li>
-                    <?php if ($auth->isAllow('setting', 2)): ?>
+<!--                    --><?php //if ($auth->isAllow('setting', 2)): ?>
                     <li><a href="<?= base_url(); ?>admin/setting"><i class="icon-cog5"></i>تنظیمات سایت</a></li>
-                    <?php endif; ?>
+<!--                    --><?php //endif; ?>
                     <li><a href="<?= base_url('admin/logout'); ?>"><i class="icon-switch2"></i> خروج</a></li>
                 </ul>
             </li>

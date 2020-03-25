@@ -223,15 +223,12 @@
                                                        placeholder="درصد"
                                                        value="<?= set_value($pVals['discount'] ?? ''); ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-7">
-                                                <span class="text-danger">*</span>
+                                            <div class="form-group col-lg-4">
                                                 <label>زمان تخفیف:</label>
-                                                <input type="hidden" name="off_Until" id="altDateFieldExpire">
-                                                <input type="text" class="form-control range-to"
-                                                       placeholder="تاریخ انقضا" data-time="true"
-                                                       data-alt-field="#altDateFieldExpire"
-                                                       data-format="YYYY/MM/DD - HH:mm"
-                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <label>پاداش خرید:</label>

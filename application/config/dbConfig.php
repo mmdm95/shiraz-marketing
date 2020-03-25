@@ -44,9 +44,9 @@ return array(
     'databases' => array(
         'default' => array(
             'type' => 'mysql',
-             'dsn' => 'mysql:host=localhost;dbname=shz_marketing;charset=utf8',
-             'username' => 'root',
-             'password' => '',
+            'dsn' => 'mysql:host=localhost;dbname=shirazmarketing;charset=utf8',
+            'username' => 'root',
+            'password' => '',
             'options' => []
         )
     )

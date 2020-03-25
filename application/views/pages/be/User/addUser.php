@@ -116,14 +116,11 @@
                                                        value="">
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
                                                 <label>تاریخ تولد:</label>
-                                                <input type="hidden" name="" id="altDateFieldExpire">
-                                                <input type="text" class="form-control range-to"
-                                                       placeholder="تاریخ انقضا" readonly data-time="true"
-                                                       data-alt-field="#altDateFieldExpire"
-                                                       data-format="YYYY/MM/DD - HH:mm"
-                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ تولد" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
@@ -217,6 +214,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </form>
                     </div>

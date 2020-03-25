@@ -1,5 +1,5 @@
 <!-- Main navbar -->
-<?php $this->view("templates/be/mainnavbar", $data); ?>
+<?php $this->view("templates/fe/user/mainnavbar", $data); ?>
 <!-- /main navbar -->
 <!-- Page container -->
 <div class="page-container">
@@ -7,7 +7,7 @@
     <div class="page-content">
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
         <!-- Main sidebar -->
-        <?php $this->view("templates/be/mainsidebar", $data); ?>
+        <?php $this->view("templates/fe/user/mainsidebar", $data); ?>
         <!-- /main sidebar -->
         <!-- Main content -->
         <div class="content-wrapper">
@@ -26,13 +26,8 @@
                 <div class="breadcrumb-line">
                     <ul class="breadcrumb">
                         <li>
-                            <a href="<?= base_url(); ?>admin/index"><i class="icon-home2 position-left"></i>
+                            <a href="<?= base_url(); ?>user/dashboard"><i class="icon-home2 position-left"></i>
                                 داشبورد
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= base_url(); ?>admin/user/manageUser">
-                                مدیریت کاربران
                             </a>
                         </li>
                         <li class="active">مشاهده کاربر</li>
@@ -64,7 +59,7 @@
                                 <i class="icon-statistics position-left"></i>
                                 ارتقاء
                             </a>
-                            <a href="<?= base_url() ?>admin/user/edituser" type="button" class="btn btn-warning display-inline-block pull-right mt-5">
+                            <a href="<?= base_url() ?>user/edituser" type="button" class="btn btn-warning display-inline-block pull-right mt-5">
                                 <i class="icon-database-edit2 position-left"></i>
                                 تکمیل اطلاعات کاربر
                             </a>
@@ -253,170 +248,6 @@
 saeedgerami72@gmail.com
                                                 </span>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">سفارش‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>شماره فاکتور</th>
-                                                    <th>تاریخ ثبت سفارش</th>
-                                                    <th>وشعیت سفارش</th>
-                                                    <th>مبلغ سفارش</th>
-                                                    <th>وضعیت پرداخت</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    <td align="center">
-                                                        <!--                                                            --><?php //if (!empty($factor['payed_amount'])): ?>
-                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
-                                                                 border-left-lg border-left-success">
-                                                                    پرداخت شده
-                                                                </span>
-                                                        <!--                                                            --><?php //else: ?>
-                                                        <!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-                                                        <!--                                                                 border-left-lg border-left-danger">-->
-                                                        <!--                                                                    پرداخت نشده-->
-                                                        <!--                                                                </span>-->
-                                                        <!--                                                            --><?php //endif; ?>
-                                                    </td>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-info-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">زیرمجموعه‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>نام و نام خانوادگی</th>
-                                                    <th>نام کاربری</th>
-                                                    <th>معرف</th>
-                                                    <th>تاریخ ثبت</th>
-                                                    <th>فعال/غیرفعال</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                        <input type="hidden" value="">
-                                                        <input type="checkbox"
-                                                               class="switchery uActiveDeactiveBtn"/>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-green-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-black-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/changePassword"
-                                                                   title="تغییر رمز عبور" data-popup="tooltip">
-                                                                    <i class="icon-key"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <ul class="icons-list mt-10">
-                                                            <li class="text-primary-600 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/editUser"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-
-                                                </tbody>
-                                            </table>
                                         </div>
                                     </div>
                                 </div>
