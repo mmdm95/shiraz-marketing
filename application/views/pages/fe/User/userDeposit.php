@@ -1,5 +1,5 @@
 <!-- Main navbar -->
-<?php $this->view("templates/be/mainnavbar", $data); ?>
+<?php $this->view("templates/fe/user/mainnavbar", $data); ?>
 <!-- /main navbar -->
 <!-- Page container -->
 <div class="page-container">
@@ -7,7 +7,7 @@
     <div class="page-content">
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
         <!-- Main sidebar -->
-        <?php $this->view("templates/be/mainsidebar", $data); ?>
+        <?php $this->view("templates/fe/user/mainsidebar", $data); ?>
         <!-- /main sidebar -->
         <!-- Main content -->
         <div class="content-wrapper">
@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مشاهده کیف پول کاربر</span>
+                                    class="text-semibold">کیف پول من</span>
                         </h5>
                     </div>
                 </div>
@@ -26,16 +26,11 @@
                 <div class="breadcrumb-line">
                     <ul class="breadcrumb">
                         <li>
-                            <a href="<?= base_url(); ?>admin/index"><i class="icon-home2 position-left"></i>
+                            <a href="<?= base_url(); ?>user/dashboard"><i class="icon-home2 position-left"></i>
                                 داشبورد
                             </a>
                         </li>
-                        <li>
-                            <a href="<?= base_url(); ?>admin/user/manageUser">
-                                مدیریت کاربران
-                            </a>
-                        </li>
-                        <li class="active">کیف پول</li>
+                        <li class="active">کیف پول من</li>
                     </ul>
 
                 </div>
@@ -44,45 +39,6 @@
             <!-- Content area -->
             <div class="content">
                 <!-- Centered forms -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
-                              class="validation-form">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="panel panel-white">
-                                        <div class="panel-heading">
-                                            <h6 class="panel-title">شارژ کیف پول کاربر</h6>
-                                            <div class="heading-elements">
-                                                <ul class="icons-list">
-                                                    <li><a data-action="collapse"></a></li>
-                                                    <li><a data-action="close"></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="form-group col-lg-8">
-                                                <span class="text-danger">*</span>
-                                                <label>مبلغ:</label>
-                                                <input name="price" type="text"
-                                                       class="form-control" placeholder="به تومان"
-                                                       value=""">
-                                            </div>
-                                            <div class="col-md-2 pt-20">
-                                                <button type="submit"
-                                                        class="btn btn-primary submit-button submit-button">
-                                                    ذخیره
-                                                    <i class="icon-arrow-left12 position-right"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </form>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="row">

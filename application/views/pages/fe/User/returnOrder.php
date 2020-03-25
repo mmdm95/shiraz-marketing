@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">تغییر رمز عبور</span>
+                                class="text-semibold">فرم مرجوع صفارش</span>
                         </h5>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">تغییر رمز عبور</li>
+                        <li class="active">مرجوع سفارش</li>
                     </ul>
 
                 </div>
@@ -49,7 +49,7 @@
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">
-                                            <h6 class="panel-title">تغییر رمز عبور</h6>
+                                            <h6 class="panel-title">توضیحات</h6>
                                             <div class="heading-elements">
                                                 <ul class="icons-list">
                                                     <li><a data-action="collapse"></a></li>
@@ -58,53 +58,32 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <?php //if (isset($data['errors']) && count($data['errors'])): ?>
-                                            <div class="alert alert-danger">
-                                                <ul>
-                                                    <?php //foreach ($data['errors'] as $err): ?>
-                                                    <li>
-                                                        <? //= $err; ?><!--</li>-->
-                                               <?php //endforeach; ?>
-                                                </ul>
-
-                                            </div>
-                                            <?php //elseif (isset($data['success'])): ?>
-                                            <div class="alert alert-success">
-                                                <p>
-                                                    <? //= $data['success']; ?>
-                                                </p>
-                                            </div>
-
-                                            <?php //endif; ?>
-                                            <div class="alert alert-info alert-styled-left alert-bordered">
-                                                <p>
-                                                    <i class="icon-dash"></i>
-                                                    در صورت عدم تغییر رمز عبور، این مقدار تغییر نخواهد کرد.
-                                                </p>
+                                            <div class="form-group col-lg-4">
+                                                <label>سفارش خود را انتخاب کنید:</label>
+                                                <select class="select"
+                                                        name="subset_of">
+                                                    <option value="-1">کد سفارش</option>
+                                                    <option value="1">پر کردن دیتا</option>
+                                                </select>
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>رمز عبور جدید:</label>
-                                                <input name="password" type="text"
-                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
+                                                <label>تاریخ خرید:</label>
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ تولد" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
-                                            <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
-                                                <label>تکرار رمز عبور جدید:</label>
-                                                <input name="re_password" type="text"
-                                                       class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
+                                            <div class="form-group col-md-12 mt-10">
+                                                <textarea
+                                                    class="form-control"
+                                                    style="width: 100%; min-width: 100%; max-width: 100%; min-height: 100px;"
+                                                    name="description" placeholder="توضیحات"
+                                                    rows="10"><?= set_value($pVals['description'] ?? ''); ?></textarea>
                                             </div>
-
                                             <div class="text-right col-md-12">
-                                                <a href="<?= base_url('user/dashboard'); ?>"
-                                                   class="btn btn-default mr-5">
-                                                    بازگشت
-                                                </a>
                                                 <button type="submit"
                                                         class="btn btn-primary submit-button submit-button">
-                                                    ذخیره
+                                                    درخواست ارجاع
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

@@ -1,5 +1,5 @@
 <!-- Main navbar -->
-<?php $this->view("templates/be/mainnavbar", $data); ?>
+<?php $this->view("templates/fe/user/mainnavbar", $data); ?>
 <!-- /main navbar -->
 <!-- Page container -->
 <div class="page-container">
@@ -7,7 +7,7 @@
     <div class="page-content">
         <input type="hidden" id="BASE_URL" value="<?= base_url(); ?>">
         <!-- Main sidebar -->
-        <?php $this->view("templates/be/mainsidebar", $data); ?>
+        <?php $this->view("templates/fe/user/mainsidebar", $data); ?>
         <!-- /main sidebar -->
         <!-- Main content -->
         <div class="content-wrapper">
@@ -26,16 +26,11 @@
                 <div class="breadcrumb-line">
                     <ul class="breadcrumb">
                         <li>
-                            <a href="<?= base_url(); ?>admin/index"><i class="icon-home2 position-left"></i>
+                            <a href="<?= base_url(); ?>user/dashboard"><i class="icon-home2 position-left"></i>
                                 داشبورد
                             </a>
                         </li>
-                        <li>
-                            <a href="<?= base_url(); ?>admin/user/manageUser">
-                                مدیریت کاربران
-                            </a>
-                        </li>
-                        <li class="active">ویرایش کاربر</li>
+                        <li class="active">ویرایش حساب کاربری</li>
                     </ul>
 
                 </div>
@@ -82,28 +77,6 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <!--                                            --><?php //if (isset($data['errors']) && count($data['errors'])): ?>
-                                            <!--                                                <div class="alert alert-danger">-->
-                                            <!--                                                    <ul>-->
-                                            <!--                                                        --><?php //foreach ($data['errors'] as $err): ?>
-                                            <!--                                                            <li>-->
-                                            <? //= $err; ?><!--</li>-->
-                                            <!--                                                        --><?php //endforeach; ?>
-                                            <!--                                                    </ul>-->
-                                            <!--                                                </div>-->
-                                            <!--                                            --><?php //elseif (isset($data['success'])): ?>
-                                            <!--                                                <div class="alert alert-success">-->
-                                            <!--                                                    <p>-->
-                                            <!--                                                        --><? //= $data['success']; ?>
-                                            <!--                                                    </p>-->
-                                            <!--                                                </div>-->
-                                            <!--                                            --><?php //endif; ?>
-                                            <!--                                            <div class="alert alert-info alert-styled-left alert-bordered">-->
-                                            <!--                                                <p>-->
-                                            <!--                                                    <i class="icon-dash"></i>-->
-                                            <!--                                                    در صورت عدم تغییر رمز عبور، این مقدار تغییر نخواهد کرد.-->
-                                            <!--                                                </p>-->
-                                            <!--                                            </div>-->
                                             <div class="form-group col-lg-4">
                                                 <label>بازاریاب معرف:</label>
                                                 <select class="select"
@@ -151,14 +124,11 @@
                                                        value="">
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <span class="text-danger">*</span>
                                                 <label>تاریخ تولد:</label>
-                                                <input type="hidden" name="" id="altDateFieldExpire">
-                                                <input type="text" class="form-control range-to"
-                                                       placeholder="تاریخ انقضا" readonly data-time="true"
-                                                       data-alt-field="#altDateFieldExpire"
-                                                       data-format="YYYY/MM/DD - HH:mm"
-                                                       value="<?= set_value($fesVals['expire'] ?? ''); ?>">
+                                                <input type="hidden" name="expire" id="altDateField">
+                                                <input type="text" class="form-control myAltDatepicker"
+                                                       placeholder="تاریخ تولد" readonly data-alt-field="#altDateField"
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
