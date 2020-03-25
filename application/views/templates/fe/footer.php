@@ -82,7 +82,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                         <li class="list-inline-item">
                             <a href="" class="socials social-telegram"
                                data-toggle="tooltip" data-placement="top" title="تلگرام">
-                                <i class="la la-paper-plane-o"></i>
+                                <i class="la la-telegram"></i>
                             </a>
                         </li>
                         <li class="list-inline-item">

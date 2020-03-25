@@ -12,7 +12,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
             <div class="col-md-8 col-lg-6">
                 <div class="card-gap"></div>
                 <div class="box overflow-hidden">
-                    <div class="box-header bg-info text-white">
+                    <div class="box-header bg-info text-white py-4">
                         <i class="la la-user" aria-hidden="true"></i>
                         ورود به پنل کاربری
                     </div>
@@ -67,7 +67,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="l-remember"
-                                           checked="checked">
+                                           checked="checked" name="remember">
                                     <label class="custom-control-label" for="l-remember">مرا به خاطر بسپار</label>
                                 </div>
                             </div>

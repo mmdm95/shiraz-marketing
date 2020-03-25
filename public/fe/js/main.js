@@ -7,7 +7,7 @@
      * Super global shop object that have required functionality
      * @constructor
      */
-    var SHM = function () {
+    var Shop = function () {
         //************************************************************
         //********************* Local Operations *********************
         //************************************************************
@@ -20,7 +20,7 @@
             body = $('body'),
             //-----
             is_connect = false,
-            is_local = true, // Change this after development (for release it must be false)
+            is_local = false, // Change this after development (for release it must be false)
             //-----
             info_icon = 'la la-info-circle',
             warning_icon = 'la la-bell',
@@ -28,48 +28,16 @@
             danger_icon = 'la la-times';
 
         var
-            loader = "<div class='custom-loader-modal'>\
-                         <div class='custom-loader-contents'>\
-                            <img class='custom-loader-img' src='" + baseUrl + siteLogo + "' alt=''/>\
-                            <div class='custom-loader-loader'>\
-                                <svg class=\"circular\" viewBox=\"25 25 50 50\">\
-                                    <circle class=\"base-path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"1\" stroke-miterlimit=\"10\"/>\
-                                    <circle class=\"path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"2\" stroke-miterlimit=\"10\"/>\
-                                </svg>\
-                            </div>\
-                         </div>\
-                       </div>",
-            loader_relative = "<div class='custom-loader-modal is-relative'>\
-                         <div class='custom-loader-contents'>\
-                            <img class='custom-loader-img' src='" + baseUrl + siteLogo + "' alt=''/>\
-                            <div class='custom-loader-loader'>\
-                                <svg class=\"circular\" viewBox=\"25 25 50 50\">\
-                                    <circle class=\"base-path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"1\" stroke-miterlimit=\"10\"/>\
-                                    <circle class=\"path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"2\" stroke-miterlimit=\"10\"/>\
-                                </svg>\
-                            </div>\
-                         </div>\
-                       </div>",
-            loader_limited = "<div class='custom-loader-modal limited'>\
-                                 <div class='custom-loader-contents limited'>\
-                                    <div class='custom-loader-loader'>\
-                                        <svg class=\"circular\" viewBox=\"25 25 50 50\">\
-                                            <circle class=\"base-path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"1\" stroke-miterlimit=\"10\"/>\
-                                            <circle class=\"path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"2\" stroke-miterlimit=\"10\"/>\
-                                        </svg>\
-                                    </div>\
-                                 </div>\
-                               </div>",
-            loader_limited_type2 = "<div class='custom-loader-modal limited type-2'>\
-                                 <div class='custom-loader-contents limited type-2'>\
-                                    <div class='custom-loader-loader'>\
-                                        <svg class=\"circular\" viewBox=\"25 25 50 50\">\
-                                            <circle class=\"base-path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"1\" stroke-miterlimit=\"10\"/>\
-                                            <circle class=\"path\" cx=\"50\" cy=\"50\" r=\"20\" fill=\"none\" stroke-width=\"2\" stroke-miterlimit=\"10\"/>\
-                                        </svg>\
-                                    </div>\
-                                 </div>\
-                               </div>";
+            loader = "<div class='loader-modal'>\
+                        <div></div>\
+                        <div></div>\
+                        <div></div>\
+                      </div>",
+            loader_little = "<div class='loader-modal loader-little'>\
+                                <div></div>\
+                                <div></div>\
+                                <div></div>\
+                             </div>";
 
         var defDoneFn, defFailFn, defAlwaysFn;
 
@@ -163,18 +131,22 @@
         };
 
         _this.showLoader = true;
-        _this.addLoader = function (to, limited, type) {
+        _this.addLoader = function (to, type, relative) {
             var which;
             if (typeof to !== typeof undefined && $(to).length) {
                 to = to && $(to).length ? $(to) : body;
-                limited = limited === true;
-                which = limited ? (type == 2 ? loader_limited_type2 : loader_limited) : loader_relative;
+                which = type === 2 ? loader_little : loader;
             } else {
                 to = body;
                 which = loader;
             }
+            relative = !!relative;
 
-            to.append(which).find('.custom-loader-modal').css('visibility', 'visible')
+            var loaderContainer = to.append(which).find('.loader-modal');
+            if (relative) {
+                loaderContainer.addClass('is-relative');
+            }
+            loaderContainer.css('visibility', 'visible')
                 .animate({
                     'opacity': 1
                 }, 300);
@@ -309,8 +281,8 @@
         _this.updateStatus();
     };
     $(function () {
-        $.shm = function () {
-            return new SHM();
+        $.shop = function () {
+            return new Shop();
         };
 
         // initialize select 2
@@ -475,7 +447,7 @@
         $('.smooth-scroll').on('click', function (e) {
             e.preventDefault();
             var target = $(this).attr('href');
-            $.shm().scrollToElement(target, -30);
+            $.shop().scrollToElement(target, -30);
         });
 
         // Show components according to id
@@ -491,7 +463,7 @@
         if (elemArr.length && $.inArray(hash, elemArr) !== -1) {
             var selector = $('#' + hash);
             if (selector.length) {
-                $.shm().scrollToElement(selector, -30);
+                $.shop().scrollToElement(selector, -30);
             }
         }
 
@@ -513,7 +485,7 @@
         });
 
         backToTop.on('click.' + namespc, function () {
-            $.shm().scrollToElement('body', 0, 500);
+            $.shop().scrollToElement('body', 0, 500);
         });
 
         // Refine bootstrap dropdown inside click issue

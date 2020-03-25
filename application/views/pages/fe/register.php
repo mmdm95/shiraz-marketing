@@ -12,11 +12,15 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
             <div class="col-md-8 col-lg-6">
                 <div class="card-gap"></div>
                 <div class="box overflow-hidden">
-                    <div class="box-header bg-success text-white">
+                    <div class="box-header bg-success text-white py-4">
                         <i class="la la-user-plus" aria-hidden="true"></i>
                         ثبت نام در شیراز مارکتینگ
                     </div>
                     <div class="box-body">
+                        <div class="alert alert-info">
+                            کلمه عبور باید شامل حروف و اعداد انگلیسی باشد و حداقل ۹ کاراکتر داشته باشد.
+                        </div>
+
                         <form action="<?= base_url('login'); ?>" method="post">
                             <div class="form-group">
                                 <label for="r-username">
@@ -83,7 +87,19 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                     </span>
                                 </div>
                             </div>
-                            <div class="form-group text-center">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="r-rules"
+                                           checked="checked" name="rules">
+                                    <label class="custom-control-label" for="r-rules">
+                                        <a href="<?= base_url('pages/rules'); ?>" target="_blank">
+                                            قوانین سایت
+                                        </a>
+                                        را مطالعه کردم و آنها را می‌پذیرم.
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group text-center mt-5">
                                 <div class="form-group form-account-captcha" data-captcha-url="<?= ACTION; ?>">
                                     <img src="" alt="captcha">
                                     <button type="button"

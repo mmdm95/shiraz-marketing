@@ -6,7 +6,11 @@ abstract class AbstractPaymentController extends HController
     protected $auth;
     protected $setting;
     protected $data = [];
-
+    //-----
+    const AJAX_TYPE_ERROR = 'error';
+    const AJAX_TYPE_INFO = 'info';
+    const AJAX_TYPE_WARNING = 'warning';
+    const AJAX_TYPE_SUCCESS = 'success';
     // Define payment tables and codes and functions
     const PAYMENT_TABLE_MABNA = 'gateway_mabna';
     const PAYMENT_TABLE_IDPAY = 'gateway_idpay';
@@ -49,6 +53,7 @@ abstract class AbstractPaymentController extends HController
     const TBL_CITY = 'cities';
     const TBL_COMPLAINT = 'complaints';
     const TBL_CONTACT_US = 'contact_us';
+    const TBL_COUPON = 'coupons';
     const TBL_FAQ = 'faq';
     const TBL_ICON = 'icons';
     const TBL_MAIN_SLIDER = 'main_sliders';

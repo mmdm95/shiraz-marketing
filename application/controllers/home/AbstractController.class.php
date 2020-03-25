@@ -18,6 +18,12 @@ include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 
 abstract class AbstractController extends AbstractPaymentController
 {
+    //-----
+    protected $couponPastDays = 30 * 24 * 60 * 60; // 1 month
+    //-----
+    protected $haveCartAccess = false;
+    protected $cartCookieName = 'cart__products_items';
+
     public function __construct()
     {
         parent::__construct();
@@ -294,26 +300,24 @@ abstract class AbstractController extends AbstractPaymentController
     public function cartAction()
     {
         // Check cart and cart items
-//        $cartItems = $this->_fetch_cart_items();
-//        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
-//        $this->data['items'] = $cartItems['items'];
-
-//        var_dump();
+        $cartItems = $this->_fetch_cart_items();
+        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
+        $this->data['items'] = $cartItems['items'];
         //-----
-//        $this->data['totalAmount'] = 0;
-//        $this->data['totalDiscountedAmount'] = 0;
-//        foreach ($this->data['items'] as $item) {
-//            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
-//            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
-//        }
+        $this->data['totalAmount'] = 0;
+        $this->data['totalDiscountedAmount'] = 0;
+        foreach ($this->data['items'] as $item) {
+            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
+            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
+        }
 
-//        $this->data['cart_content'] = $this->load->view('templates/fe/cart/main-cart', $this->data, true);
+        $this->data['cart_content'] = $this->load->view('templates/fe/cart/main-cart', $this->data, true);
 
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'سبد خرید');
 
         // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
 
         $this->_render_page(['pages/fe/cart']);
     }
@@ -321,38 +325,24 @@ abstract class AbstractController extends AbstractPaymentController
     public function addToCartAction()
     {
         if (!is_ajax()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $cookieModel = new CookieModel();
         $model = new Model();
 
-        $type = 'success';
+        $type = self::AJAX_TYPE_SUCCESS;
         $msg = 'محصول با موفقیت به سبد اضافه شد.';
 
         $id = $_POST['postedId'] ?? null;
-        $colorCode = $_POST['postedColorCode'] ?? null;
         if (!isset($id) || !is_numeric($id)) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
-        if (!$model->is_exist('products', 'id=:id', ['id' => $id])) {
-            message('error', 200, 'این محصول وجود ندارد.');
+        if (!$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $id])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'این محصول وجود ندارد.');
         }
-        if (!$model->it_count('products', 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
-            message('error', 200, 'محصول ناموجود است.');
-        }
-
-        // Find color id with color code or select first one
-        if (!isset($colorCode) || !$model->is_exist('colors', 'color_code=:cc', ['cc' => $colorCode])) {
-            $colorId = $model->select_it(null, 'products_advanced', 'color_id', 'id=:id', ['id' => $id])[0]['color_id'];
-        } else {
-            $colorId = $model->select_it(null, 'colors', 'id', 'color_code=:cc', ['cc' => $colorCode])[0]['id'];
-            if (!$model->is_exist('products_colors', 'product_id=:pId AND color_id=:cId', ['pId' => $id, 'cId' => $colorId])) {
-                $colorId = $model->select_it(null, 'products_advanced', 'color_id', 'id=:id', ['id' => $id])[0]['color_id'];
-            }
-        }
-        if (!$model->it_count('products_colors', 'product_id=:id AND color_id=:cId AND count>:c', ['id' => $id, 'cId' => $colorId, 'c' => 0])) {
-            message('error', 200, 'محصول ناموجود است.');
+        if (!$model->it_count(self::TBL_PRODUCT, 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'محصول ناموجود است.');
         }
 
         // read
@@ -360,41 +350,31 @@ abstract class AbstractController extends AbstractPaymentController
 
         // check if the item is in the array, if it is, do not add
         if (array_key_exists($id, $saved_cart_items)) {
-            $curArrKey = array_search($colorId, array_column($saved_cart_items[$id], 'color'));
-            if ($curArrKey === false) {
-                // add new item to existence item in array
-                $saved_cart_items[$id][] = array('quantity' => 1, 'color' => $colorId);
-            } else {
-                $stockCount = $model->select_it(null, 'products_colors', 'count',
-                    'product_id=:pId AND color_id=:cId', ['pId' => $id, 'cId' => $saved_cart_items[$id][$curArrKey]['color']]);
-                if ($stockCount) {
-                    $stockCount = convertNumbersToPersian($stockCount[0]['count'], true);
-                    if ($saved_cart_items[$id][$curArrKey]['quantity'] + 1 > $stockCount) {
-                        $type = 'warning';
-                        $msg = 'محصول به تعداد حداکثر خود رسیده است!';
-                    } else {
-                        $saved_cart_items[$id][$curArrKey]['quantity'] += 1;
-                        $type = 'info';
-                        $msg = 'تعداد محصول در سبد افزایش یافت.';
-                    }
+            $stockCount = $model->select_it(null, self::TBL_PRODUCT, 'stock_count',
+                'id=:id', ['id' => $id]);
+            if ($stockCount) {
+                $stockCount = convertNumbersToPersian($stockCount[0]['stock_count'], true);
+                if ($saved_cart_items[$id]['quantity'] + 1 > $stockCount) {
+                    $type = self::AJAX_TYPE_WARNING;
+                    $msg = 'محصول به تعداد حداکثر خود رسیده است!';
                 } else {
-                    $type = 'error';
-                    $msg = 'خطا در افزودن محصول به سبد!!';
+                    $saved_cart_items[$id]['quantity'] += 1;
+                    $type = self::AJAX_TYPE_INFO;
+                    $msg = 'تعداد محصول در سبد افزایش یافت.';
                 }
+            } else {
+                $type = self::AJAX_TYPE_ERROR;
+                $msg = 'خطا در افزودن محصول به سبد!!';
             }
+
             $cart_items = $saved_cart_items;
         } else {
             // add new item on array
-            $cart_items[$id] = array(
-                array('quantity' => 1, 'color' => $colorId)
-            );
-
+            $cart_items[$id] = array('quantity' => 1);
             $cart_items = array_merge_recursive_distinct($cart_items, $saved_cart_items);
         }
 
-        $cart_items_count = array_sum(array_map(function ($v) {
-            return count($v);
-        }, $cart_items));
+        $cart_items_count = count($cart_items);
 
         // put item to cookie
         $json = json_encode($cart_items);
@@ -406,36 +386,22 @@ abstract class AbstractController extends AbstractPaymentController
     public function updateCartAction()
     {
         if (!is_ajax() && $this->haveCartAccess !== true) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $cookieModel = new CookieModel();
         $model = new Model();
 
         $id = $_POST['postedId'] ?? null;
-        $colorCode = $_POST['postedColorCode'] ?? null;
         $quantity = $_POST['quantity'] ?? 1;
         if (!isset($id) || !is_numeric($id)) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
-        if (!$model->is_exist('products', 'id=:id', ['id' => $id])) {
-            message('error', 200, 'این محصول وجود ندارد.');
+        if (!$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $id])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'این محصول وجود ندارد.');
         }
-        if (!$model->it_count('products', 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
-            message('error', 200, 'محصول ناموجود است.');
-        }
-
-        // Find color id with color code or select first one
-        if (isset($colorCode) && $model->is_exist('colors', 'color_code=:cc', ['cc' => $colorCode])) {
-            $colorId = $model->select_it(null, 'colors', 'id', 'color_code=:cc', ['cc' => $colorCode])[0]['id'];
-            if (!$model->is_exist('products_colors', 'product_id=:pId AND color_id=:cId', ['pId' => $id, 'cId' => $colorId])) {
-                message('error', 200, 'محصول مورد نظر با چنین رنگی وجود ندارد!');
-            }
-        } else {
-            message('error', 200, 'محصول مورد نظر با چنین رنگی وجود ندارد!');
-        }
-        if (!$model->it_count('products_colors', 'product_id=:id AND color_id=:cId AND count>:c', ['id' => $id, 'cId' => $colorId, 'c' => 0])) {
-            message('error', 200, 'محصول ناموجود است.');
+        if (!$model->it_count(self::TBL_PRODUCT, 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'محصول ناموجود است.');
         }
 
         // make quantity a minimum of 1
@@ -444,17 +410,15 @@ abstract class AbstractController extends AbstractPaymentController
         // read cookie
         $saved_cart_items = $this->_read_cart_cookie();
 
-        // Get current key of item
-        $curArrKey = array_search($colorId, array_column($saved_cart_items[$id], 'color'));
-        if ($curArrKey === false) {
-            message('error', 200, 'چنین محصولی در سبد خرید وجود ندارد!');
+        if (!isset($saved_cart_items[$id])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'چنین محصولی در سبد خرید وجود ندارد!');
         }
 
         // delete cookie value
         $cookieModel->set_cookie($this->cartCookieName, '', time() - 3600);
 
         // add the item with updated quantity
-        $saved_cart_items[$id][$curArrKey]['quantity'] = $quantity;
+        $saved_cart_items[$id]['quantity'] = $quantity;
 
         // enter new value
         $json = json_encode($saved_cart_items);
@@ -463,13 +427,13 @@ abstract class AbstractController extends AbstractPaymentController
         if ($this->haveCartAccess === true) {
             return true;
         }
-        message('success', 200, 'سبد خرید بروزرسانی شد.');
+        message(self::AJAX_TYPE_SUCCESS, 200, 'سبد خرید بروزرسانی شد.');
     }
 
     public function removeFromCartAction()
     {
         if (!is_ajax() && $this->haveCartAccess !== true) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $cookieModel = new CookieModel();
@@ -478,63 +442,20 @@ abstract class AbstractController extends AbstractPaymentController
         $id = $_POST['postedId'] ?? null;
         $colorCode = $_POST['postedColorCode'] ?? null;
         if (!isset($id) || !is_numeric($id)) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
-        if (!$model->is_exist('products', 'id=:id', ['id' => $id])) {
-            message('error', 200, 'این محصول وجود ندارد.');
+        if (!$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $id])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'این محصول وجود ندارد.');
         }
-        if (!$model->it_count('products', 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
-            message('error', 200, 'محصول ناموجود است.');
+        if (!$model->it_count(self::TBL_PRODUCT, 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'محصول ناموجود است.');
         }
 
         // read
         $saved_cart_items = $this->_read_cart_cookie();
 
-        if (isset($colorCode) && $colorCode == 'all') {
-            // remove the item from the array
-            unset($saved_cart_items[$id]);
-
-            // delete cookie value
-            unset($_COOKIE[$this->cartCookieName]);
-
-            // empty value and expiration one hour before
-            $cookieModel->set_cookie($this->cartCookieName, '', time() - 3600);
-
-            // enter new value
-            $json = json_encode($saved_cart_items);
-            $cookieModel->set_cookie($this->cartCookieName, $json, time() + 365 * 24 * 60 * 60, '/', null, null, true);
-            $_COOKIE[$this->cartCookieName] = $json;
-
-            if ($this->haveCartAccess === true) {
-                $this->haveCartAccess = false;
-                return $saved_cart_items;
-            }
-            exit;
-        }
-
-        // Find color id with color code or select first one
-        if (isset($colorCode) && $model->is_exist('colors', 'color_code=:cc', ['cc' => $colorCode])) {
-            $colorId = $model->select_it(null, 'colors', 'id', 'color_code=:cc', ['cc' => $colorCode])[0]['id'];
-            if (!$model->is_exist('products_colors', 'product_id=:pId AND color_id=:cId', ['pId' => $id, 'cId' => $colorId])) {
-                message('error', 200, 'محصول مورد نظر با چنین رنگی وجود ندارد!');
-            }
-        } else {
-            message('error', 200, 'محصول مورد نظر با چنین رنگی وجود ندارد!');
-        }
-        if (!$model->it_count('products_colors', 'product_id=:id AND color_id=:cId AND count>:c', ['id' => $id, 'cId' => $colorId, 'c' => 0])) {
-            message('error', 200, 'محصول ناموجود است.');
-        }
-
-        // Get current key of item
-        $curArrKey = array_search($colorId, array_column($saved_cart_items[$id], 'color'));
-        if ($curArrKey === false) {
-            message('error', 200, 'چنین محصولی در سبد خرید وجود ندارد!');
-        }
-
-        $saved_cart_items = array_map('array_values', $saved_cart_items);
-
         // remove the item from the array
-        unset($saved_cart_items[$id][$curArrKey]);
+        unset($saved_cart_items[$id]);
 
         // delete cookie value
         unset($_COOKIE[$this->cartCookieName]);
@@ -547,15 +468,13 @@ abstract class AbstractController extends AbstractPaymentController
         $cookieModel->set_cookie($this->cartCookieName, $json, time() + 365 * 24 * 60 * 60, '/', null, null, true);
         $_COOKIE[$this->cartCookieName] = $json;
 
-        $cart_items_count = array_sum(array_map(function ($v) {
-            return count($v);
-        }, $saved_cart_items));
+        $cart_items_count = count($saved_cart_items);
 
         if ($this->haveCartAccess === true) {
             $this->haveCartAccess = false;
             return $saved_cart_items;
         } else {
-            message('info', 200, ['محصول از سبد خرید حذف شد.', $cart_items_count]);
+            message(self::AJAX_TYPE_INFO, 200, ['محصول از سبد خرید حذف شد.', $cart_items_count]);
             exit;
         }
     }
@@ -590,7 +509,7 @@ abstract class AbstractController extends AbstractPaymentController
     public function fetchUpdatedCartAction()
     {
         if (!is_ajax()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $saved_cart_items = $this->_read_cart_cookie();
@@ -609,7 +528,7 @@ abstract class AbstractController extends AbstractPaymentController
         }
         $data['auth'] = $this->auth;
 
-        message('success', 200, $this->load->view('templates/fe/cart/main-cart', $data, true));
+        message(self::AJAX_TYPE_SUCCESS, 200, $this->load->view('templates/fe/cart/main-cart', $data, true));
     }
 
     public function fetchCardItemsAction()
@@ -625,14 +544,12 @@ abstract class AbstractController extends AbstractPaymentController
             $data['totalAmount'] += $item['discount_price'] * $item['quantity'];
         }
 
-        $cart_items_count = array_sum(array_map(function ($v) {
-            return count($v);
-        }, $saved_cart_items));
+        $cart_items_count = count($saved_cart_items);
 
         if (!is_ajax()) {
             return [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count];
         } else {
-            message('success', 200, [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count]);
+            message(self::AJAX_TYPE_SUCCESS, 200, [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count]);
             exit;
         }
     }
@@ -668,69 +585,9 @@ abstract class AbstractController extends AbstractPaymentController
         //-----
         foreach ($tmpItems as $info) {
             $res = $info;
-            foreach ($saved_cart_items[$res['id']] as $k => $v) {
-                //-----
-                if (isset($v['color']) && $model->is_exist('products_colors', 'product_id=:pId AND color_id=:cId',
-                        ['pId' => $res['id'], 'cId' => $v['color']])) {
-                    $tmpColorCount = $model->select_it(null, 'products_colors', 'count',
-                        'product_id=:pId AND color_id=:cId', ['pId' => $res['id'], 'cId' => $v['color']])[0]['count'];
-                    $tmpColorCount = convertNumbersToPersian($tmpColorCount, true);
-                    $color = $model->select_it(null, 'colors', ['id', 'color_code', 'color_name', 'color_hex', 'deletable'],
-                        'id=:id', ['id' => $v['color']])[0];
-                    $res['color_code'] = $color['color_code'];
-                    $res['color_name'] = $color['color_name'];
-                    $res['color_hex'] = $color['color_hex'];
-                    $res['deletable'] = $color['deletable'];
-                } else {
-                    $this->haveCartAccess = true;
-                    $_POST['postedId'] = $res['id'];
-                    $_POST['postedColorCode'] = 'all';
-                    $saved_cart_items = $this->removeFromCartAction();
-                    $this->haveCartAccess = false;
-                    unset($_POST['postedId']);
-                    unset($_POST['postedColorCode']);
-                    continue;
-                }
-                //-----
-                $price = $model->select_it(null, 'products_guarantee', 'guarantee_price',
-                    'product_id=:pId', ['pId' => $res['id']]);
-                if (count($price)) {
-                    $price = convertNumbersToPersian($price[0]['guarantee_price'], true) ?: 0;
-                } else {
-                    $price = 0;
-                }
-
-                $res['guarantee_price'] = $price;
-                $res['base_price'] = convertNumbersToPersian($model->select_it(null, 'products_colors', 'price',
-                    'product_id=:pId AND color_id=:cId AND count>:c', ['pId' => $res['id'], 'cId' => $color['id'], 'c' => 0],
-                    null, 'id ASC', 1)[0]['price'], true);
-                $res['price'] = $price + $res['base_price'];
-
-                $discount = $res['discount'];
-                $haveFestival = false;
-
-                if (in_array($res['f_id'], $this->data['activeFestivalsId'])) {
-                    $discount = $res['festival_discount'];
-                    $haveFestival = $res['festival_discount'] ? true : false;
-                }
-                $haveDiscount = $discount ? true : false;
-
-                $res['in_festival'] = $haveFestival;
-
-                if ($haveDiscount) {
-                    if (!$haveFestival && $res['discount_unit'] == 1) {
-                        $res['discount_amount'] = $res['discount'] ?: 0;
-                        $discountedPrice = convertNumbersToPersian($res['price'], true) - convertNumbersToPersian($res['discount'] ?: 0, true);
-                    } else if ($haveFestival || $res['discount_unit'] == 2) {
-                        $res['discount_amount'] = $discount ?: 0;
-                        $discountedPrice = convertNumbersToPersian($res['price'], true) - (convertNumbersToPersian($res['price'], true) * convertNumbersToPersian($discount ?: 0, true) / 100);
-                    }
-                } else {
-                    $res['discount_amount'] = 0;
-                    $discountedPrice = convertNumbersToPersian($res['price'], true);
-                }
-                $res['discount_price'] = $discountedPrice;
-                $res['quantity'] = $v['quantity'] > $tmpColorCount ? $tmpColorCount : $v['quantity'];
+            foreach ($saved_cart_items as $k => $v) {
+                $res['quantity'] = $v['quantity'] > $res['stock_count'] ? $res['stock_count'] : $v['quantity'];
+                $res['discount_percentage'] = (convertNumbersToPersian($res['price'], true) - convertNumbersToPersian($res['discount_price'], true)) / convertNumbersToPersian($res['price'], true);
 
                 $items[] = $res;
             }
@@ -757,55 +614,36 @@ abstract class AbstractController extends AbstractPaymentController
             ];
         }
         //-----
-        $model = new Model();
+        $model = new \ProductModel();
         //-----
         foreach ($saved_cart_items as $id => $eachItem) {
-            foreach ($eachItem as $k => $item) {
-                $mainItem = $model->join_it(null, 'products_festivals AS pf', 'products_advanced AS p', [
-                    'pf.festival_id AS f_id', 'pf.discount AS festival_discount', 'p.id', 'p.product_code', 'p.product_title',
-                    'p.image', 'p.discount', 'p.discount_unit', 'p.stock_count', 'p.brand_name', 'p.brand_id', 'p.category_code',
-                    'p.category_name', 'p.available'
-                ], 'pf.product_id=p.id', 'p.id=:id AND p.stock_count>:sc AND p.available=:av', ['id' => $id, 'sc' => 0, 'av' => 1],
-                    ['p.id'], null, null, null, false, 'RIGHT');
-                $mainItemColor = $model->select_it(null, 'products_colors', ['count'],
-                    'product_id=:pId AND color_id=:cId', ['pId' => $id, 'cId' => $item['color']]);
-                $this->haveCartAccess = true;
-                if (!count($mainItem) || !count($mainItemColor) ||
-                    (count($mainItem) && $mainItem[0]['available'] == 0) ||
-                    (count($mainItemColor) && $mainItemColor[0]['count'] == 0)) {
-
-                    $_POST['postedId'] = $id;
-                    $_POST['postedColorCode'] = 'all';
-                    if (count($mainItemColor)) {
-                        $_POST['postedColorCode'] = $item['color'];
-                    }
-                    if (count($mainItem)) {
-                        $delete_items_array[] = $mainItem[0];
-                    }
-                    $this->removeFromCartAction();
-                    //-----
-                    unset($_POST['postedId']);
-                    unset($_POST['postedColorCode']);
-                }
-                if (count($mainItemColor) && $mainItemColor[0]['count'] < $item['quantity']) {
-                    $colorCode = $model->select_it(null, 'colors', ['color_code'],
-                        'id=:id', ['id' => $item['color']])[0]['color_code'];
-                    $_POST['postedId'] = $id;
-                    $_POST['postedColorCode'] = $colorCode;
-                    $_POST['quantity'] = $mainItemColor[0]['count'];
-                    if ($this->updateCartAction() === true) {
-                        $delete_items_array[] = $mainItem[0];
-                    }
-                    //-----
-                    unset($_POST['postedId']);
-                    unset($_POST['postedColorCode']);
-                    unset($_POST['quantity']);
-                }
+            $mainItem = $model->getProducts('p.id=:id AND p.stock_count>:sc AND p.available=:av', ['id' => $id, 'sc' => 0, 'av' => 1]);
+            $this->haveCartAccess = true;
+            if (!count($mainItem) ||
+                (count($mainItem) && $mainItem[0]['available'] == 0)) {
+                $_POST['postedId'] = $id;
                 if (count($mainItem)) {
-                    $main_items_array[] = $mainItem[0];
+                    $delete_items_array[] = $mainItem[0];
                 }
-                $this->haveCartAccess = false;
+                $this->removeFromCartAction();
+                //-----
+                unset($_POST['postedId']);
+                unset($_POST['postedColorCode']);
             }
+            if (count($mainItem) && $mainItem[0]['stock_count'] < $eachItem['quantity']) {
+                $_POST['postedId'] = $id;
+                $_POST['quantity'] = $mainItem[0]['stock_count'];
+                if ($this->updateCartAction() === true) {
+                    $delete_items_array[] = $mainItem[0];
+                }
+                //-----
+                unset($_POST['postedId']);
+                unset($_POST['quantity']);
+            }
+            if (count($mainItem)) {
+                $main_items_array[] = $mainItem[0];
+            }
+            $this->haveCartAccess = false;
         }
         return [
             'deleted' => $delete_items_array,

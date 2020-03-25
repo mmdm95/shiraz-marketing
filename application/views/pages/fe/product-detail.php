@@ -160,7 +160,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                                         <ul class="list-unstyled product-detail-side-share col p-0">
                                             <li class="list-inline-item">
                                                 <a href="#" class="btn-link-black-reverse">
-                                                    <i class="la la-paper-plane" aria-hidden="true"></i>
+                                                    <i class="la la-telegram" aria-hidden="true"></i>
                                                 </a>
                                             </li>
                                             <li class="list-inline-item">

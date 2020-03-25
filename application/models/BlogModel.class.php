@@ -10,7 +10,7 @@ class BlogModel extends HModel
     {
         parent::__construct();
 
-        $this->table = 'users';
+        $this->table = 'blog';
         $this->db = $this->getDb();
     }
 
@@ -84,7 +84,7 @@ class BlogModel extends HModel
         //-----
         $relatedWhere .= !empty($where) ? ' AND (' . $where . ')' : '';
 
-        return $this->getAllBlog(3, 0, $relatedWhere, array_merge($relatedParams, $params));
+        return $this->getAllBlog($limit, 0, $relatedWhere, array_merge($relatedParams, $params));
     }
 
     public function getBlogDetail($params)
@@ -146,37 +146,5 @@ class BlogModel extends HModel
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0];
         return [];
-    }
-
-    public function getBlogComments($where, $bindParams = [], $orderBy = [], $limit = 5, $offset = 0)
-    {
-        $select = $this->select();
-        $select->cols([
-            'c.id', 'c.name', 'c.body', 'c.respond', 'c.respond_on', 'c.created_on', 'u.full_name'
-        ])->from('comments AS c');
-
-        try {
-            $select->join(
-                'LEFT',
-                'users AS u',
-                'c.responder_id=u.id'
-            );
-        } catch (\Aura\SqlQuery\Exception $e) {
-            die('unexpected error: ' . $e->getMessage());
-        }
-
-        $select->where($where);
-
-        if (!empty($bindParams) && is_array($bindParams)) {
-            $select->bindValues($bindParams);
-        }
-        if (!empty((int)$limit)) {
-            $select->limit($limit)->offset((int)$offset);
-        }
-        if (!empty($orderBy) && is_array($orderBy)) {
-            $select->orderBy($orderBy);
-        }
-
-        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
     }
 }
