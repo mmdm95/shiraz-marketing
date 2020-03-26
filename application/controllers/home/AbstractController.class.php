@@ -23,6 +23,8 @@ abstract class AbstractController extends AbstractPaymentController
     //-----
     protected $haveCartAccess = false;
     protected $cartCookieName = 'cart__products_items_roham';
+    //-----
+    protected $messageSession = 'message_redirect_session';
 
     public function __construct()
     {
@@ -556,6 +558,145 @@ abstract class AbstractController extends AbstractPaymentController
             message(self::AJAX_TYPE_SUCCESS, 200, [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count]);
             exit;
         }
+    }
+
+    //------------------------------
+    //-------- Cart actions --------
+    //------------ AND -------------
+    //------ Shopping process ------
+    //------------------------------
+
+    public function shoppingAction()
+    {
+        // reset shopping session
+        unset($_SESSION['shopping_page_session']);
+
+        $model = new Model();
+
+        if (!$this->auth->isLoggedIn()) {
+
+            $this->redirect(base_url('login?back_url=' . base_url('shopping')));
+        }
+        if ($this->data['identity']->flag_buy != 1) {
+
+            $this->redirect(base_url('user/editUser?back_url=' . base_url('shopping')));
+        }
+
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
+        $this->data['items'] = $cartItems['items'];
+        //-----
+        if (!count($this->data['items'])) {
+            $this->redirect(base_url('cart'));
+        }
+        //-----
+        //Get addresses
+        $this->data['addresses'] = $model->select_it(null, 'users_address', '*',
+            'user_id=:uId', ['uId' => $this->data['identity']->id]);
+        // Get shippings
+        $this->data['shippings'] = $model->select_it(null, 'shippings', '*',
+            'status=:s', ['s' => 1]);
+
+        // Shared post variable for shipping info and side shopping card
+        $_POST['postedCode'] = $this->data['shippings'][0]['shipping_code'];
+        // Get shipping info part for first shipping
+        $this->haveShippingAccess = true;
+        $this->data['shipping_info'] = $this->shippingInformationAction();
+        // Get shopping side card part for first time
+        $this->haveShoppingSideCardAccess = true;
+        $this->data['shopping_side_card'] = $this->shoppingSideCardAction();
+        unset($_POST['postedCode']);
+        //-----
+
+        // Submit form for next step
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('shopping');
+        $form->setFieldsName(['addrRadio', 'shipping-radio', 'send-factor'])
+            ->setDefaults('send-factor', 'off')->setMethod('post');
+        try {
+            $form->afterCheckCallback(function ($values) use ($model, $form) {
+                $this->data['_shopping_arr'] = [];
+                // Check for address's id
+                $addrId = array_column($this->data['addresses'], 'id');
+                if (!in_array($values['addrRadio'], $addrId)) {
+                    $form->setError('آدرس انتخاب شده نامعتبر است.');
+                } else {
+                    $this->data['_shopping_arr'][$this->sessionStr['address_id']] = $values['addrRadio'];
+                }
+                // Check for shipping's code
+                $shippingCode = array_column($this->data['shippings'], 'shipping_code');
+                if (!in_array($values['shipping-radio'], $shippingCode)) {
+                    $form->setError('نحوه ارسال انتخاب شده نامعتبر است.');
+                } else {
+                    $this->data['_shopping_arr'][$this->sessionStr['shipping_code']] = $values['shipping-radio'];
+                }
+                if ($form->isChecked('send-factor')) {
+                    $this->data['_shopping_arr'][$this->sessionStr['want_factor']] = true;
+                } else {
+                    $this->data['_shopping_arr'][$this->sessionStr['want_factor']] = false;
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $_SESSION['shopping_page_session'] = encryption_decryption(ED_ENCRYPT, json_encode($this->data['_shopping_arr']));
+                $this->redirect(base_url('prepareToPay'));
+            } else {
+                $this->data['errors'] = $form->getError();
+            }
+        }
+
+        // Check error that is come from prepareToPay page
+        if (!count($this->data['errors']) && isset($_SESSION['error_from_prepareToPay_page_session']) &&
+            count($_SESSION['error_from_prepareToPay_page_session'])) {
+            $this->data['errors'] = $_SESSION['error_from_prepareToPay_page_session'];
+            unset($_SESSION['error_from_prepareToPay_page_session']);
+        }
+        //-----
+        $this->data['totalAmount'] = 0;
+        $this->data['totalDiscountedAmount'] = 0;
+        foreach ($this->data['items'] as $item) {
+            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
+            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
+        }
+
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اطلاعات ارسال');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/shoppingJs.js');
+
+        $this->_render_page(['pages/fe/shopping']);
+    }
+
+    public function prepareToPayAction()
+    {
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'آماده پرداخت');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+
+        $this->_render_page(['pages/fe/payment']);
+    }
+
+    public function payResultAction()
+    {
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
+
+        // Extra js
+//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
+
+        $this->_render_page(['pages/fe/pay-result']);
     }
 
     //----->

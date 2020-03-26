@@ -27,39 +27,6 @@ class HomeController extends AbstractController
         ]);
     }
 
-    public function shoppingAction()
-    {
-        // Other information
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اطلاعات ارسال');
-
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
-
-        $this->_render_page(['pages/fe/shopping']);
-    }
-
-    public function prepareToPayAction()
-    {
-        // Other information
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'آماده پرداخت');
-
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
-
-        $this->_render_page(['pages/fe/payment']);
-    }
-
-    public function payResultAction()
-    {
-        // Other information
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
-
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
-
-        $this->_render_page(['pages/fe/pay-result']);
-    }
-
     public function pagesAction($param)
     {
 //        $model = new Model();

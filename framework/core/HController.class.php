@@ -1,4 +1,7 @@
 <?php
+
+use HSession\Session\Session;
+
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 class HController
@@ -9,6 +12,7 @@ class HController
 
     public $config;
     public $load;
+    protected $session;
     protected $asset;
     protected $error;
 
@@ -20,6 +24,10 @@ class HController
         $this->config = getConfig('config');
 
         $this->load = new Loader();
+
+        $this->load->library('HSession/vendor/autoload');
+
+        $this->session = Session::getInstance();
         $this->asset = new Asset();
         $this->error = new Exceptions();
 
@@ -46,7 +54,7 @@ class HController
      * Get the H singleton
      *
      * @static
-     * @return	object
+     * @return    object
      */
     public static function &get_instance()
     {
