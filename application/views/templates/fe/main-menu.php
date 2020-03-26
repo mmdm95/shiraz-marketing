@@ -1,6 +1,4 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <header class="header-main">
     <div class="header-top-shadow"></div>
@@ -49,11 +47,11 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
                     <div class="menu-icon basket-icon dropdown-toggle" id="shoppingCart" data-toggle="dropdown"
                          aria-haspopup="true" aria-expanded="false" data-target="basketDropdown">
                         <i class="la la-shopping-cart" id="cart"></i>
-                        <span class="basket-number badge">۰</span>
+                        <span class="basket-number badge"><?= convertNumbersToPersian($cart_items[1]); ?></span>
                     </div>
                     <div class="basket-items-container dropdown-menu" id="basketDropdown"
                          aria-labelledby="shoppingCart">
-
+                        <?= $cart_items[0]; ?>
                     </div>
                 </div>
             </div>

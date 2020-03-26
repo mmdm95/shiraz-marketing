@@ -1,9 +1,6 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <footer class="main-footer">
-    <div class="separator secondary mt-0"></div>
     <div class="container footer-top">
         <div class="row">
             <div class="col-md-3 col-sm-6">

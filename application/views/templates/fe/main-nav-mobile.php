@@ -1,6 +1,4 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <nav class="nav-main-mobile custom-scrollbar-y js-offcanvas" id="offCanvasMenu">
     <div class="nav-main-mobile-header ltr">

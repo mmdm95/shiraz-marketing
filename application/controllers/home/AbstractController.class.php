@@ -22,7 +22,7 @@ abstract class AbstractController extends AbstractPaymentController
     protected $couponPastDays = 30 * 24 * 60 * 60; // 1 month
     //-----
     protected $haveCartAccess = false;
-    protected $cartCookieName = 'cart__products_items';
+    protected $cartCookieName = 'cart__products_items_roham';
 
     public function __construct()
     {
@@ -62,6 +62,14 @@ abstract class AbstractController extends AbstractPaymentController
             $this->data['favIcon'] = $this->setting['main']['favIcon'] ? base_url($this->setting['main']['favIcon']) : '';
             $this->data['logo'] = $this->setting['main']['logo'] ?? '';
         }
+
+        if (!is_ajax()) {
+            // Cart items
+            $this->data['cart_items'] = $this->fetchCardItemsAction();
+        }
+
+        // Cancel reserved items from reserved table
+        $this->_cancel_reserved_items();
     }
 
     public function loginAction()
@@ -511,10 +519,6 @@ abstract class AbstractController extends AbstractPaymentController
         if (!is_ajax()) {
             $this->error->access_denied();
         }
-
-        $saved_cart_items = $this->_read_cart_cookie();
-
-        // Fetch cart items
 
         // Check cart and cart items
         $cartItems = $this->_fetch_cart_items();
@@ -1149,11 +1153,11 @@ abstract class AbstractController extends AbstractPaymentController
         // Remove not payed items from reserved factors and return item(s) count to stock
         $model = new Model();
         $reservedTime = time() - OWN_WAIT_TIME;
-        $previouslyReserved = $model->select_it(null, 'factors_reserved', '*', 'factor_time<=:ft', ['ft' => $reservedTime]);
+        $previouslyReserved = $model->select_it(null, self::TBL_ORDER_RESERVED, '*', 'expire_time<=:et', ['et' => $reservedTime]);
         if (count($previouslyReserved)) {
             foreach ($previouslyReserved as $reserved) {
-                $factorStatus = $model->select_it(null, 'factors', 'payment_status', 'factor_code=:fc', ['fc' => $reserved['factor_code']]);
-                $items = $model->select_it(null, 'factors_item', ['product_code', 'product_count'], 'factor_code=:fc', ['fc' => $reserved['factor_code']]);
+                $orderStatus = $model->select_it(null, self::TBL_ORDER, 'payment_status', 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                $items = $model->select_it(null, self::TBL_ORDER_ITEM, ['product_id', 'product_count'], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 foreach ($items as $k => $item) {
                     try {
                         $res = $model->update_it('products', [], [
@@ -1163,15 +1167,15 @@ abstract class AbstractController extends AbstractPaymentController
                     } catch (Exception $e) {
                     }
                 }
-                if (count($factorStatus) && $factorStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
-                    $model->delete_it('factors', 'factor_code=:fc', ['fc' => $reserved['factor_code']]);
-                } else if ($factorStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
-                    $model->update_it('factors', [
-                        'send_status' => 8
-                    ], 'factor_code=:fc', ['fc' => $reserved['factor_code']]);
+                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
+                    $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                } else if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
+                    $model->update_it(self::TBL_ORDER, [
+                        'send_status' => SEND_STATUS_CANCELED
+                    ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 }
             }
-            $model->delete_it('factors_reserved', 'factor_time<=:ft', ['ft' => $reservedTime]);
+            $model->delete_it(self::TBL_ORDER_RESERVED, 'expire_time<=:et', ['et' => $reservedTime]);
         }
         //-----
     }

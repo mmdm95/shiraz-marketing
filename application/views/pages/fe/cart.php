@@ -1,6 +1,4 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <?php $this->view('templates/fe/main-menu', $data); ?>
 <?php $this->view('templates/fe/main-nav', $data); ?>
@@ -32,8 +30,14 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
             </div>
         </div>
 
-        <?= $cart_content; ?>
+        <div class="page_cart__wrapper">
+            <?= $cart_content; ?>
+        </div>
     </div>
 </main>
+
+<!-- Removed/Updated products modal -->
+<?php $this->view('templates/fe/cart/modified-items-modal', $data); ?>
+<!-- Removed/Updated products modal -->
 
 <?php $this->view('templates/fe/footer', $data); ?>

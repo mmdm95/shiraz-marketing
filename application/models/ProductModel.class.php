@@ -15,8 +15,8 @@ class ProductModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.stock_count',
-            'p.available', 'c.name AS category_name', 'c.icon AS category_icon'
+            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.stock_count', 'p.max_cart_count',
+            'p.available', 'p.category_id', 'c.slug AS category_slug', 'c.name AS category_name', 'c.icon AS category_icon'
         ])->from($this->table . ' AS p');
 
         try {

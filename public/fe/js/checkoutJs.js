@@ -21,7 +21,7 @@
             remove_from_cart_url = baseUrl + 'removeFromCart',
             ajax_obj = {};
 
-        cart_wrapper = $('.cart_page__wrapper');
+        cart_wrapper = $('.page_cart__wrapper');
 
         //------------------------------
         //---------- Functions ---------
@@ -83,35 +83,31 @@
         }
 
         function quantitySelectInputChange () {
-            var $this, qnt, p_id, color;
+            var $this, qnt, p_id;
             quantity_select_input.off('change.' + namespace).on('change.' + namespace, function (e) {
                 $this = $(this);
-                p_id = $this.closest('tr').data('product-id');
-                color = $this.closest('tr').data('color-code');
+                p_id = $this.closest('.shopping-cart-item').data('product-id');
                 qnt = $this.find(':selected');
                 qnt = qnt ? qnt.val() : $this.find('option').first().val();
                 if(qnt && p_id) {
                     ajax_obj.postedId = p_id;
                     ajax_obj.quantity = qnt;
-                    ajax_obj.postedColorCode = color;
                     doUpdate();
                 }
             });
         }
 
         function removeItemClick() {
-            var $this, p_id, color;
+            var $this, p_id;
             remove_item_btn.off('click.' + namespace).on('click.' + namespace, function (e) {
                 e.preventDefault();
                 //-----
                 $this = $(this);
                 //-----
                 shop.question(null, function () {
-                    p_id = $this.closest('tr').data('product-id');
-                    color = $this.closest('tr').data('color-code');
+                    p_id = $this.closest('.shopping-cart-item').data('product-id');
                     if(p_id) {
                         ajax_obj.postedId = p_id;
-                        ajax_obj.postedColorCode = color;
                         doDelete();
                     }
                 });
@@ -120,19 +116,10 @@
 
         function functionsCaller() {
             remove_item_btn = $('.checkout-btn-remove');
-            quantity_select_input = $('.quantity-select-input');
+            quantity_select_input = $('.shopping-cart-item-count');
             //-----
             removeItemClick();
             quantitySelectInputChange();
-            //-----
-            var wiki = $('.wiki');
-            wiki.each(function () {
-                var $this = $(this);
-                $this.popover({
-                    content: $($this.data('content-el')).html(),
-                    html: true
-                });
-            });
         }
 
         //------------------------------

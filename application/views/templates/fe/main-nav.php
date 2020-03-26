@@ -1,6 +1,4 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <div class="nav-main">
     <div class="container">

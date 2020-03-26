@@ -467,6 +467,9 @@
             }
         }
 
+        // Always show these modals
+        $('.always-show-modal').modal();
+
         //------------------------------------------------
 
         // Back to top

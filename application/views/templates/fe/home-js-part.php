@@ -1,6 +1,4 @@
-<?php
-defined('BASE_PATH') OR exit('No direct script access allowed');
-?>
+<?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <!-- inject:js-->
 <!-- select2 Js -->

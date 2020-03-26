@@ -5,7 +5,6 @@ return array(
         // Admin Controller Actions
         'delete',
         'activeDeactive',
-        'showBrandInPages',
         'showInMenu',
         'productAvailability',
         'setFestivalToMainOne',
@@ -17,10 +16,6 @@ return array(
         // Home Controller Actions
         'recalculatePrice',
         'addToFavorite',
-        'getProductComments',
-        'commentEfficiency',
-        'getProducts',
-        'getOffers',
         'addToCart',
         'updateCart',
         'removeFromCart',
