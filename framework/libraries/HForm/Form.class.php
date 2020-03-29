@@ -852,7 +852,7 @@ class Form implements HIForm
         try {
             $this->_validationHasError($value, $name);
 
-            if (preg_match("/^09[0-9]{9}$/", $value)) {
+            if (preg_match("/^(098|\+98|0)?9\d{9}$/", $value)) {
                 return true;
             }
 

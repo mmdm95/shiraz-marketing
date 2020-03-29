@@ -30,6 +30,9 @@
                         </h5>
                     </div>
                     <div class="box-body">
+                        <?php $this->view('templates/fe/alert/error', ['errors' => $contactErrors ?? null]); ?>
+                        <?php $this->view('templates/fe/alert/success', ['success' => $contactSuccess ?? null]); ?>
+
                         <form action="<?= base_url('contactUs'); ?>" method="post">
                             <div class="form-group">
                                 <label for="c-title">
@@ -41,7 +44,7 @@
                                 </label>
                                 <div class="main-input__wrapper no-icon right">
                                     <input type="text" id="c-title" class="form-control" name="title"
-                                           placeholder="عنوان">
+                                           placeholder="عنوان" value="<?= $contactValues['title'] ?? ''; ?>">
                                     <span class="input-icon left clear-icon">
                                         <i class="la la-times"></i>
                                     </span>
@@ -56,7 +59,8 @@
                                 </label>
                                 <div class="main-input__wrapper no-icon right">
                                     <input type="text" id="c-firstName" class="form-control" name="first_name"
-                                           placeholder="نام">
+                                           placeholder="نام"
+                                           value="<?= $contactValues['first_name'] ?? $identity->first_name ?? ''; ?>">
                                     <span class="input-icon left clear-icon">
                                         <i class="la la-times"></i>
                                     </span>
@@ -68,7 +72,8 @@
                                 </label>
                                 <div class="main-input__wrapper no-icon right">
                                     <input type="text" id="c-lastName" class="form-control" name="last_name"
-                                           placeholder="نام خانوادگی">
+                                           placeholder="نام خانوادگی"
+                                           value="<?= $contactValues['last_name'] ?? $identity->last_name ?? ''; ?>">
                                     <span class="input-icon left clear-icon">
                                         <i class="la la-times"></i>
                                     </span>
@@ -83,7 +88,8 @@
                                 </label>
                                 <div class="main-input__wrapper no-icon right">
                                     <input type="text" id="c-mobile" class="form-control" name="mobile"
-                                           placeholder="موبایل">
+                                           placeholder="موبایل"
+                                           value="<?= $contactValues['mobile'] ?? $identity->mobile ?? ''; ?>">
                                     <span class="input-icon left clear-icon">
                                         <i class="la la-times"></i>
                                     </span>
@@ -94,7 +100,8 @@
                                     ایمیل :
                                 </label>
                                 <div class="main-input__wrapper no-icon right">
-                                    <input type="text" id="c-email" class="form-control" name="email" placeholder="ایمیل">
+                                    <input type="text" id="c-email" class="form-control" name="email"
+                                           placeholder="ایمیل" value="<?= $contactValues['email'] ?? ''; ?>">
                                     <span class="input-icon left clear-icon">
                                         <i class="la la-times"></i>
                                     </span>
@@ -111,12 +118,13 @@
                                           id="c-body"
                                           cols="30" rows="10"
                                           class="form-control"
-                                          placeholder="متن مورد نظر شما"></textarea>
+                                          placeholder="متن مورد نظر شما"><?= $contactValues['body'] ?? ''; ?></textarea>
                             </div>
                             <div class="form-group text-center">
                                 <div class="form-group form-account-captcha" data-captcha-url="<?= ACTION; ?>">
                                     <img src="" alt="captcha">
-                                    <button type="button" class="btn btn-link text-danger font-size-21px mr-2 mb-0 form-captcha">
+                                    <button type="button"
+                                            class="btn btn-link text-danger font-size-21px mr-2 mb-0 form-captcha">
                                         <i class="la la-refresh"></i>
                                     </button>
                                 </div>

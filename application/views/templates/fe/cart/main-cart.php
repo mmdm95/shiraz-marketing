@@ -43,7 +43,7 @@
                                 <div class="card-info">
                                     <?php if ($item['discount_percentage'] != 0): ?>
                                         <span class="card-price-off">
-                                            <?php if (convertNumbersToPersian($item['discount_price'], true) == 0): ?>
+                                            <?php if ($item['discount_percentage'] == 100): ?>
                                                 رایگان
                                             <?php else: ?>
                                                 <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
@@ -56,7 +56,7 @@
                                         </span>
                                     <?php else: ?>
                                         <span class="card-price-off">
-                                            <?php if (convertNumbersToPersian($item['discount_price'], true) == 0): ?>
+                                            <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
                                                 رایگان
                                             <?php else: ?>
                                                 <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>

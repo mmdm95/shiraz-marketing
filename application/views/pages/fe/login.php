@@ -7,7 +7,7 @@
 <main class="main-container page-login">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-md-8 col-lg-5">
                 <div class="card-gap"></div>
                 <div class="box overflow-hidden">
                     <div class="box-header bg-info text-white py-4">
@@ -15,7 +15,12 @@
                         ورود به پنل کاربری
                     </div>
                     <div class="box-body">
-                        <form action="<?= base_url('login'); ?>" method="post">
+                        <?php $this->view('templates/fe/alert/error', ['errors' => $loginErrors ?? null]); ?>
+
+                        <form action="<?= base_url('login'); ?><?= isset($_GET['back_url']) ? '?back_url=' . URITracker::get_last_uri() : ''; ?>"
+                              method="post">
+                            <?= $form_token_login; ?>
+
                             <div class="form-group">
                                 <label for="l-username">
                                     نام کاربری
@@ -26,7 +31,7 @@
                                 </label>
                                 <div class="main-input__wrapper">
                                     <input type="text" id="l-username" class="form-control" name="username"
-                                           placeholder="نام کاربری">
+                                           placeholder="نام کاربری" value="<?= $loginValues['username'] ?? ''; ?>">
                                     <span class="input-icon right">
                                         <i class="la la-user"></i>
                                     </span>

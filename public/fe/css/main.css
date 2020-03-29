@@ -143,6 +143,10 @@
     background: var(--dark);
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: var(--font-default);
     background-color: var(--light-bg);
@@ -205,6 +209,12 @@ a {
     justify-content: stretch;
 }
 
+ul.list-persian {
+    list-style-type: decimal;
+    list-style-type: arabic-indic;
+    list-style-type: persian;
+}
+
 .rtl .list-inline-item:not(:last-child),
 .rtl-text .list-inline-item:not(:last-child) {
     margin-right: 0;
@@ -225,6 +235,10 @@ a {
 
 .font-size-48px {
     font-size: 48px;
+}
+
+.font-size-80px {
+    font-size: 80px;
 }
 
 .img-40px-40px {
@@ -256,6 +270,42 @@ a {
 .badge {
     padding: .4rem .75rem;
     font-size: 85%;
+}
+
+/****************************************
+************* Custom alerts *************
+*****************************************/
+
+.rtl .alert-dismissible,
+.rtl-text .alert-dismissible {
+    padding-right: 1.25rem;
+    padding-left: 4rem;
+}
+
+.rtl .alert-dismissible .close,
+.rtl-text .alert-dismissible .close {
+    left: 0;
+    right: auto;
+}
+
+/****************************************
+************ Custom dropdown ************
+*****************************************/
+
+.rtl .dropdown-toggle::after,
+.rtl-text .dropdown-toggle::after {
+    margin-right: .255em;
+    margin-left: 0;
+    vertical-align: 0;
+}
+
+.dropdown-item.active {
+    background-color: var(--success);
+}
+
+.dropdown-item {
+    padding-top: .625rem;
+    padding-bottom: .625rem;
 }
 
 /****************************************
@@ -342,6 +392,13 @@ a {
 
 .btn {
     padding: .75rem 1rem;
+}
+
+.btn-warning,
+.btn-warning:not(:disabled):not(.disabled):hover,
+.btn-warning:not(:disabled):not(.disabled):active,
+.btn-warning:not(:disabled):not(.disabled):focus {
+    color: #fff !important;
 }
 
 .btn-wd {
@@ -590,7 +647,7 @@ a {
 +++++++++++++++*/
 
 @media (min-width: 576px) {
-    .modal-dialog {
+    .modal-lg, .modal-xl {
         max-width: 92%;
     }
 }
@@ -839,6 +896,7 @@ a {
     font-size: 1.25rem;
     color: #666;
     padding: 1.5rem 0;
+    margin: 0;
 }
 
 .basket-container .basket-items-container .basket-items-info {
@@ -2375,8 +2433,16 @@ a {
 }
 
 .page-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
-    content: "\f111";
-    font: normal normal normal 13px/1 LineAwesome;
+    content: "\f104";
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-family: 'Line Awesome Free';
+    font-weight: 900;
     padding: 0 .75rem 0 .5rem;
 }
 
@@ -2602,7 +2668,7 @@ a {
     padding: 25px 0;
 }
 
-.shopping-cart-container .empty-cart .empty-text {
+.empty-text {
     display: block;
     text-align: center;
     font-size: 16px;

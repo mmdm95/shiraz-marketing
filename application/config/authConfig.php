@@ -54,10 +54,6 @@ return array(
                 'column' => 'mobile',
                 'type' => 'VARCHAR(11)'
             ],
-            'email' => [
-                'column' => 'email',
-                'type' => 'VARCHAR(255)'
-            ],
             'password' => [
                 'column' => 'password',
                 'type' => 'VARCHAR(128)'

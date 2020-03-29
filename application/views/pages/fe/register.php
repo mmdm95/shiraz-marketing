@@ -7,7 +7,7 @@
 <main class="main-container page-login">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-md-8 col-lg-5">
                 <div class="card-gap"></div>
                 <div class="box overflow-hidden">
                     <div class="box-header bg-success text-white py-4">
@@ -18,8 +18,12 @@
                         <div class="alert alert-info">
                             کلمه عبور باید شامل حروف و اعداد انگلیسی باشد و حداقل ۹ کاراکتر داشته باشد.
                         </div>
+                        <?php $this->view('templates/fe/alert/error', ['errors' => $registerErrors ?? null]); ?>
 
-                        <form action="<?= base_url('login'); ?>" method="post">
+                        <form action="<?= base_url('register'); ?><?= isset($_GET['back_url']) ? '?back_url=' . URITracker::get_last_uri() : ''; ?>"
+                              method="post">
+                            <?= $form_token_register; ?>
+
                             <div class="form-group">
                                 <label for="r-username">
                                     نام کاربری
@@ -30,7 +34,8 @@
                                 </label>
                                 <div class="main-input__wrapper">
                                     <input type="text" id="r-username" class="form-control" name="username"
-                                           placeholder="برای مثال: ۰۹۱۷xxxxxxx">
+                                           placeholder="برای مثال: ۰۹۱۷xxxxxxx"
+                                           value="<?= $registerValues['username'] ?? ''; ?>">
                                     <span class="input-icon right">
                                     <i class="la la-user"></i>
                                 </span>

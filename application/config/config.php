@@ -20,16 +20,16 @@ defined('DEF_ACTION') OR define('DEF_ACTION', 'index');
 //===============================================
 
 // Save The Keys In Your Configuration File
-defined('MAIN_KEY') OR define('MAIN_KEY','Lk5Uz3slx3BrAghS1aaW5AYgWZRV0tIX5eI0yPchFz4=');
-defined('ASSURED_KEY') OR define('ASSURED_KEY','EZ44mFi3TlAey1b2w4Y7lVDuqO+SRxGXsa7nctnr/JmMrA2vN6EJhrvdVZbxaQs5jpSe34X3ejFK/o9+Y5c83w==');
+defined('MAIN_KEY') OR define('MAIN_KEY', 'Lk5Uz3slx3BrAghS1aaW5AYgWZRV0tIX5eI0yPchFz4=');
+defined('ASSURED_KEY') OR define('ASSURED_KEY', 'EZ44mFi3TlAey1b2w4Y7lVDuqO+SRxGXsa7nctnr/JmMrA2vN6EJhrvdVZbxaQs5jpSe34X3ejFK/o9+Y5c83w==');
 
 //===============================================
 
 // Default user profile image
-defined('PROFILE_DEFAULT_IMAGE') OR define('PROFILE_DEFAULT_IMAGE', 'public/fe/img/user-default.jpg');
+defined('PROFILE_DEFAULT_IMAGE') OR define('PROFILE_DEFAULT_IMAGE', 'public/fe/images/user-default.jpg');
 
 // Default users profile image directory
-defined('PROFILE_IMAGE_DIR') OR define('PROFILE_IMAGE_DIR', 'public/users/profileImages/');
+defined('PROFILE_IMAGE_DIR') OR define('PROFILE_IMAGE_DIR', 'public/uploads/users/profileImages/');
 
 // My custom payment status
 defined('OWN_PAYMENT_STATUS_SUCCESSFUL') OR define('OWN_PAYMENT_STATUS_SUCCESSFUL', 1);
@@ -37,6 +37,18 @@ defined('OWN_PAYMENT_STATUS_FAILED') OR define('OWN_PAYMENT_STATUS_FAILED', 0);
 defined('OWN_PAYMENT_STATUS_NOT_PAYED') OR define('OWN_PAYMENT_STATUS_NOT_PAYED', -9);
 defined('OWN_PAYMENT_STATUS_WAIT') OR define('OWN_PAYMENT_STATUS_WAIT', -8);
 
+// My custom order code prefix
+defined('ITEMS_EACH_PAGE_DEFAULT') OR define('ITEMS_EACH_PAGE_DEFAULT', 24);
+
+// My custom sms replacement
+defined('SMS_REPLACEMENT_CHARS') OR define('SMS_REPLACEMENT_CHARS', [
+    'mobile' => '@mobile@',
+    'code' => '@code@',
+    'orderCode' => '@orderCode@',
+]);
+
+// My custom order code prefix
+defined('ORDER_CODE_PREFIX') OR define('ORDER_CODE_PREFIX', 'SHM-');
 
 // My custom send status
 defined('SEND_STATUS_IN_QUEUE') OR define('SEND_STATUS_IN_QUEUE', 1);

@@ -1,7 +1,7 @@
 <?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <?php if (count($updated_items_in_cart)): ?>
-    <div class="always-show-modal modal fade" id="myModal" tabindex="-1" role="dialog"
+    <div class="always-show-modal modal fade" tabindex="-1" role="dialog"
          aria-labelledby="Removed/Updated product(s)" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

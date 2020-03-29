@@ -10,8 +10,14 @@
     <div class="container">
         <nav class="page-breadcrumb" aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= base_url('index'); ?>" class="btn-link-black">خانه</a></li>
+                <li class="breadcrumb-item">
+                    <a href="<?= base_url('index'); ?>" class="btn-link-black">خانه</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="<?= base_url('product/all'); ?>" class="btn-link-black">همه محصولات</a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">
+                    <?= $orderText; ?>
                     محصولات
                 </li>
             </ol>
@@ -23,7 +29,7 @@
             <div class="d-flex mb-4">
                 <div class="section-title-icon"></div>
                 <h1 class="section-title">
-                    جدیدترین
+                    <?= $orderText; ?>
                 </h1>
             </div>
             <div class="d-sm-flex d-block align-items-center mb-4 justify-content-end">
@@ -31,516 +37,110 @@
                     <label for="sortBySelect" class="text-nowrap ml-3 mb-0">
                         مرتب سازی:
                     </label>
-                    <select name="sort_by" id="sortBySelect" class="input-select2">
-                        <option value="1">
+                    <button type="button" class="btn btn-light dropdown-toggle form-control" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <?= $orderText; ?>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item <?= $orderParam == 'newest' ? 'active' : ''; ?>"
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/newest">
                             جدیدترین
-                        </option>
-                        <option value="2">
+                        </a>
+                        <a class="dropdown-item <?= $orderParam == 'most_discount' ? 'active' : ''; ?>"
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_discount">
                             پرتخفیفترین
-                        </option>
-                        <option value="3">
+                        </a>
+                        <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_view">
                             پربازدیدترین
-                        </option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        میدان ولیعصر
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
                         </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۳۵٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۳۳،۸۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۲،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        ماسال
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور 2.5 روزه ماسوله تا ماسال
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۲۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۱۹۹،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۲۴۹،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        مشهد
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور ۳.۵ روزه مشهد
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۸۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۶۰،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        زعفرانیه
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تئاتر کمدی پاستیل
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۴۰،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        میدان ولیعصر
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۳۵٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۳۳،۸۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۲،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        ماسال
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور 2.5 روزه ماسوله تا ماسال
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۲۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۱۹۹،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۲۴۹،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        مشهد
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور ۳.۵ روزه مشهد
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۸۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۶۰،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        زعفرانیه
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تئاتر کمدی پاستیل
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۴۰،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        میدان ولیعصر
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۳۵٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۳۳،۸۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۲،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        ماسال
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور 2.5 روزه ماسوله تا ماسال
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۲۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۱۹۹،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۲۴۹،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        مشهد
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تور ۳.۵ روزه مشهد
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۸۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۵۶۰،۰۰۰
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <span class="card-location">
-                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                        زعفرانیه
-                    </span>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            تئاتر کمدی پاستیل
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <div>
-                        <span class="btn rounded-pill card-off-percentage">
-                            ۵۰٪
-                            <span class="card-off-percentage-takhfif">
-                                تخفیف
-                            </span>
-                        </span>
-                        </div>
-                        <div>
-                        <span class="card-price-off">
-                            ۲۰،۰۰۰
-                            تومان
-                        </span>
-                            <span class="card-price">
-                            ۴۰،۰۰۰
-                        </span>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <nav aria-label="صفحه‌بندی محصولات">
-            <ul class="pagination flex-row-reverse justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#"><i class="la la-angle-left" aria-hidden="true"></i></a></li>
-                <li class="page-item active"><a class="page-link" href="#">۱</a></li>
-                <li class="page-item"><a class="page-link" href="#">۲</a></li>
-                <li class="page-item"><a class="page-link" href="#">۳</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="la la-angle-right" aria-hidden="true"></i></a></li>
-            </ul>
-        </nav>
+        <?php if (count($products)): ?>
+            <div class="row">
+                <?php foreach ($products as $item): ?>
+                    <div class="card-wrapper col-lg-4 col-md-6 col-12">
+                        <div class="card">
+                            <div class="card-img">
+                                <div class="img-placeholder">
+                                    <i class="la la-image" aria-hidden="true"></i>
+                                </div>
+                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
+                                    <img src="<?= base_url($item['image']); ?>" alt="<?= $item['title']; ?>">
+                                </a>
+                                <span class="card-location">
+                                    <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                    <?= $item['place']; ?>
+                                </span>
+                            </div>
+                            <div class="card-title">
+                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
+                                    <?= $item['title']; ?>
+                                </a>
+                            </div>
+                            <div class="card-info">
+                                <div>
+                                    <?php
+                                    $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - convertNumbersToPersian($item['discount_price'], true)) / convertNumbersToPersian($item['price'], true)) * 100);
+                                    ?>
+                                    <?php if ($discountPercentage != 0): ?>
+                                        <span class="btn rounded-pill card-off-percentage">
+                                        <?= convertNumbersToPersian($discountPercentage); ?>
+                                            <span class="card-off-percentage-takhfif">
+                                                تخفیف
+                                            </span>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <?php if ($discountPercentage != 0): ?>
+                                        <span class="card-price-off">
+                                            <?php if ($discountPercentage == 100): ?>
+                                                رایگان
+                                            <?php else: ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
+                                                تومان
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="card-price">
+                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="card-price-off">
+                                            <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
+                                                رایگان
+                                            <?php else: ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                                تومان
+                                            <?php endif; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php $this->view('templates/fe/pagination', [
+                'total' => $pagination['total'],
+                'firstPage' => $pagination['firstPage'],
+                'lastPage' => $pagination['lastPage'],
+                'pageNo' => $pagination['page'],
+                'href' => base_url('product/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . '/order/' . $orderParam,
+            ]); ?>
+        <?php else: ?>
+            <div class="box">
+                <div class="box-body text-center text-secondary">
+                    <p class="empty-text">
+                        هیچ موردی پیدا نشد!
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 

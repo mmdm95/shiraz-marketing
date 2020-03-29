@@ -10,9 +10,14 @@
     <div class="container">
         <nav class="page-breadcrumb" aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= base_url('index'); ?>" class="btn-link-black">خانه</a></li>
+                <li class="breadcrumb-item">
+                    <a href="<?= base_url('index'); ?>" class="btn-link-black">خانه</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="<?= base_url('blog/all'); ?>" class="btn-link-black">همه اخبار و اطلاعیه‌ها</a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    اخبار و اطلاعیه‌ها
+                    <?= $orderText; ?>
                 </li>
             </ol>
         </nav>
@@ -23,689 +28,125 @@
             <div class="d-flex mb-4">
                 <div class="section-title-icon"></div>
                 <h1 class="section-title">
-                    جدیدترین
+                    <?= $orderText; ?>
                 </h1>
             </div>
             <div class="d-sm-flex d-block align-items-center mb-4 justify-content-end">
-                <div class="d-sm-flex d-inline-block align-items-center ml-sm-4 ml-0 mb-3">
-                    <label for="sortByCategorySelect" class="text-nowrap ml-3 mb-0">
-                        دسته‌بندی:
-                    </label>
-                    <select name="sort_by_category" id="sortByCategorySelect" class="input-select2">
-                        <option value="1">
-                            اطلاعیه
-                        </option>
-                        <option value="2">
-                            خبررسانی
-                        </option>
-                    </select>
-                </div>
+                <?php if (count($categories)): ?>
+                    <div class="d-sm-flex d-inline-block align-items-center ml-sm-4 ml-0 mb-3">
+                        <label for="sortByCategorySelect" class="text-nowrap ml-3 mb-0">
+                            دسته‌بندی:
+                        </label>
+                        <button type="button" class="btn btn-light dropdown-toggle form-control" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            <?= $categoryText; ?>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item <?= empty($categoryParam) ? 'active' : ''; ?>"
+                               href="<?= base_url('blog/all/order/' . $orderParam); ?>">
+                                همه
+                            </a>
+                            <?php foreach ($categories as $category): ?>
+                                <a class="dropdown-item <?= $category['slug'] == $categoryParam || $category['id'] == $categoryParam ? 'active' : ''; ?>"
+                                   href="<?= base_url('blog/all/category/' . $category['slug'] . '/order/' . $orderParam); ?>">
+                                    <?= $category['name']; ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
                 <div class="d-sm-flex d-inline-block align-items-center mb-3">
                     <label for="sortBySelect" class="text-nowrap ml-3 mb-0">
                         مرتب سازی:
                     </label>
-                    <select name="sort_by" id="sortBySelect" class="input-select2">
-                        <option value="1">
+                    <button type="button" class="btn btn-light dropdown-toggle form-control" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <?= $orderText; ?>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item <?= $orderParam == 'newest' ? 'active' : ''; ?>"
+                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/newest">
                             جدیدترین
-                        </option>
-                        <option value="2">
+                        </a>
+                        <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
+                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_view">
                             پربازدیدترین
-                        </option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            اردیبهشت
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
                         </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            اردیبهشت
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <div class="img-placeholder">
-                            <i class="la la-image" aria-hidden="true"></i>
-                        </div>
-                        <!--                    <a href="#">-->
-                        <!--                        <img src="-->
-                        <? //= asset_url('fe/images/tmp/c-1.jpg'); ?><!--" alt="">-->
-                        <!--                    </a>-->
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            اردیبهشت
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-2.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-3.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="card-wrapper col-lg-4 col-md-6 col-12">
-                <div class="card card-news">
-                    <div class="card-img">
-                        <a href="#">
-                            <img src="<?= asset_url('fe/images/tmp/c-4.jpg'); ?>" alt="">
-                        </a>
-                        <div class="card-date">
-                        <span class="day">
-                            ۲۶
-                        </span>
-                            <span class="month">
-                            شهریور
-                        </span>
-                        </div>
-                    </div>
-                    <div class="card-title">
-                        <a href="#">
-                            رستوران زند هتل پارسیان کوثر صبحانه
-                        </a>
-                    </div>
-                    <p class="card-abstract">
-                        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است،
-                        چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی
-                        مورد
-                        نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد، کتابهای زیادی در شصت و سه درصد
-                        گذشته
-                        حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای
-                        طراحان
-                        رایانه ای علی الخصوص طراحان خلاقی، و فرهنگ پیشرو در زبان فارسی ایجاد کرد، در این صورت می توان
-                        امید
-                        داشت که تمام و دشواری موجود در ارائه راهکارها، و شرایط سخت تایپ به پایان رسد و زمان مورد نیاز
-                        شامل
-                        حروفچینی دستاوردهای اصلی، و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار
-                        گیرد.
-                    </p>
-                    <div class="card-info">
-                        <ul class="list-unstyled">
-                            <li class="list-inline-item">
-                                <i class="la la-list"></i>
-                                <a href="#" class="btn-link-secondary">
-                                    خبررسانی
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <i class="la la-eye"></i>
-                                ۱،۱۱۰
-                                بازدید
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
 
-        <nav aria-label="صفحه‌بندی اخبار و اطلاعیه‌ها">
-            <ul class="pagination flex-row-reverse justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#"><i class="la la-angle-left"
-                                                                                aria-hidden="true"></i></a></li>
-                <li class="page-item active"><a class="page-link" href="#">۱</a></li>
-                <li class="page-item"><a class="page-link" href="#">۲</a></li>
-                <li class="page-item"><a class="page-link" href="#">۳</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="la la-angle-right" aria-hidden="true"></i></a>
-                </li>
-            </ul>
-        </nav>
+        <?php if (count($blog)): ?>
+            <div class="row">
+                <?php foreach ($blog as $b): ?>
+                    <div class="card-wrapper col-lg-4 col-md-6 col-12">
+                        <div class="card card-news">
+                            <div class="card-img">
+                                <div class="img-placeholder">
+                                    <i class="la la-image" aria-hidden="true"></i>
+                                </div>
+                                <a href="<?= base_url('blog/detail/' . $b['id'] . '/' . $b['slug']); ?>">
+                                    <img src="<?= base_url($b['image']); ?>" alt="<?= $b['title']; ?>">
+                                </a>
+                                <div class="card-date">
+                                    <?php
+                                    $day = jDateTime::date('d', $b['created_at']);
+                                    $month = jDateTime::date('F', $b['created_at']);
+                                    ?>
+                                    <span class="day">
+                                        <?= $day; ?>
+                                    </span>
+                                    <span class="month">
+                                        <?= $month; ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-title">
+                                <a href="<?= base_url('blog/detail/' . $b['id'] . '/' . $b['slug']); ?>">
+                                    <?= $b['title']; ?>
+                                </a>
+                            </div>
+                            <p class="card-abstract">
+                                <?= $b['abstract']; ?>
+                            </p>
+                            <div class="card-info">
+                                <ul class="list-unstyled">
+                                    <li class="list-inline-item">
+                                        <i class="la la-list"></i>
+                                        <a href="<?= base_url('blog/all/category/' . $b['category_id']); ?>"
+                                           class="btn-link-secondary">
+                                            <?= $b['category_name']; ?>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <i class="la la-eye"></i>
+                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($b['view_count']), true)); ?>
+                                        بازدید
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <?php $this->view('templates/fe/pagination', [
+                'total' => $pagination['total'],
+                'firstPage' => $pagination['firstPage'],
+                'lastPage' => $pagination['lastPage'],
+                'pageNo' => $pagination['page'],
+                'href' => base_url('blog/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . '/order/' . $orderParam,
+            ]); ?>
+        <?php else: ?>
+            <div class="box">
+                <div class="box-body text-center text-secondary">
+                    <p class="empty-text">
+                        هیچ موردی پیدا نشد!
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 

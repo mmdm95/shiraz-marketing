@@ -14,13 +14,19 @@ class Session implements SessionInterface
      * Session flash data identifier
      * @var $flash_prefix string
      */
-    protected $flash_prefix = '__flash_data_1475963';
+    protected $flash_prefix = '__flash_data_heeva_team';
 
     /**
      * Hash session data then store in session global array
      * @var $encode_session bool
      */
     protected $encode_session = true;
+
+    /**
+     * Use json_encode to encode any type of parameter
+     * @var bool $use_json_encode
+     */
+    protected $use_json_encode = true;
 
     public function __construct($start = true)
     {
@@ -51,14 +57,15 @@ class Session implements SessionInterface
      *    2. With null parameter, it just return sessions that are not flash data
      *
      * @param string|null $key
+     * @param bool $useJsonAssoc
      * @return mixed
      */
-    public function get($key = null)
+    public function get($key = null, $useJsonAssoc = true)
     {
         // To key specific session
         if ($this->hasStart() && !empty($key)) {
             if ($this->has($key)) {
-                return $this->prepareGetSessionValue($_SESSION[$key]);
+                return $this->prepareGetSessionValue($_SESSION[$key], $useJsonAssoc);
             }
             return null;
         }
@@ -67,7 +74,7 @@ class Session implements SessionInterface
         $sessions = array_diff($_SESSION, $_SESSION[$this->flash_prefix] ?? []);
         if ($this->encode_session) {
             foreach ($sessions as $k => $value) {
-                $sessions[$k] = $this->prepareGetSessionValue($value);
+                $sessions[$k] = $this->prepareGetSessionValue($value, $useJsonAssoc);
             }
         }
         return $sessions;
@@ -121,12 +128,13 @@ class Session implements SessionInterface
      *
      * @param $key
      * @param bool $delete
+     * @param bool $useJsonAssoc
      * @return mixed
      */
-    public function getFlash($key, $delete = true)
+    public function getFlash($key, $delete = true, $useJsonAssoc = true)
     {
         if ($this->hasStart() && $this->hasFlash($key)) {
-            $flashSess = $this->prepareGetSessionValue($_SESSION[$this->flash_prefix][$key]);
+            $flashSess = $this->prepareGetSessionValue($_SESSION[$this->flash_prefix][$key], $useJsonAssoc = true);
             if (true == (bool)$delete) {
                 $this->removeFlash($key);
             }
@@ -139,15 +147,16 @@ class Session implements SessionInterface
      * Get all flash sessions data
      *
      * @param bool $delete
+     * @param bool $useJsonAssoc
      * @return mixed
      */
-    public function getFlashes($delete = true)
+    public function getFlashes($delete = true, $useJsonAssoc = true)
     {
         if ($this->hasStart()) {
             $flashes = $_SESSION[$this->flash_prefix];
             if ($this->encode_session) {
                 foreach ($flashes as $key => $value) {
-                    $flashes[$key] = $this->prepareGetSessionValue($value);
+                    $flashes[$key] = $this->prepareGetSessionValue($value, $useJsonAssoc = true);
                     if (true == (bool)$delete) {
                         $this->removeFlash($key);
                     }
@@ -240,6 +249,19 @@ class Session implements SessionInterface
     public function encodeSessions($answer = true): SessionInterface
     {
         $this->encode_session = !(false === $answer);
+        return $this;
+    }
+
+    /**
+     * Use json_encode on value to store
+     *
+     * @param bool $answer
+     * @return SessionInterface
+     */
+    public function useJsonEncode($answer = true): SessionInterface
+    {
+        $this->use_json_encode = !(false === $answer);
+        return $this;
     }
 
     /**
@@ -250,7 +272,12 @@ class Session implements SessionInterface
      */
     protected function prepareSetSessionValue($value)
     {
-        $value = htmlspecialchars($value);
+        if (is_string($value)) {
+            $value = htmlspecialchars($value);
+        }
+        if ($this->use_json_encode) {
+            $value = json_encode($value);
+        }
         if ($this->encode_session) {
             $value = Crypt::getInstance()->encrypt($value);
             $value = false === $value ? "" : $value;
@@ -262,14 +289,24 @@ class Session implements SessionInterface
      * Prepare session value to retrieve (check if decryption need)
      *
      * @param $value
+     * @param $useJsonAssoc
      * @return mixed
      */
-    protected function prepareGetSessionValue($value)
+    protected function prepareGetSessionValue($value, $useJsonAssoc)
     {
         if ($this->encode_session) {
             $value = Crypt::getInstance()->decrypt($value);
         }
-        $value = htmlspecialchars_decode($value);
+        if (is_string($value)) {
+            if ($this->use_json_encode && $useJsonAssoc) {
+                $value = json_decode($value, true);
+            } else {
+                $value = json_decode($value);
+            }
+        }
+        if(is_string($value)) {
+            $value = htmlspecialchars_decode($value);
+        }
         return $value;
     }
 }

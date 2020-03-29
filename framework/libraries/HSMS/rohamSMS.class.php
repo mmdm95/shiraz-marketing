@@ -97,8 +97,6 @@ class rohamSMS implements smsInterface
     private $_config = [
         'userName' => 'shirazmarketing',
         'password' => '2280155346',
-//        'userName' => 'hrdashti',
-//        'password' => '1122',
     ];
 
     /**
@@ -108,8 +106,6 @@ class rohamSMS implements smsInterface
     private $_parameters = [
         'isFlash' => false,
         'fromNumber' => '10000100000',
-//        'fromNumber' => '5000200022',
-//        'fromNumber' => '210001010101010',
     ];
 
     /**
@@ -296,7 +292,7 @@ class rohamSMS implements smsInterface
     protected function _validate_numbers($numbers)
     {
         $numbers = array_filter($numbers, function ($number) {
-            return preg_match("/^09[0-9]{9}$/", $number);
+            return preg_match("/^(098|\+98|0)?9\d{9}$/", $number);
         });
         $numbers = convertNumbersToPersian($numbers, true);
         return $numbers;

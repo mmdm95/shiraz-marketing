@@ -10,6 +10,9 @@
     ],
     "require": {},
     "description": "",
+    "config": {
+        "optimize-autoloader": true
+    },
     "autoload": {
         "psr-4": {
             "HSession\\":"vendor/src/"

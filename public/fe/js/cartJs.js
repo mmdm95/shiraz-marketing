@@ -109,13 +109,14 @@
             }
 
             function addToCartClick() {
-                var $this, item;
+                var $this, item, quantity;
                 add_item_btn.off('click.' + namespace).on('click.' + namespace, function (e) {
                     e.preventDefault();
                     //-----
                     $this = $(this);
                     item = $this.attr('data-item-id');
-                    _this.addToCart(item);
+                    quantity = $this.attr('data-item-quantity');
+                    _this.addToCart(item, false, quantity);
                 });
             }
 
@@ -168,12 +169,15 @@
             _this.init = function () {
                 functionsCaller();
             };
-            _this.addToCart = function (item, color) {
+            _this.addToCart = function (item, color, quantity) {
                 ajax_obj.add = {};
                 if (item) {
                     ajax_obj['add']['postedId'] = item;
                     if (color) {
                         ajax_obj['add']['postedColorCode'] = color;
+                    }
+                    if (quantity) {
+                        ajax_obj['add']['quantity'] = quantity;
                     }
                     doAddAjax();
                 }
@@ -202,5 +206,26 @@
 
         var cart = $.cart();
         cart.init();
+    });
+
+    // Product detail add to cart js part
+    $(function () {
+        var
+            namespace = 'product_detail_action',
+            //-----
+            selectInp;
+
+        selectInp = $('[data-cart-quantity-for]');
+        selectInp.off('change.' + namespace).on('change.' + namespace, function () {
+            var $this, qnt, dist;
+            $this = $(this);
+            dist = $this.data('cart-quantity-for');
+            dist = dist && $(dist) && $(dist).length ? $(dist) : false;
+            qnt = $this.find(':selected');
+            qnt = qnt ? qnt.val() : $this.find('option').first().val();
+            if (qnt && dist) {
+                dist.data('item-quantity', qnt);
+            }
+        });
     });
 })(jQuery);

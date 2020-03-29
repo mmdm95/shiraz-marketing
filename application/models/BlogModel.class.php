@@ -2,31 +2,29 @@
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 
-require_once LIB_PATH . 'HPayment/vendor/autoload.php';
-
 class BlogModel extends HModel
 {
     public function __construct()
     {
         parent::__construct();
 
-        $this->table = 'blog';
+        $this->table = AbstractPaymentController::TBL_BLOG;
         $this->db = $this->getDb();
     }
 
-    public function getAllBlog($limit = null, $offset = 0, $where = '', $bindParams = [], $getQuery = false)
+    public function getAllBlog($where = '', $bindParams = [], $limit = null, $offset = 0, $orderBy = ['p.id DESC'])
     {
         $select = $this->select();
         $select->cols([
-            'b.image', 'b.title', 'b.slug', 'b.abstract', 'b.writer',
-            'b.created_at', 'b.updated_at', 'c.id AS c_id', 'c.category_name'
-        ])->from('blog AS b');
+            'b.image', 'b.title', 'b.slug', 'b.abstract', 'b.view_count',
+            'b.created_at', 'b.updated_at', 'b.category_id', 'c.name AS category_name'
+        ])->from($this->table . ' AS b');
 
         try {
             $select->join(
                 'LEFT',
-                'categories AS c',
-                'b.category_id=c.id'
+                AbstractPaymentController::TBL_BLOG_CATEGORY . ' AS c',
+                'c.id=b.category_id'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -38,17 +36,13 @@ class BlogModel extends HModel
         if (!empty($bindParams) && is_array($bindParams)) {
             $select->bindValues($bindParams);
         }
-
-        $select->where('b.publish=:pub')->bindValues(['pub' => 1]);
-
         if (!empty((int)$limit)) {
             $select->limit($limit);
         }
-        $select->orderBy(['b.id DESC'])->offset($offset);
-
-        if ((bool)$getQuery) {
-            return $select->getStatement();
+        if (!empty($orderBy) && is_array($orderBy)) {
+            $select->orderBy($orderBy);
         }
+        $select->offset($offset)->groupBy(['b.id']);
 
         return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
     }
@@ -91,7 +85,7 @@ class BlogModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            '*', 'b.id As id', 'b.publish AS publish', 'b.keywords',
+            'b.*', 'b.id As id', 'b.publish AS publish', 'b.keywords',
             'c.id AS c_id', 'c.publish AS c_publish'
         ])->from('blog AS b');
 

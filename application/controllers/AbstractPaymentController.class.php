@@ -67,6 +67,7 @@ abstract class AbstractPaymentController extends HController
     const TBL_SEND_STATUS = 'send_status';
     const TBL_STATIC_PAGES = 'static_pages';
     const TBL_USER = 'users';
+    const TBL_USER_ROLE = 'users_roles';
     const TBL_USER_ACCOUNT = 'user_accounts';
     const TBL_USER_ACCOUNT_DEPOSIT = 'user_account_deposit';
     const TBL_USER_BANK_ACCOUNT = 'user_bank_accounts';

@@ -3,7 +3,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 
 require_once LIB_PATH . 'HPayment/vendor/autoload.php';
 
-class FactorModel extends HModel
+class OrderModel extends HModel
 {
     public function __construct()
     {

@@ -37,7 +37,7 @@
 </main>
 
 <!-- Removed/Updated products modal -->
-<?php $this->view('templates/fe/cart/modified-items-modal', $data); ?>
+<?php $this->view('templates/fe/modal/modified-items', $data); ?>
 <!-- Removed/Updated products modal -->
 
 <?php $this->view('templates/fe/footer', $data); ?>

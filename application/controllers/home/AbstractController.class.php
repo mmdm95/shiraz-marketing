@@ -11,6 +11,8 @@ use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use HSMS\rohamSMS;
+use HSMS\SMSException;
 use Model;
 
 
@@ -25,23 +27,26 @@ abstract class AbstractController extends AbstractPaymentController
     protected $cartCookieName = 'cart__products_items_roham';
     //-----
     protected $messageSession = 'message_redirect_session';
+    // Flash message configuration
+    const FLASH_MESSAGE_TYPE_INFO = 'info';
+    const FLASH_MESSAGE_TYPE_WARNING = 'warning';
+    const FLASH_MESSAGE_TYPE_DANGER = 'danger';
+    const FLASH_MESSAGE_TYPE_SUCCESS = 'success';
+    //---->
+    const FLASH_MESSAGE_ICON_INFO = 'la la-info-circle';
+    const FLASH_MESSAGE_ICON_WARNING = 'la la-exclamation-circle';
+    const FLASH_MESSAGE_ICON_DANGER = 'la la-times-circle';
+    const FLASH_MESSAGE_ICON_SUCCESS = 'la la-check-circle';
 
     public function __construct()
     {
         parent::__construct();
 
         $this->load->library('HAuthentication/Auth');
-//        try {
-//            $this->auth = new Auth();
-//            $_SESSION['home_panel_namespace'] = 'home_hva_ms_rhm_7472';
-//            $this->auth->setNamespace($_SESSION['home_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
-//        } catch (HAException $e) {
-//            echo $e;
-//        }
         try {
             $this->auth = new Auth();
-            $_SESSION['admin_panel_namespace'] = 'admin_hva_ms_rhm_7472';
-            $this->auth->setNamespace($_SESSION['admin_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
+            $_SESSION['home_panel_namespace'] = 'home_hva_ms_rhm_7472';
+            $this->auth->setNamespace($_SESSION['home_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
         } catch (HAException $e) {
             echo $e;
         }
@@ -76,6 +81,14 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function loginAction()
     {
+        $this->_shared();
+
+        if ($this->auth->isLoggedIn()) {
+            $this->error->show_404();
+        }
+
+        $this->_login(['captcha' => ACTION]);
+
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ورود');
 
         $this->_render_page([
@@ -85,6 +98,12 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function registerAction()
     {
+        if ($this->auth->isLoggedIn()) {
+            $this->error->show_404();
+        }
+
+        $this->_register(['captcha' => ACTION]);
+
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ثبت نام');
 
         $this->_render_page([
@@ -110,6 +129,8 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function forgetPasswordAction($param)
     {
+        $this->_shared();
+
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فراموشی کلمه عبور');
 
         $this->_render_page([
@@ -119,6 +140,17 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function activationAction($param)
     {
+        $this->_shared();
+
+        $model = new Model();
+        $this->data['mobile'] = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess'] ?? '');
+
+        if (!isset($_SESSION['username_validation_sess']) || !isset($_SESSION['password_validation_sess']) ||
+            $this->data['mobile'] === false || !$model->is_exist('users', 'username=:u AND activation_code!=""',
+                ['u' => $this->data['mobile']])) {
+            $this->error->show_404();
+        }
+
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فعالسازی اکانت کاربری');
 
         $this->_render_page([
@@ -154,27 +186,30 @@ abstract class AbstractController extends AbstractPaymentController
 
         $model = new Model();
 
+        $this->load->helper('bank');
+
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token_register'] = $form->csrfToken('register');
-        $form->setFieldsName(['mobile', 'password', 're_password', 'role', 'registerCaptcha'])
-            ->setDefaults('role', AUTH_ROLE_GUEST)
-            ->setMethod('post', [], ['role']);
+        $form->setFieldsName(['username', 'password', 're_password', 'rules', 'registerCaptcha'])
+            ->setMethod('post', [], ['rules']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form, $param) {
-                $values['mobile'] = convertNumbersToPersian($values['mobile'], true);
+                $values['username'] = trim(convertNumbersToPersian($values['username'], true));
 
-                $form->isRequired(['mobile', 'password', 're_password', 'role', 'registerCaptcha'], 'فیلدهای ضروری را خالی نگذارید.');
-                if ($model->is_exist('users', 'username=:name AND active=:a',
-                    ['name' => $values['mobile'], 'a' => 1])) {
-                    $form->setError('این شماره تلفن وجود دارد، لطفا دوباره تلاش کنید.');
+                if (!$form->isChecked('rules')) {
+                    $form->setError('برای ادامه فرایند ثبت نام، می‌بایست قوانین سایت را بپذیرید.');
+                    return;
                 }
-                $form->isLengthInRange('password', 8, 16, 'تعداد رمز عبور باید بین ۸ تا ۱۶ کاراکتر باشد.');
-                $form->validatePersianMobile('mobile');
-                $form->validatePassword('password', 2, 'رمز عبور باید شامل حروف و اعداد باشد.');
-                if ($values['role'] == AUTH_ROLE_GUEST || !in_array($values['role'], [AUTH_ROLE_STUDENT, AUTH_ROLE_COLLEGE_STUDENT, AUTH_ROLE_GRADUATE])) {
-                    $form->setError('نقش انتخاب شده نامعتبر است.');
+
+                $form->isRequired(['username', 'password', 're_password', 'registerCaptcha'], 'فیلدهای ضروری را خالی نگذارید.');
+                if ($model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
+                    $form->setError('این شماره موبایل وجود دارد، لطفا دوباره تلاش کنید.');
+                    return;
                 }
+                $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.');
+                $form->validatePersianMobile('username');
+                $form->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
                 $config = getConfig('config');
                 if (!isset($config['captcha_session_name']) ||
                     !isset($_SESSION[$config['captcha_session_name']][$param['captcha']]) ||
@@ -184,26 +219,26 @@ abstract class AbstractController extends AbstractPaymentController
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $this->data['code'] = generateRandomString(6, GRS_NUMBER);
-                $this->data['_username'] = $values['mobile'];
-                $this->data['_password'] = trim($values['password']);
+                $this->data['_username'] = $values['username'];
 
+                $userModel = new \UserModel();
                 $model->transactionBegin();
-                $res2 = $model->delete_it('users', 'username=:u', ['u' => $values['mobile']]);
-                $res = $model->insert_it('users', [
-                    'activation_code' => $this->data['code'],
-                    'username' => convertNumbersToPersian(trim($values['mobile']), true),
+                $res = $model->insert_it(self::TBL_USER, [
+                    'user_code' => $userModel->getNewUserCode(),
+                    'mobile' => convertNumbersToPersian(trim($values['username']), true),
                     'password' => password_hash(trim($values['password']), PASSWORD_DEFAULT),
-                    'ip_address' => get_client_ip_env(),
-                    'created_on' => time(),
-                    'active' => 1,
                     'image' => PROFILE_DEFAULT_IMAGE,
+                    'activation_code' => $this->data['code'],
+                    'activation_code_time' => time(),
+                    'ip_address' => get_client_ip_env(),
+                    'created_at' => time(),
                 ], [], true);
-                $res3 = $model->insert_it('users_roles', [
+                $res3 = $model->insert_it(self::TBL_USER_ROLE, [
                     'user_id' => $res,
-                    'role_id' => (int)$values['role'],
+                    'role_id' => AUTH_ROLE_USER,
                 ]);
 
-                if ($res && $res2 && $res3) {
+                if ($res && $res3) {
                     $model->transactionComplete();
                 } else {
                     $model->transactionRollback();
@@ -218,28 +253,31 @@ abstract class AbstractController extends AbstractPaymentController
         if ($form->isSubmit()) {
             if ($res) {
                 $_SESSION['username_validation_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
-                $_SESSION['password_validation_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_password']);
 
                 // Send SMS code goes here
+                $this->load->library('HSMS/rohamSMS');
+                $sms = new rohamSMS();
+                try {
+                    $body = $this->setting['sms']['activationCodeMsg'];
+                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['_username'], $body);
+                    $body = str_replace(SMS_REPLACEMENT_CHARS['code'], $this->data['code'], $body);
+                    $is_sent = $sms->set_numbers($this->data['_username'])->body($body)->send();
+
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_INFO,
+                        'icon' => self::FLASH_MESSAGE_ICON_INFO,
+                        'message' => 'پیامک فعالسازی حساب کاربری برای شماره شما ارسال شد.',
+                    ]);
+                } catch (SMSException $e) {
+                    die($e->getMessage());
+                }
 
                 // Unset data
-                unset($this->data['mobile']);
                 unset($this->data['code']);
 
-                $message = 'در حال پردازش عملیات ورود';
+                $message = 'در حال پردازش عملیات ثبت نام';
                 $delay = 1;
-//                if (isset($_GET['back_url'])) {
-//                    $this->redirect(base_url('verifyPhone?back_url=' . $_GET['back_url']), $message, $delay);
-//                }
-
-                $login = $this->auth->login($this->data['_username'], $this->data['_password'], false,
-                    false, 'active=:active', ['active' => 1]);
-                if (is_array($login)) {
-                    $form->setError($login['err']);
-                    $this->data['registerErrors'] = $form->getError();
-                } else {
-                    $this->redirect(base_url('user/dashboard#profile'), $message, $delay);
-                }
+                $this->redirect(base_url('activation'), $message, $delay);
             } else {
                 $this->data['registerErrors'] = $form->getError();
                 $this->data['registerValues'] = $form->getValues();
@@ -252,13 +290,12 @@ abstract class AbstractController extends AbstractPaymentController
         $this->data['loginErrors'] = [];
         $this->data['loginValues'] = [];
 
-
         if ($this->auth->isLoggedIn()) {
             return;
         }
 
         $model = new Model();
-
+        //-----
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token_login'] = $form->csrfToken('login');
@@ -345,6 +382,7 @@ abstract class AbstractController extends AbstractPaymentController
         $msg = 'محصول با موفقیت به سبد اضافه شد.';
 
         $id = $_POST['postedId'] ?? null;
+        $quantity = $_POST['quantity'] ?? null;
         if (!isset($id) || !is_numeric($id)) {
             message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
@@ -362,15 +400,28 @@ abstract class AbstractController extends AbstractPaymentController
         if (array_key_exists($id, $saved_cart_items)) {
             $stockCount = $model->select_it(null, self::TBL_PRODUCT, 'stock_count',
                 'id=:id', ['id' => $id]);
-            if ($stockCount) {
+            if (count($stockCount)) {
                 $stockCount = convertNumbersToPersian($stockCount[0]['stock_count'], true);
-                if ($saved_cart_items[$id]['quantity'] + 1 > $stockCount) {
-                    $type = self::AJAX_TYPE_WARNING;
-                    $msg = 'محصول به تعداد حداکثر خود رسیده است!';
+                if (isset($quantity)) {
+                    if ($quantity > $stockCount) {
+                        $type = self::AJAX_TYPE_WARNING;
+                        $msg = 'محصول به تعداد حداکثر خود رسیده است!';
+                    } else {
+                        // make quantity a minimum of 1
+                        $quantity = !is_numeric($quantity) || $quantity <= 0 ? 1 : $quantity;
+                        $saved_cart_items[$id]['quantity'] = $quantity;
+                        $type = self::AJAX_TYPE_INFO;
+                        $msg = 'تعداد محصول در سبد تغییر کرد.';
+                    }
                 } else {
-                    $saved_cart_items[$id]['quantity'] += 1;
-                    $type = self::AJAX_TYPE_INFO;
-                    $msg = 'تعداد محصول در سبد افزایش یافت.';
+                    if ($saved_cart_items[$id]['quantity'] + 1 > $stockCount) {
+                        $type = self::AJAX_TYPE_WARNING;
+                        $msg = 'محصول به تعداد حداکثر خود رسیده است!';
+                    } else {
+                        $saved_cart_items[$id]['quantity'] += 1;
+                        $type = self::AJAX_TYPE_INFO;
+                        $msg = 'تعداد محصول در سبد افزایش یافت.';
+                    }
                 }
             } else {
                 $type = self::AJAX_TYPE_ERROR;
@@ -379,8 +430,14 @@ abstract class AbstractController extends AbstractPaymentController
 
             $cart_items = $saved_cart_items;
         } else {
-            // add new item on array
-            $cart_items[$id] = array('quantity' => 1);
+            if (isset($quantity)) {
+                // make quantity a minimum of 1
+                $quantity = !is_numeric($quantity) || $quantity <= 0 ? 1 : $quantity;
+                $cart_items[$id] = array('quantity' => $quantity);
+            } else {
+                // add new item on array
+                $cart_items[$id] = array('quantity' => 1);
+            }
             $cart_items = array_merge_recursive_distinct($cart_items, $saved_cart_items);
         }
 
@@ -396,7 +453,8 @@ abstract class AbstractController extends AbstractPaymentController
     public function updateCartAction()
     {
         if (!is_ajax() && $this->haveCartAccess !== true) {
-            $this->error->access_denied();
+//            $this->error->access_denied();
+            return false;
         }
 
         $cookieModel = new CookieModel();
@@ -428,7 +486,16 @@ abstract class AbstractController extends AbstractPaymentController
         $cookieModel->set_cookie($this->cartCookieName, '', time() - 3600);
 
         // add the item with updated quantity
-        $saved_cart_items[$id]['quantity'] = $quantity;
+        $stockCount = $model->select_it(null, self::TBL_PRODUCT, 'stock_count',
+            'id=:id', ['id' => $id]);
+        if (count($stockCount)) {
+            $stockCount = convertNumbersToPersian($stockCount[0]['stock_count'], true);
+            if ($quantity > $stockCount) {
+                message(self::AJAX_TYPE_WARNING, 200, 'محصول به تعداد حداکثر خود رسیده است!');
+            } else {
+                $saved_cart_items[$id]['quantity'] = $quantity;
+            }
+        }
 
         // enter new value
         $json = json_encode($saved_cart_items);
@@ -450,7 +517,6 @@ abstract class AbstractController extends AbstractPaymentController
         $model = new Model();
 
         $id = $_POST['postedId'] ?? null;
-        $colorCode = $_POST['postedColorCode'] ?? null;
         if (!isset($id) || !is_numeric($id)) {
             message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
@@ -574,11 +640,19 @@ abstract class AbstractController extends AbstractPaymentController
         $model = new Model();
 
         if (!$this->auth->isLoggedIn()) {
-
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'لطفا ابتدا به حساب کابری خود وارد شوید.',
+            ]);
             $this->redirect(base_url('login?back_url=' . base_url('shopping')));
         }
         if ($this->data['identity']->flag_buy != 1) {
-
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'لطفا اطلاعات حساب خود را تکمیل کنید.',
+            ]);
             $this->redirect(base_url('user/editUser?back_url=' . base_url('shopping')));
         }
 
@@ -590,23 +664,6 @@ abstract class AbstractController extends AbstractPaymentController
         if (!count($this->data['items'])) {
             $this->redirect(base_url('cart'));
         }
-        //-----
-        //Get addresses
-        $this->data['addresses'] = $model->select_it(null, 'users_address', '*',
-            'user_id=:uId', ['uId' => $this->data['identity']->id]);
-        // Get shippings
-        $this->data['shippings'] = $model->select_it(null, 'shippings', '*',
-            'status=:s', ['s' => 1]);
-
-        // Shared post variable for shipping info and side shopping card
-        $_POST['postedCode'] = $this->data['shippings'][0]['shipping_code'];
-        // Get shipping info part for first shipping
-        $this->haveShippingAccess = true;
-        $this->data['shipping_info'] = $this->shippingInformationAction();
-        // Get shopping side card part for first time
-        $this->haveShoppingSideCardAccess = true;
-        $this->data['shopping_side_card'] = $this->shoppingSideCardAction();
-        unset($_POST['postedCode']);
         //-----
 
         // Submit form for next step
@@ -717,7 +774,7 @@ abstract class AbstractController extends AbstractPaymentController
         return $saved_cart_items;
     }
 
-    private function _fetch_cart_items($cookie_items = null)
+    protected function _fetch_cart_items($cookie_items = null)
     {
         //-----
         $model = new Model();
@@ -732,7 +789,7 @@ abstract class AbstractController extends AbstractPaymentController
             $res = $info;
             foreach ($saved_cart_items as $k => $v) {
                 $res['quantity'] = $v['quantity'] > $res['stock_count'] ? $res['stock_count'] : $v['quantity'];
-                $res['discount_percentage'] = (convertNumbersToPersian($res['price'], true) - convertNumbersToPersian($res['discount_price'], true)) / convertNumbersToPersian($res['price'], true);
+                $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - convertNumbersToPersian($res['discount_price'], true)) / convertNumbersToPersian($res['price'], true)) * 100);
 
                 $items[] = $res;
             }
@@ -773,7 +830,6 @@ abstract class AbstractController extends AbstractPaymentController
                 $this->removeFromCartAction();
                 //-----
                 unset($_POST['postedId']);
-                unset($_POST['postedColorCode']);
             }
             if (count($mainItem) && $mainItem[0]['stock_count'] < $eachItem['quantity']) {
                 $_POST['postedId'] = $id;
@@ -1319,6 +1375,13 @@ abstract class AbstractController extends AbstractPaymentController
             $model->delete_it(self::TBL_ORDER_RESERVED, 'expire_time<=:et', ['et' => $reservedTime]);
         }
         //-----
+    }
+
+    //-----
+
+    protected function _shared()
+    {
+        $this->data['flash_message'] = $this->session->getFlash($this->messageSession);
     }
 
     //-----
