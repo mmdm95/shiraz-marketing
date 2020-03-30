@@ -35,7 +35,7 @@
                     <i class="la la-times" aria-hidden="true"></i>
                 </button>
             </div>
-            <div class="modal-body text-center">
+            <div class="modal-body text-center pt-0">
                 <?php if ($flash_message['icon']): ?>
                     <i class="font-size-80px <?= $color; ?> <?= $icon; ?>" aria-hidden="true"></i>
                 <?php endif; ?>

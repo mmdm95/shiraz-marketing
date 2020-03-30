@@ -5,9 +5,9 @@
     &copy;
     <?= convertNumbersToPersian(date('Y')); ?>
     _
-    توسعه داده شده توسط
-    <a href="#" target="_blank" class="text-purple">
-        تیم هیوا
+    توسعه داده شده توسط شرکت
+    <a href="http://www.spsroham.ir" target="_blank" class="text-orange">
+        داده افزار رهام
     </a>
 </div>
 <!-- /footer -->

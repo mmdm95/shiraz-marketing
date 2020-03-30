@@ -30,31 +30,30 @@ class BlogController extends AbstractController
     {
         $model = new Model();
         //-----
-//        if (!isset($param[0]) || !$model->is_exist('blog', 'slug=:slug AND publish=:pub', ['slug' => $param[0], 'pub' => 1])) {
-//            $_SESSION['blog-detail-err'] = 'پارامترهای ارسالی برای مشاهده بلاگ نادرست هستند!';
-//            $this->redirect(base_url('blog/allBlog'));
-//        }
+        if (!isset($param[0]) || !$model->is_exist(self::TBL_BLOG, 'id=:id AND publish=:pub', ['id' => $param[0], 'pub' => 1])) {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'مطلب مورد نظر وجود ندارد!',
+            ]);
+            $this->redirect(base_url('blog/all'));
+        }
         //-----
-//        $blog = new BlogModel();
-//        $this->data['blog'] = $blog->getBlogDetail(['slug' => $param[0]]);
-//        $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-//        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
-//        $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-//        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id ASC']);
+        $blog = new BlogModel();
+        $this->data['blog'] = $blog->getBlogDetail('id=:id', ['id' => $param[0]]);
+        $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
+        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
+        $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
+        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id ASC']);
         //-----
-//        $this->data['lastPosts'] = $model->select_it(null, 'blog', [
-//            'image', 'title', 'slug', 'writer', 'created_at', 'updated_at'
-//        ], 'publish=:pub', ['pub' => 1], null, ['id DESC'], 5);
+        $this->data['lastPosts'] = $blog->getAllBlog('b.publish=:pub', ['pub' => 1], 4);
         //-----
-//        $this->data['categories'] = $model->select_it(null, 'categories', ['id', 'category_name'],
-//            'publish=:pub', ['pub' => 1]);
+        $this->data['categories'] = $model->select_it(null, self::TBL_BLOG_CATEGORY, ['id', 'name', 'slug'],
+            'publish=:pub AND show_in_side=:sis', ['pub' => 1, 'sis' => 1]);
         //-----
-//        $this->data['related'] = $blog->getRelatedBlog($this->data['blog'], 3);
+        $this->data['related'] = $blog->getRelatedBlog($this->data['blog'], 6);
 
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'بلاگ');
-
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/blogJs.js');
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات بلاگ', @$this->data['blog']['title']);
 
         $this->_render_page([
             'pages/fe/blog-detail',

@@ -17,7 +17,7 @@
                     <div class="box-body">
                         <?php $this->view('templates/fe/alert/error', ['errors' => $loginErrors ?? null]); ?>
 
-                        <form action="<?= base_url('login'); ?><?= isset($_GET['back_url']) ? '?back_url=' . URITracker::get_last_uri() : ''; ?>"
+                        <form action="<?= base_url('login'); ?><?= isset($_GET['back_url']) ? '?back_url=' . $_GET['back_url'] : ''; ?>"
                               method="post">
                             <?= $form_token_login; ?>
 

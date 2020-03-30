@@ -69,40 +69,42 @@ class BlogModel extends HModel
                 $params['key_' . $k] = '%' . $keyword . '%';
             }
         }
-        if (isset($blog['c_id'])) {
+        if (isset($blog['category_id'])) {
             $where .= ' OR b.category_id=:catId';
-            $params['catId'] = $blog['c_id'];
+            $params['catId'] = $blog['category_id'];
         }
         //-----
         $where = trim(trim($where), 'OR');
         //-----
         $relatedWhere .= !empty($where) ? ' AND (' . $where . ')' : '';
 
-        return $this->getAllBlog($limit, 0, $relatedWhere, array_merge($relatedParams, $params));
+        return $this->getAllBlog($relatedWhere, array_merge($relatedParams, $params), $limit);
     }
 
-    public function getBlogDetail($params)
+    public function getBlogDetail($where, $bindParams = [])
     {
         $select = $this->select();
         $select->cols([
             'b.*', 'b.id As id', 'b.publish AS publish', 'b.keywords',
-            'c.id AS c_id', 'c.publish AS c_publish'
-        ])->from('blog AS b');
+            'c.id AS category_id', 'c.publish AS category_publish'
+        ])->from($this->table . ' AS b');
 
         try {
             $select->join(
                 'LEFT',
-                'categories AS c',
+                AbstractPaymentController::TBL_BLOG_CATEGORY . ' AS c',
                 'b.category_id=c.id'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
         }
 
-        if ($params['slug']) {
-            $select->where('slug=:slug')->bindValues(['slug' => $params['slug']]);
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
         }
-        $select->where('b.publish=:pub')->bindValues(['pub' => 1]);
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
 
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0];
@@ -113,13 +115,13 @@ class BlogModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'b.title', 'b.slug', 'b.id AS id', 'b.created_at', 'b.updated_at', 'c.category_name', 'c.id AS c_id'
-        ])->from('blog AS b');
+            'b.id', 'b.title', 'b.slug', 'b.created_at', 'b.updated_at', 'c.category_name', 'c.id AS category_id'
+        ])->from($this->table . ' AS b');
 
         try {
             $select->join(
                 'LEFT',
-                'categories AS c',
+                AbstractPaymentController::TBL_BLOG_CATEGORY . ' AS c',
                 'b.category_id=c.id'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
@@ -134,8 +136,7 @@ class BlogModel extends HModel
             $select->orderBy($orderBy);
         }
 
-        $select->where('b.publish=:pub')->bindValues(['pub' => 1])
-            ->limit(1);
+        $select->limit(1);
 
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0];

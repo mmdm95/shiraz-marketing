@@ -15,8 +15,6 @@ use voku\helper\AntiXSS;
 
 include_once 'AbstractController.class.php';
 
-
-
 class UserController extends AbstractController
 {
     public function addUserAction(){

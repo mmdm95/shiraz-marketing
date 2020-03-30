@@ -32,6 +32,8 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/index');
     }
 
+    //-----
+
     public function manageStaticPageAction()
     {
         // Base configuration
@@ -74,8 +76,12 @@ class HomeController extends AbstractController
 
     }
 
+    //-----
+
     public function manageFAQAction()
     {
+        $model = new Model();
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت سؤالات متداول');
 
@@ -89,13 +95,42 @@ class HomeController extends AbstractController
 
     public function addFAQAction()
     {
+        $model = new Model();
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('addFAQ');
+        $form->setFieldsName(['answer', 'question'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($model, $form) {
+                $form->isRequired(['answer', 'question'], 'فیلدهای ضروری را خالی نگذارید.');
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->insert_it(self::TBL_FAQ, [
+                    'answer' => trim($values['answer']),
+                    'question' => trim($values['question']),
+                ]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['faqVals'] = $form->getValues();
+            }
+        }
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن سؤال');
-
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
         $this->_render_page('pages/be/FAQ/addFAQ');
     }
@@ -112,6 +147,33 @@ class HomeController extends AbstractController
 
         $this->_render_page('pages/be/FAQ/editFAQ');
     }
+
+    public function deleteFAQAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            message('error', 403, 'دسترسی غیر مجاز');
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = 'faq';
+        if (!isset($id)) {
+            message('error', 200, 'پیام نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+            message('error', 200, 'سوال وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
+        if ($res) {
+            message('success', 200, 'سوال با موفقیت حذف شد.');
+        }
+
+        message('error', 200, 'عملیات با خطا مواجه شد.');
+    }
+
+    //-----
 
     public function manageSliderAction()
     {
@@ -152,6 +214,8 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/slider/editSlide');
     }
 
+    //-----
+
     public function manageContactUsAction()
     {
         // Base configuration
@@ -177,6 +241,8 @@ class HomeController extends AbstractController
 
         $this->_render_page('pages/be/ContactUs/viewContact');
     }
+
+    //-----
 
     public function manageComplaintsAction()
     {
@@ -204,55 +270,7 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/Complaint/viewComplaint');
     }
 
-
-    public function fileUploadAction($params)
-    {
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
-        }
-
-        $this->load->helper('easy file manager');
-        //Security options
-        $this->data['upload']['allow_upload'] = allow_upload();
-        $this->data['upload']['allow_create_folder'] = allow_create_folder();
-        $this->data['upload']['allow_direct_link'] = allow_direct_link();
-        $this->data['upload']['MAX_UPLOAD_SIZE'] = max_upload_size();
-
-        if (isset($params[0]) && $params[0] == 'download') {
-            unset($params[0]);
-            $otherParams = implode(DS, $params);
-            if ($otherParams != '') {
-                $file = str_replace('@', '.', $otherParams);
-                if (file_exists($file)) {
-                    $filename = basename($file);
-                    header('Content-Type: ' . mime_content_type($file));
-                    header('Content-Length: ' . filesize($file));
-                    header(sprintf('Content-Disposition: attachment; filename=%s',
-                        strpos('MSIE', $_SERVER['HTTP_REFERER']) ? rawurlencode($filename) : "\"$filename\""));
-                    ob_flush();
-                    readfile(base_url($file));
-                    exit;
-                }
-            }
-        }
-
-        // Base configuration
-        // Extra header information
-        $this->data['title'] = titleMaker(' - ', set_value($this->setting['main']['title'] ?? ''), 'پنل مدیریت', 'مدیریت فایل‌ها');
-
-        // Extra css
-        $this->data['css'][] = $this->asset->css('be/css/efm.css');
-        $this->data['css'][] = $this->asset->css('be/css/treeview.css');
-
-        // Extra js
-        $this->data['js'][] = $this->asset->script('be/js/plugins/media/fancybox.min.js');
-
-        $this->load->view('templates/be/admin-header-part', $this->data);
-        $this->load->view('pages/be/file-upload', $this->data);
-        $this->load->view('templates/be/admin-js-part', $this->data);
-        $this->load->view('templates/be/efm-main', $this->data);
-        $this->load->view('templates/be/admin-footer-part', $this->data);
-    }
+    //-----
 
     public function settingAction()
     {
@@ -516,6 +534,57 @@ class HomeController extends AbstractController
             'pages/be/setting',
             'templates/be/efm'
         ]);
+    }
+
+    //-----
+
+    public function fileUploadAction($params)
+    {
+        if (!$this->auth->isLoggedIn()) {
+            $this->redirect(base_url('admin/login'));
+        }
+
+        $this->load->helper('easy file manager');
+        //Security options
+        $this->data['upload']['allow_upload'] = allow_upload();
+        $this->data['upload']['allow_create_folder'] = allow_create_folder();
+        $this->data['upload']['allow_direct_link'] = allow_direct_link();
+        $this->data['upload']['MAX_UPLOAD_SIZE'] = max_upload_size();
+
+        if (isset($params[0]) && $params[0] == 'download') {
+            unset($params[0]);
+            $otherParams = implode(DS, $params);
+            if ($otherParams != '') {
+                $file = str_replace('@', '.', $otherParams);
+                if (file_exists($file)) {
+                    $filename = basename($file);
+                    header('Content-Type: ' . mime_content_type($file));
+                    header('Content-Length: ' . filesize($file));
+                    header(sprintf('Content-Disposition: attachment; filename=%s',
+                        strpos('MSIE', $_SERVER['HTTP_REFERER']) ? rawurlencode($filename) : "\"$filename\""));
+                    ob_flush();
+                    readfile(base_url($file));
+                    exit;
+                }
+            }
+        }
+
+        // Base configuration
+        // Extra header information
+        $this->data['title'] = titleMaker(' - ', set_value($this->setting['main']['title'] ?? ''), 'پنل مدیریت', 'مدیریت فایل‌ها');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+        $this->data['css'][] = $this->asset->css('be/css/treeview.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/media/fancybox.min.js');
+
+        $this->load->view('templates/be/admin-header-part', $this->data);
+        $this->load->view('pages/be/file-upload', $this->data);
+        $this->load->view('templates/be/admin-js-part', $this->data);
+        $this->load->view('templates/be/efm-main', $this->data);
+        $this->load->view('templates/be/admin-footer-part', $this->data);
     }
 
     public function easyFileManagerAction()

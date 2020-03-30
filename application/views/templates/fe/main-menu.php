@@ -22,7 +22,7 @@
                     </button>
                     <div class="search-input">
                         <span class="search-icon">
-                            <i class="la la-search" aria-hidden="true"></i>
+                            <i class="la la-search float-right" aria-hidden="true"></i>
                         </span>
                         <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
                     </div>

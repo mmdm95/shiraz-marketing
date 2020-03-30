@@ -28,7 +28,7 @@ class ProductController extends AbstractController
         $model = new Model();
         $productModel = new ProductModel();
         //-----
-        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $param[0]])) {
+        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id AND publish=:pub', ['id' => $param[0], 'pub' => 1])) {
             $this->session->setFlash($this->messageSession, [
                 'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                 'icon' => self::FLASH_MESSAGE_ICON_WARNING,

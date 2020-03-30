@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\AbstractController;
 
 defined('BASE_PATH') OR exit('No direct script access allowed');
@@ -40,6 +41,9 @@ abstract class AbstractController extends AbstractPaymentController
         // Config(s)
         $this->data['favIcon'] = $this->setting['main']['favIcon'] ? base_url($this->setting['main']['favIcon']) : '';
         $this->data['logo'] = $this->setting['main']['logo'] ?? '';
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
 
 //        $model = new Model();
 //        $model->insert_it('users', [
