@@ -21,7 +21,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i>
-                            <span class="text-semibold">مشاهده محصولات</span>
+                            <span class="text-semibold">مشاهده سؤالات</span>
                         </h5>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                                 داشبورد
                             </a>
                         </li>
-                        <li class="active">مشاهده محصولات</li>
+                        <li class="active">مشاهده سؤالات</li>
                     </ul>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                             <div class="col-sm-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">محصولات</h6>
+                                        <h6 class="panel-title">سؤالات</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -66,32 +66,37 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-primary-600">
-                                                                <a href="<?= base_url(); ?>admin/editFAQ/"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteProductBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
+                                                <?php foreach ($faqValues as $key => $faq): ?>
+                                                    <tr>
+                                                        <td>
+                                                            <?= convertNumbersToPersian(($key + 1)); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= $faq['question']; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= $faq['answer']; ?>
+                                                        </td>
+                                                        <td style="width: 115px;" class="text-center">
+                                                            <ul class="icons-list">
+                                                                <li class="text-primary-600">
+                                                                    <a href="<?= base_url(); ?>admin/editFAQ/"
+                                                                       title="ویرایش" data-popup="tooltip">
+                                                                        <i class="icon-pencil7"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="text-danger-600">
+                                                                    <a class="deleteProductBtn"
+                                                                       title="حذف" data-popup="tooltip">
+                                                                        <input type="hidden"
+                                                                               value="<?= $faq['id']; ?>">
+                                                                        <i class="icon-trash"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

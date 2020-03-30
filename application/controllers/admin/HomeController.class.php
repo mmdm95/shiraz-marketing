@@ -36,10 +36,12 @@ class HomeController extends AbstractController
 
     public function manageStaticPageAction()
     {
+        $model = new Model();
+        $this->data['pages'] = $model->select_it(null, 'static_pages');
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت مطالب ثابت');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
@@ -76,11 +78,38 @@ class HomeController extends AbstractController
 
     }
 
+    public function deleteStaticPageAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            message('error', 403, 'دسترسی غیر مجاز');
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = self::TBL_STATIC_PAGES;
+        if (!isset($id)) {
+            message('error', 200, 'نوشته نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+            message('error', 200, 'نوشته وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
+        if ($res) {
+            message('success', 200, 'نوشته با موفقیت حذف شد.');
+        }
+
+        message('error', 200, 'عملیات با خطا مواجه شد.');
+    }
+
     //-----
 
     public function manageFAQAction()
     {
         $model = new Model();
+        $this->data['faqValues'] = $model->select_it(null, self::TBL_FAQ, '*',
+            null, null, null, ['id DESC']);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت سؤالات متداول');
@@ -96,6 +125,8 @@ class HomeController extends AbstractController
     public function addFAQAction()
     {
         $model = new Model();
+
+        $this->data['errors'] = [];
 
         $this->load->library('HForm/Form');
         $form = new Form();
@@ -125,7 +156,7 @@ class HomeController extends AbstractController
                 $this->data['success'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors'] = $form->getError();
-                $this->data['faqVals'] = $form->getValues();
+                $this->data['faqValues'] = $form->getValues();
             }
         }
 
@@ -135,15 +166,53 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/FAQ/addFAQ');
     }
 
-    public function editFAQAction()
+    public function editFAQAction($param)
     {
+        $model = new Model();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_FAQ, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/manageFAQ'));
+        }
+
+        $this->data['param'] = $param;
+
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('editFAQ');
+        $form->setFieldsName(['question', 'answer'])->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($model, $form) {
+                $form->isRequired(['question', 'answer'], 'فیلدهای ضروری را خالی نگذارید.');
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->update_it(self::TBL_FAQ, [
+                    'answer' => trim($values['answer']),
+                    'question' => trim($values['question']),
+                ], 'id=:id', ['id' => $this->data['param'][0]]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['faqValues'] = $form->getValues();
+            }
+        }
+
+        $this->data['faqCurValues'] = $model->select_it(null, self::TBL_FAQ, '*', 'id=:id', ['id' => $param[0]])[0];
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش سؤال');
-
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
         $this->_render_page('pages/be/FAQ/editFAQ');
     }
@@ -157,7 +226,7 @@ class HomeController extends AbstractController
         $model = new Model();
 
         $id = @$_POST['postedId'];
-        $table = 'faq';
+        $table = self::TBL_FAQ;
         if (!isset($id)) {
             message('error', 200, 'پیام نامعتبر است.');
         }

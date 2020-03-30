@@ -28,6 +28,10 @@ abstract class AbstractController extends AbstractPaymentController
             echo $e;
         }
 
+        if (ACTION != 'login' && !$this->auth->isLoggedIn()) {
+            $this->redirect(base_url('admin/login'));
+        }
+
         // Load file helper .e.g: read_json, etc.
         $this->load->helper('file');
 

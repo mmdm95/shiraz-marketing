@@ -41,13 +41,17 @@
                 </div>
             </div>
             <!-- /page header -->
+
             <!-- Content area -->
             <div class="content">
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
-                              class="validation-form">
+                        <form action="<?= base_url(); ?>admin/addFAQ" method="post">
+                            <?= $form_token; ?>
+                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
@@ -68,16 +72,16 @@
                                             </p>
                                             <div class="row">
                                                 <div class="form-group col-md-12 mt-10">
-                                        <textarea rows="5" cols="12" class="form-control"
-                                                  name="question"
-                                                  style="min-height: 100px; resize: vertical;"
-                                                  placeholder="سؤال"></textarea>
+                                                    <textarea rows="5" cols="12" class="form-control"
+                                                              name="question"
+                                                              style="min-height: 100px; resize: vertical;"
+                                                              placeholder="سؤال"><?= $faqValues['question'] ?? ''; ?></textarea>
                                                 </div>
                                                 <div class="form-group col-md-12 mt-10">
-                                        <textarea rows="5" cols="12" class="form-control"
-                                                  name="answer"
-                                                  style="min-height: 100px; resize: vertical;"
-                                                  placeholder="پاسخ"></textarea>
+                                                    <textarea rows="5" cols="12" class="form-control"
+                                                              name="answer"
+                                                              style="min-height: 100px; resize: vertical;"
+                                                              placeholder="پاسخ"><?= $faqValues['answer'] ?? ''; ?></textarea>
                                                 </div>
                                                 <div class="text-right col-md-12">
                                                     <button type="submit" class="btn btn-primary">
@@ -93,6 +97,7 @@
                         </form>
                     </div>
                 </div>
+
                 <!-- Footer -->
                 <?php $this->view("templates/be/copyright", $data); ?>
                 <!-- /footer -->
