@@ -22,11 +22,10 @@ class ReportController extends AbstractController
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'گزارش سفارشات');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
-        $this->_render_page('pages/be/report/orderReport');
+        $this->_render_page('pages/be/Report/orderReport');
     }
 }

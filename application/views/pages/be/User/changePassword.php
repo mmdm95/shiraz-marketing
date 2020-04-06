@@ -46,70 +46,54 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
-                              class="validation-form">
-                            <!--                            --><? //= $data['form_token']; ?>
+                        <form action="<?= base_url('admin/user/changePassword/' . $param[0]); ?>" method="post">
+                            <?= $form_token; ?>
 
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">
-                                            <h6 class="panel-title">مشخصات فردی</h6>
+                                            <h6 class="panel-title">تغییر کلمه عبور</h6>
                                             <div class="heading-elements">
                                                 <ul class="icons-list">
                                                     <li><a data-action="collapse"></a></li>
-                                                    <li><a data-action="close"></a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <?php //if (isset($data['errors']) && count($data['errors'])): ?>
-                                            <div class="alert alert-danger">
-                                                <ul>
-                                                    <?php //foreach ($data['errors'] as $err): ?>
-                                                    <li>
-                                                        <? //= $err; ?><!--</li>-->
-                                               <?php //endforeach; ?>
-                                                </ul>
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
-                                            </div>
-                                            <?php //elseif (isset($data['success'])): ?>
-                                            <div class="alert alert-success">
-                                                <p>
-                                                    <? //= $data['success']; ?>
-                                                </p>
-                                            </div>
-
-                                            <?php //endif; ?>
                                             <div class="alert alert-info alert-styled-left alert-bordered">
                                                 <p>
                                                     <i class="icon-dash"></i>
-                                                    در صورت عدم تغییر رمز عبور، این مقدار تغییر نخواهد کرد.
+                                                    کلمه عبور باید شامل حروف و اعداد انگلیسی و حداقل ۹ کاراکتر باشد.
                                                 </p>
                                             </div>
+
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>رمز عبور جدید:</label>
-                                                <input name="password" type="text"
+                                                <input name="password" type="password"
                                                        class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
+                                                       value="">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>تکرار رمز عبور جدید:</label>
-                                                <input name="re_password" type="text"
+                                                <input name="re_password" type="password"
                                                        class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
-                                                       value=""">
+                                                       value="">
                                             </div>
 
                                             <div class="text-right col-md-12">
-                                                <a href="<?= base_url('admin/manageUser'); ?>"
+                                                <a href="<?= base_url('admin/user/manageUser'); ?>"
                                                    class="btn btn-default mr-5">
                                                     بازگشت
                                                 </a>
                                                 <button type="submit"
-                                                        class="btn btn-primary submit-button submit-button">
-                                                    ذخیره
+                                                        class="btn btn-success submit-button submit-button">
+                                                    تغییر کلمه عبور
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

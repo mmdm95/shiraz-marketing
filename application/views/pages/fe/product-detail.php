@@ -81,7 +81,8 @@
                         </div>
                     </div>
                     <?php
-                    $discountPercentage = floor(((convertNumbersToPersian($product['price'], true) - convertNumbersToPersian($product['discount_price'], true)) / convertNumbersToPersian($product['price'], true)) * 100);
+                    $discount = $product['discount_until'] > time() ? convertNumbersToPersian($product['discount_price'], true) : 0;
+                    $discountPercentage = floor(((convertNumbersToPersian($product['price'], true) - $discount) / convertNumbersToPersian($product['price'], true)) * 100);
                     ?>
                     <div class="box-body pt-0">
                         <div class="product-detail-side">
@@ -252,10 +253,15 @@
                             محصولات مرتبط
                         </h1>
                     </div>
-                    <div class="similar-items owl-carousel">
+                    <div class="items-slider-col-3 owl-carousel">
                         <?php foreach ($product['related'] as $related): ?>
                             <div class="card-wrapper semi-col-3">
                                 <div class="card">
+                                    <?php if ($related['is_special'] == 1): ?>
+                                        <div class="off-label">
+                                            ویژه
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="card-img">
                                         <div class="img-placeholder">
                                             <i class="la la-image" aria-hidden="true"></i>
@@ -265,12 +271,12 @@
                                                  alt="<?= $related['title']; ?>">
                                         </a>
                                         <span class="card-location">
-                                        <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                                        <?= $related['place']; ?>
-                                    </span>
+                                            <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                            <?= $related['place']; ?>
+                                        </span>
                                     </div>
                                     <div class="card-title">
-                                        <a href="<?= base_url('product/detail/' . $related['id'] . '/' . $related['slug']); ?>">
+                                        <a href="<?= base_url('product/detail/' . $related['id'] . '/' . $related['slug']); ?>" title="<?= $related['title']; ?>">
                                             <?= $related['title']; ?>
                                         </a>
                                     </div>
@@ -293,19 +299,19 @@
                                                     <?php if ($discountPercentage == 100): ?>
                                                         رایگان
                                                     <?php else: ?>
-                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['discount_price'], true))); ?>
+                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['discount_price'], true))); ?>
                                                         تومان
                                                     <?php endif; ?>
                                                 </div>
                                                 <div class="card-price">
-                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['price'], true))); ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['price'], true))); ?>
                                                 </div>
                                             <?php else: ?>
                                                 <div class="card-price-off">
-                                                    <?php if (convertNumbersToPersian($product['price'], true) == 0): ?>
+                                                    <?php if (convertNumbersToPersian($related['price'], true) == 0): ?>
                                                         رایگان
                                                     <?php else: ?>
-                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['price'], true))); ?>
+                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['price'], true))); ?>
                                                         تومان
                                                     <?php endif; ?>
                                                 </div>

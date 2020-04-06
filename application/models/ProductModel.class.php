@@ -15,9 +15,9 @@ class ProductModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.stock_count', 'p.max_cart_count', 'p.place',
-            'p.available', 'p.category_id', 'p.is_special', 'c.slug AS category_slug', 'c.name AS category_name',
-            'c.icon AS category_icon', 'u.mobile AS username', 'u.first_name AS user_first_name',
+            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.discount_until', 'p.stock_count', 'p.max_cart_count',
+            'p.place', 'p.available', 'p.category_id', 'p.is_special', 'c.slug AS category_slug', 'c.name AS category_name',
+            'c.icon AS category_icon', 'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name',
         ])->from($this->table . ' AS p');
 
         try {
@@ -78,6 +78,8 @@ class ProductModel extends HModel
         }
         $select->limit(1);
 
-        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0];
+        return [];
     }
 }

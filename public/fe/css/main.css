@@ -1394,7 +1394,7 @@ a {
 }
 
 .main-input__wrapper .form-control {
-    padding: 24px 60px;
+    padding: 18px 60px;
 }
 
 .main-input__wrapper.no-icon.right .form-control {
@@ -1664,6 +1664,8 @@ a {
     overflow: hidden;
 }
 
+.card-wrapper.semi-col-4 .card-img,
+.card-wrapper.semi-col-4 .card-img img,
 .card-wrapper.col-lg-4 .card-img,
 .card-wrapper.col-lg-4 .card-img img {
     width: 100%;
@@ -1686,7 +1688,7 @@ a {
 .card .card-title a {
     display: block;
     height: 50px;
-    font-size: 15px;
+    font-size: .95rem;
     color: var(--dark);
     padding: 0 1.25rem;
     line-height: 50px;
@@ -1721,7 +1723,7 @@ a {
 .card .card-info .card-price-off {
     display: block;
     color: var(--success);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     text-align: center;
 }
 
@@ -1729,12 +1731,14 @@ a {
     display: block;
     color: var(--sub-title-color);
     text-decoration: line-through;
-    font-size: 1.05rem;
+    font-size: .95rem;
     text-align: center;
 }
 
 /*********** News card ************/
 
+.card-wrapper.semi-col-4 .card-news .card-img,
+.card-wrapper.semi-col-4 .card-news .card-img img,
 .card-wrapper.col-lg-4 .card-news .card-img,
 .card-wrapper.col-lg-4 .card-news .card-img img {
     width: 100%;
@@ -1791,8 +1795,8 @@ a {
     padding: 0 1rem;
     overflow: hidden;
     text-align: justify;
-    line-height: 28px;
-    font-size: 1.05rem;
+    line-height: 1.8;
+    font-size: .95rem;
     color: var(--sub-title-color-2);
     opacity: 0;
     visibility: hidden;
@@ -1810,7 +1814,7 @@ a {
 .card-wrapper .card-news .card-info .list-unstyled {
     padding: 0;
     margin: 0;
-    font-size: 1.05rem;
+    font-size: .9rem;
 }
 
 .card-wrapper .card-news .card-info .list-inline-item {
@@ -1820,7 +1824,7 @@ a {
 .card-wrapper .card-news .card-info .list-inline-item i {
     float: right;
     margin-left: 7px;
-    font-size: 1.5rem;
+    font-size: 1.325rem;
 }
 
 .card-wrapper .card-news .card-img {
@@ -1839,6 +1843,7 @@ a {
     transition: all ease-in-out 0.2s;
 }
 
+.card-wrapper.semi-col-4 .card-news:hover .card-img,
 .card-wrapper.col-lg-4 .card-news:hover .card-img {
     width: 100%;
     height: 203px;
@@ -1866,6 +1871,8 @@ a {
 +++++++++++++++*/
 
 @media (max-width: 1199.98px) {
+    .card-wrapper.semi-col-4 .card-img,
+    .card-wrapper.semi-col-4 .card-img img,
     .card-wrapper.col-lg-4 .card-img,
     .card-wrapper.col-lg-4 .card-img img {
         height: 188px;
@@ -1879,6 +1886,8 @@ a {
     }
 
     /*********** News card ************/
+    .card-wrapper.semi-col-4 .card-news .card-img,
+    .card-wrapper.semi-col-4 .card-news .card-img img,
     .card-wrapper.col-lg-4 .card-news .card-img,
     .card-wrapper.col-lg-4 .card-news .card-img img {
         height: 248px;
@@ -1891,6 +1900,7 @@ a {
         height: 198px;
     }
 
+    .card-wrapper.semi-col-4 .card-news:hover .card-img,
     .card-wrapper.col-lg-4 .card-news:hover .card-img {
         height: 148px;
     }
@@ -1985,7 +1995,7 @@ a {
 
 .owl-carousel .owl-nav button.owl-next.disabled,
 .owl-carousel .owl-nav button.owl-prev.disabled {
-    opacity: 0;
+    opacity: .15;
 }
 
 .owl-carousel .owl-nav {
@@ -2748,15 +2758,23 @@ a {
 +++++++++++++++*/
 
 @media (max-width: 767.98px) {
-    .similar-items .card-wrapper.semi-col-3 .card-img,
-    .similar-items .card-wrapper.semi-col-3 .card-img img {
+    .items-slider-col-4 .card-info .card-off-percentage .card-off-percentage-takhfif {
+        display: none;
+    }
+
+    .items-slider-col-4 .card-wrapper.semi-col-4 .card-img,
+    .items-slider-col-4 .card-wrapper.semi-col-4 .card-img img,
+    .items-slider-col-3 .card-wrapper.semi-col-3 .card-img,
+    .items-slider-col-3 .card-wrapper.semi-col-3 .card-img img {
         height: 213px !important;
     }
 }
 
 @media (max-width: 575.98px) {
-    .similar-items .card-wrapper.semi-col-3 .card-img,
-    .similar-items .card-wrapper.semi-col-3 .card-img img {
+    .items-slider-col-4 .card-wrapper.semi-col-4 .card-img,
+    .items-slider-col-4 .card-wrapper.semi-col-4 .card-img img,
+    .items-slider-col-3 .card-wrapper.semi-col-3 .card-img,
+    .items-slider-col-3 .card-wrapper.semi-col-3 .card-img img {
         height: auto !important;
     }
 }

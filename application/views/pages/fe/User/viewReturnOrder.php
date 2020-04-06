@@ -30,14 +30,14 @@
                 <div class="breadcrumb-line">
                     <ul class="breadcrumb">
                         <li>
-                            <a href="">
+                            <a href="<?= base_url('user/dashboard'); ?>">
                                 <i class="icon-home2 position-left"></i>
                                 داشبورد
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url(); ?>user/viewReturnOrder">
-                                نمایش سفارشات
+                            <a href="<?= base_url(); ?>user/manageReturnOrder">
+                                نمایش درخواست‌های مرجوعی
                             </a>
                         </li>
                         <li class="active">جزئیات</li>
@@ -50,104 +50,93 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">مشخصات سفارش</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">مشخصات سفارش</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row mb-20">
+                                    <div class="col-lg-12 mb-5 text-teal">
+                                        <strong>
+                                            <i class="icon-circle-left2 mr-5"></i>
+                                            شماره سفارش
+                                        </strong>
                                     </div>
-                                    <div class="panel-body">
-                                        <div class="row mb-20">
-                                            <div class="col-lg-12 mb-5 text-teal">
-                                                <strong>
-                                                    <i class="icon-circle-left2 mr-5"></i>
-                                                    شماره سفارش
-                                                </strong>
-                                            </div>
-                                            <div class="col-md-12 text-center p-15 border border-grey-300 text-white">
-                                                <h6 class="no-margin">
-                                                    <strong>
-
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                        </div>
-                                        <div class="row mt-20 mb-20"></div>
-                                        <div class="row mb-20">
-                                            <div class="col-sm-12 mb-5 text-teal">
-                                                <strong>
-                                                    <i class="icon-circle-left2 mr-5"></i>
-                                                    مشخصات پرداخت
-                                                </strong>
-                                            </div>
-                                            <div class="col-md-6 text-center p-15 border border-grey-300 text-primary">
-                                                <h6 class="no-margin">
-                                                    <small class="text-grey-800">
-                                                        کد فاکتور:
-                                                    </small>
-                                                    <strong>
-
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                            <div class="col-md-6 text-center p-15 border border-grey-300 text-primary">
-                                                <h6 class="no-margin">
-                                                    <small class="text-grey-800">
-                                                        تاریخ پرداخت:
-                                                    </small>
-                                                    <strong>
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                            <div class="col-md-12 text-center p-15 border border-grey-300 alert-primary">
-                                                <h6 class="no-margin">
-                                                    <small class="text-grey-800">
-                                                    دلیل درخواست مرجوعی و توضیحات خریدار:
-                                                    </small>
-                                                    <strong>
-
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                        </div>
-                                        <div class="row mt-20 mb-20"></div>
-                                        <div class="row mb-20">
-                                            <div class="col-sm-12 mb-5 text-teal">
-                                                <strong>
-                                                    <i class="icon-circle-left2 mr-5"></i>
-                                                    مشخصات ثبت کننده سفارش
-                                                </strong>
-                                            </div>
-                                            <div class="col-md-6 text-center p-15 border border-grey-300">
-                                                <h6 class="no-margin">
-                                                    <small class="text-grey-800">
-                                                        نام و نام خانوادگی :
-                                                    </small>
-                                                    <strong>
-
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                            <div class="col-md-6 text-center p-15 border border-grey-300">
-                                                <h6 class="no-margin">
-                                                    <small class="text-grey-800">
-                                                        شماره موبایل :
-                                                    </small>
-                                                    <strong>
-
-                                                    </strong>
-                                                </h6>
-                                            </div>
-                                        </div>
-                                        <div class="row mt-20 mb-20"></div>
+                                    <div class="col-md-12 text-center p-15 border border-grey-300 text-white">
+                                        <h6 class="no-margin">
+                                            <strong>
+                                                <?= $order['order_code']; ?>
+                                            </strong>
+                                        </h6>
                                     </div>
                                 </div>
 
+                                <div class="row mt-20 mb-20"></div>
+
+                                <div class="row mb-20">
+                                    <div class="col-sm-12 mb-5 text-teal">
+                                        <strong>
+                                            <i class="icon-circle-left2 mr-5"></i>
+                                            مشخصات پرداخت
+                                        </strong>
+                                    </div>
+                                    <div class="col-md-6 text-center p-15 border border-grey-300 text-primary">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                تاریخ پرداخت:
+                                            </small>
+                                            <strong>
+                                                <?= jDateTime::date('j F Y در ساعت H:i', $order['payment_date']); ?>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 text-center p-15 border border-grey-300 alert-primary">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                دلیل درخواست مرجوعی و توضیحات خریدار:
+                                            </small>
+                                            <strong>
+                                                <?= $order['description']; ?>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-20 mb-20"></div>
+
+                                <div class="row mb-20">
+                                    <div class="col-sm-12 mb-5 text-teal">
+                                        <strong>
+                                            <i class="icon-circle-left2 mr-5"></i>
+                                            مشخصات ثبت کننده سفارش
+                                        </strong>
+                                    </div>
+                                    <div class="col-md-6 text-center p-15 border border-grey-300">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                نام و نام خانوادگی :
+                                            </small>
+                                            <strong>
+                                                <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 text-center p-15 border border-grey-300">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                شماره موبایل :
+                                            </small>
+                                            <strong>
+                                                <?= convertNumbersToPersian($order['mobile']); ?>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

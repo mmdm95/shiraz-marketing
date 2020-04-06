@@ -18,7 +18,7 @@
                     <div class="page-title">
                         <h5>
                             <i class="icon-circle position-left"></i> <span
-                                class="text-semibold">مدیریت اسلاید‌ها</span>
+                                    class="text-semibold">مدیریت اسلاید‌ها</span>
                         </h5>
                     </div>
                 </div>
@@ -40,62 +40,68 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">لیست اسلاید‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>تصویر</th>
-                                                    <th>لینک</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list mt-10">
-                                                            <li class="text-primary-600 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/editSlide"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">لیست اسلاید‌ها</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>تصویر</th>
+                                            <th>لینک</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($slideValues as $key => $slide): ?>
+                                            <tr>
+                                                <td width="50px">
+                                                    <?= convertNumbersToPersian($key + 1); ?>
+                                                </td>
+                                                <td width="100px">
+                                                    <a data-url="<?= base_url($slide['image']); ?>"
+                                                       data-popup="lightbox">
+                                                        <img src=""
+                                                             data-src="<?= base_url() . $slide['image']; ?>"
+                                                             alt="<?= $slide['link']; ?>"
+                                                             class="img-rounded img-preview lazy">
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="<?= $slide['link']; ?>" target="_blank">
+                                                        <?= $slide['link']; ?>
+                                                    </a>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list mt-10">
+                                                        <li class="text-primary-600 mr-5">
+                                                            <a href="<?= base_url('admin/editSlide/' . $slide['id']); ?>"
+                                                               title="ویرایش" data-popup="tooltip">
+                                                                <i class="icon-pencil7"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li class="text-danger-600">
+                                                            <a class="deleteSlideBtn"
+                                                               title="حذف" data-popup="tooltip">
+                                                                <input type="hidden"
+                                                                       value="<?= $slide['id']; ?>">
+                                                                <i class="icon-trash"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

@@ -1601,7 +1601,7 @@ class Xls extends BaseReader
                     $codePage = CodePage::numberToName($value);
 
                     break;
-                case 0x02:    //    BlogCategory
+                case 0x02:    //    Category
                     $this->spreadsheet->getProperties()->setCategory($value);
 
                     break;

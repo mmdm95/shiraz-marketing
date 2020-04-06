@@ -2,6 +2,13 @@
     direction: rtl;
 }
 
+.note-size {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
 .my-main-page .list-inline > li:last-child {
     padding-left: 20px !important;
 }

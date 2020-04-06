@@ -14,7 +14,16 @@ class HomeController extends AbstractController
         $this->_shared();
 
         $model = new Model();
+        $blogModel = new BlogModel();
 
+        $this->data['mainSlides'] = $model->select_it(null, self::TBL_MAIN_SLIDER);
+        $this->data['offers'] = $model->select_it(null, self::TBL_PRODUCT, [
+            'id', 'title', 'slug', 'image', 'place', 'price', 'discount_price', 'discount_until',
+        ], 'publish=:pub AND available=:av AND is_special=:spec', ['pub' => 1, 'av' => 1, 'spec' => 1]);
+        $this->data['newestProducts'] = $model->select_it(null, self::TBL_PRODUCT, [
+            'id', 'title', 'slug', 'image', 'place', 'price', 'discount_price', 'is_special',
+        ], 'publish=:pub AND available=:av', ['pub' => 1, 'av' => 1]);
+        $this->data['lastNews'] = $blogModel->getAllBlog('b.publish=:pub', ['pub' => 1], 6);
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'صفحه اصلی');
 

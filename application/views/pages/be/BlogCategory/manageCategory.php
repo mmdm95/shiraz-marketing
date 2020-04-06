@@ -62,46 +62,53 @@
                                                     <th>#</th>
                                                     <th>عنوان دسته‌بندی</th>
                                                     <th>وضعیت نمایش</th>
+                                                    <th>نمایش در کنار صفحه</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load categories data -->
+                                                <?php foreach ($categories as $key => $category): ?>
                                                     <tr>
                                                         <td width="50px">
-
+                                                            <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
-
+                                                            <?= $category['name']; ?>
                                                         </td>
                                                         <td>
-<!--                                                            --><?php //if ($category['publish'] == 1): ?>
+                                                            <?php if ($category['publish'] == 1): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-success">فعال</span>
-<!--                                                            --><?php //else: ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-danger">غیر فعال</span>-->
-<!--                                                            --><?php //endif; ?>
+                                                            <?php else: ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">غیر فعال</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td width="100px">
+                                                            <input type="hidden" value="<?= $category['id']; ?>">
+                                                            <input type="checkbox" class="switchery blogCategorySideShow"
+                                                                <?= set_value($category['show_in_side'] ?? '', 1, 'checked', '', '=='); ?> />
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-primary-600">
-                                                                    <a href="<?= base_url() ; ?>/admin/blog/editCategory"
+                                                                    <a href="<?= base_url('admin/blog/editCategory/' . $category['id']); ?>"
                                                                        title="ویرایش" data-popup="tooltip">
                                                                         <i class="icon-pencil7"></i>
                                                                     </a>
                                                                 </li>
                                                                 <li class="text-danger-600">
-                                                                    <a class="deleteCategoryBtn"
+                                                                    <a class="deleteBlogCategoryBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="">
+                                                                               value="<?= $category['id']; ?>">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

@@ -50,6 +50,8 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
+                        <form action="<?= base_url(); ?>admin/editStaticPage/<?= $param[0]; ?>" method="post">
+                            <?= $data['form_token']; ?>
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -63,32 +65,15 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <?php if (isset($errors) && count($errors)): ?>
-                                                <div class="alert alert-danger alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <ul class="list-unstyled">
-                                                        <?php foreach ($errors as $err): ?>
-                                                            <li>
-                                                                <i class="icon-dash" aria-hidden="true"></i>
-                                                                <?= $err; ?>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php elseif (isset($success)): ?>
-                                                <div class="alert alert-success alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <p>
-                                                        <?= $success; ?>
-                                                    </p>
-                                                </div>
-                                            <?php endif; ?>
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
+
                                             <div class="form-group col-lg-6">
                                                 <span class="text-danger">*</span>
                                                 <label>عنوان نوشته:</label>
                                                 <input name="title" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="">
+                                                       value="<?= $spValues['title'] ?? $spTrueValues['title'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group col-lg-6">
                                                 <span class="text-danger">*</span>
@@ -97,7 +82,7 @@
                                                     <div class="col-xs-4">
                                                         <input name="url_name" type="text" class="form-control"
                                                                placeholder="اجباری"
-                                                               value="">
+                                                               value="<?= $spValues['url_name'] ?? $spTrueValues['url_name'] ?? ''; ?>">
                                                     </div>
                                                     <div class="col-xs-8 ltr mt-10">
                                                         <span class="text-muted border-bottom border-default display-block pb-5">
@@ -114,7 +99,7 @@
                                                             id="cntEditor"
                                                             class="form-control"
                                                             name="body"
-                                                            rows="10"><?= set_value($spgVals['body'] ?? ''); ?></textarea>
+                                                            rows="10"><?= $spValues['body'] ?? $spTrueValues['body'] ?? ''; ?></textarea>
                                                 </div>
                                             </div>
                                             <div class="text-right col-md-12">
@@ -122,8 +107,8 @@
                                                    class="btn btn-default mr-5">
                                                     بازگشت
                                                 </a>
-                                                <button type="submit" class="btn btn-primary submit-button">
-                                                    ذخیره
+                                                <button type="submit" class="btn btn-success submit-button">
+                                                    ویرایش
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

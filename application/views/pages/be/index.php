@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="pt-15 text-center my-main-page">
                                     <ul class="list-unstyled list-inline row">
-                                        <?php if ($auth->isAllow('user', 2)): ?>
+                                        <?php if ($auth->isAllow('user', AUTH_ACCESS_READ)): ?>
                                             <li class="col-xs-6 col-sm-4 col-md-3">
                                                 <a href="<?= base_url(); ?>admin/manageUser" style="min-width: 130px;"
                                                    class="btn btn-info btn-float btn-float-lg border-left border-grey-300
@@ -113,7 +113,7 @@
                                                 </span>
                                             </a>
                                         </li>
-                                        <?php if ($auth->isAllow('setting', 2)): ?>
+                                        <?php if ($auth->isAllow('setting', AUTH_ACCESS_READ)): ?>
                                             <li class="col-xs-6 col-sm-4 col-md-3">
                                                 <a href="<?= base_url(); ?>admin/setting" style="min-width: 130px;"
                                                    class="btn btn-info btn-float btn-float-lg border-left border-grey-300

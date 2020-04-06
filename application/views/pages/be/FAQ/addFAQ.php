@@ -49,9 +49,6 @@
                     <div class="col-md-12">
                         <form action="<?= base_url(); ?>admin/addFAQ" method="post">
                             <?= $form_token; ?>
-                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
-                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
-
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
@@ -60,11 +57,13 @@
                                             <div class="heading-elements">
                                                 <ul class="icons-list">
                                                     <li><a data-action="collapse"></a></li>
-                                                    <li><a data-action="close"></a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="panel panel-body border-top-primary text-center">
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
+
                                             <h6 class="no-margin text-semibold">
                                                 افزودن سؤال جدید
                                             </h6>
@@ -84,8 +83,12 @@
                                                               placeholder="پاسخ"><?= $faqValues['answer'] ?? ''; ?></textarea>
                                                 </div>
                                                 <div class="text-right col-md-12">
+                                                    <a href="<?= base_url('admin/manageFAQ'); ?>"
+                                                       class="btn btn-default mr-5">
+                                                        بازگشت
+                                                    </a>
                                                     <button type="submit" class="btn btn-primary">
-                                                        افزودن
+                                                        ذخیره
                                                         <i class="icon-arrow-left12 position-right"></i>
                                                     </button>
                                                 </div>

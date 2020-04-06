@@ -16,7 +16,7 @@ class Loader
 
     // Load view pages
 
-    public function view($view, $data = [], $getContent = false, $loadOnce = true, $loadOrDie = false, $customExtension = 'php')
+    public function view($view, $data = [], $getContent = false, $loadOnce = false, $loadOrDie = false, $customExtension = 'php')
     {
 
         $view = str_replace('/', DS, str_replace('\\', DS, $view));

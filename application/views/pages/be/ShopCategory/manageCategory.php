@@ -43,77 +43,80 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">دسته‌بندی‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>تصویر دسته</th>
-                                                    <th>آیکون</th>
-                                                    <th>عنوان دسته‌بندی</th>
-                                                    <th>وضعیت نمایش</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load categories data -->
-                                                    <tr>
-                                                        <td>
-
-                                                        </td>
-                                                        <td>
-
-                                                        </td>
-                                                        <td>
-
-                                                        </td>
-                                                        <td>
-
-                                                        </td>
-                                                        <td>
-<!--                                                            --><?php //if ($category['publish'] == 1): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">دسته‌بندی‌ها</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>تصویر دسته</th>
+                                            <th>آیکون</th>
+                                            <th>عنوان دسته‌بندی</th>
+                                            <th>وضعیت نمایش</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($catValues as $key => $category): ?>
+                                            <tr>
+                                                <td width="50px">
+                                                    <?= convertNumbersToPersian($key + 1); ?>
+                                                </td>
+                                                <td>
+                                                    <a data-url="<?= base_url($category['image']); ?>"
+                                                       data-popup="lightbox">
+                                                        <img src=""
+                                                             data-src="<?= base_url() . $category['image']; ?>"
+                                                             alt="<?= $category['name']; ?>"
+                                                             class="img-rounded img-preview lazy">
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <i class="la-3x <?= $category['icon']; ?>" aria-hidden="true"></i>
+                                                </td>
+                                                <td>
+                                                    <?= $category['name']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php if ($category['publish'] == 1): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-success">فعال</span>
-<!--                                                            --><?php //else: ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-danger">غیر فعال</span>-->
-<!--                                                            --><?php //endif; ?>
-                                                        </td>
-                                                        <td style="width: 115px;" class="text-center">
-                                                            <ul class="icons-list">
-                                                                <li class="text-primary-600">
-                                                                    <a href="<?= base_url() ; ?>admin/shop/editCategory"
-                                                                       title="ویرایش" data-popup="tooltip">
-                                                                        <i class="icon-pencil7"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="text-danger-600">
-                                                                    <a class="deleteCategoryBtn"
-                                                                       title="حذف" data-popup="tooltip">
-                                                                        <input type="hidden"
-                                                                               value="">
-                                                                        <i class="icon-trash"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                                    <?php else: ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">غیر فعال</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list">
+                                                        <li class="text-primary-600">
+                                                            <a href="<?= base_url('admin/shop/editCategory' . $category['id']); ?>"
+                                                               title="ویرایش" data-popup="tooltip">
+                                                                <i class="icon-pencil7"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li class="text-danger-600">
+                                                            <a class="deleteCategoryBtn"
+                                                               title="حذف" data-popup="tooltip">
+                                                                <input type="hidden"
+                                                                       value="<?= $category['id']; ?>">
+                                                                <i class="icon-trash"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

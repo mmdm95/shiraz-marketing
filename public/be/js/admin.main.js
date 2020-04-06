@@ -3,83 +3,15 @@
     'use strict';
 
     $(function () {
-        var default_rout = $('#BASE_URL').val() + 'admin/';
+        var default_rout = baseUrl + 'admin/';
         var dataTable = $('.datatable-highlight');
-
-        //********** ManageUser Action
-        $('.deleteUserBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deleteUser', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
-
-        //********** ManageBlockedUser Action
-        $('.deleteBlockedUserBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deleteBlockedUser', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
-
-        //********** ManageFeedback Action
-        $('.deleteFeedbackBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deleteFeedback', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
-
-        //********** ManageNewsletter Action
-        $('.deleteNewsletterBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deleteNewsletter', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
 
         //********** ManageBlog Action
         $('.deleteBlogBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteBlog', function () {
+            delete_something_action(this, 'blog/deleteBlog', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -91,12 +23,12 @@
         });
         //**********
 
-        //********** ManageStaticPage Action
-        $('.deleteStaticPageBtn').on('click', function (e) {
+        //********** ManageBlogCategory Action
+        $('.deleteBlogCategoryBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteStaticPage', function () {
+            delete_something_action(this, 'blog/deleteCategory', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -108,12 +40,12 @@
         });
         //**********
 
-        //********** ManageCategory Action
-        $('.deleteCategoryBtn').on('click', function (e) {
+        //********** ManageComplaints Action
+        $('.deleteComplaintBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteCategory', function () {
+            delete_something_action(this, 'deleteComplaint', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -125,12 +57,25 @@
         });
         //**********
 
-        //********** ManageComments Action
-        $('.deleteCommentBtn').on('click', function (e) {
+        //********** ManageComplaints Action (inside of viewComplaint)
+        $('#delComplaintBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteComment', function () {
+            delete_something_action(this, 'deleteComplaint', function () {
+                setTimeout(function () {
+                    window.location.href = default_rout + 'manageComplaints';
+                }, 2000);
+            });
+        });
+        //**********
+
+        //********** ManageContactUs Action
+        $('.deleteContactBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'deleteContact', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -142,124 +87,25 @@
         });
         //**********
 
-        //********** ManageComments Action (inside of viewComment)
-        $('#delCommentBtn').on('click', function (e) {
+        //********** ManageContactUs Action (inside of viewContact)
+        $('#delContactBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteComment', function () {
+            delete_something_action(this, 'deleteContact', function () {
                 setTimeout(function () {
-                    window.location.href = default_rout + 'manageComment';
+                    window.location.href = default_rout + 'manageContactUs';
                 }, 2000);
             });
         });
         //**********
 
-        //********** ManageComments Action (inside of viewComment)
-        $('#acceptCommentBtn').on('click', function (e) {
+        //********** ManageCoupon Action
+        $('.deleteCouponBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'acceptComment', function () {
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            });
-        });
-        //**********
-
-        //********** ManageComments Action (inside of viewComment)
-        $('#declineCommentBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'declineComment', function () {
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            });
-        });
-        //**********
-
-        //********** ManagePlan Action
-        $('.deletePlanBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deletePlan', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
-
-        //********** ManagePlanComments Action
-        $('.deletePlanCommentBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deletePlanComment', function () {
-                $(del_btn).closest('tr').fadeOut(800, function () {
-                    if ($.fn.DataTable) {
-                        dataTable.DataTable().row($(this)).remove().draw();
-                    } else {
-                        $(this).remove();
-                    }
-                });
-            });
-        });
-        //**********
-
-        //********** ManagePlanComments Action (inside of viewPlanComment)
-        $('#delPlanCommentBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deletePlanComment', function () {
-                setTimeout(function () {
-                    window.location.href = default_rout + 'managePlanComment';
-                }, 2000);
-            });
-        });
-        //**********
-
-        //********** ManagePlanComments Action (inside of viewPlanComment)
-        $('#acceptPlanCommentBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'acceptPlanComment', function () {
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            });
-        });
-        //**********
-
-        //********** ManagePlanComments Action (inside of viewPlanComment)
-        $('#declinePlanCommentBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'declinePlanComment', function () {
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            });
-        });
-        //**********
-
-        //********** ManageUsefulLink Action
-        $('.deleteUsefulLinkBtn').on('click', function (e) {
-            e.preventDefault();
-            var del_btn = $(this);
-
-            delete_something_action(this, 'deleteUsefulLink', function () {
+            delete_something_action(this, 'shop/deleteCoupon', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -288,12 +134,12 @@
         });
         //**********
 
-        //********** ManageContacts Action
-        $('.deleteContactBtn').on('click', function (e) {
+        //********** ManageReturnOrders Action
+        $('.deleteReturnOrderBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteContact', function () {
+            delete_something_action(this, 'shop/deleteReturnOrder', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -305,15 +151,147 @@
         });
         //**********
 
-        //********** ManageContacts Action (inside of viewContact)
-        $('#delContactBtn').on('click', function (e) {
+        //********** ManageReturnOrders Action (inside of viewReturnOrder)
+        $('#delReturnOrderBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteContact', function () {
+            delete_something_action(this, 'shop/deleteReturnOrder', function () {
                 setTimeout(function () {
-                    window.location.href = default_rout + 'manageContactUs';
+                    window.location.href = default_rout + 'shop/manageReturnOrders';
                 }, 2000);
+            });
+        });
+        //**********
+
+        //********** ManageReturnOrders Action (inside of viewReturnOrder)
+        $('#closeReturnOrderBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'shop/closeReturnOrder', function () {
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
+            });
+        });
+        //**********
+
+        //********** ManageProduct Action
+        $('.deleteProductBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'shop/deleteProduct', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** ManageShopCategory Action
+        $('.deleteCategoryBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'shop/deleteCategory', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** ManageSlider Action
+        $('.deleteSlideBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'deleteSlide', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** ManageStaticPage Action
+        $('.deleteStaticPageBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'deleteStaticPage', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** ManageUser Action
+        $('.deleteUserBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'user/deleteUser', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** ManageMarketer Action
+        $('.deleteMarketerBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'user/deleteMarketer', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
+        //********** UserUpgrade Action
+        $('.deleteMarketerRequestBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'user/deleteMarketerRequest', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
             });
         });
         //**********
@@ -383,50 +361,54 @@
             }
         }
 
+        //********** Show blog category to side
+        $('.blogCategorySideShow').on('change', function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            var stat = btn.is(':checked') ? 1 : 0;
+
+            active_deactive_action(this, 'blog/showInSide', {stat: stat});
+        });
+        //**********
+
+        //********** Toggle product availability
+        $('.productAvailability').on('change', function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            var stat = btn.is(':checked') ? 1 : 0;
+
+            active_deactive_action(this, 'shop/availableProduct', {stat: stat});
+        });
+        //**********
+
         //********** Active/Deactive user
         $('.uActiveDeactiveBtn').on('change', function (e) {
             e.preventDefault();
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'activeDeactive', {stat: stat});
+            active_deactive_action(this, 'user/activeDeactive', {stat: stat});
         });
         //**********
 
-        //********** Publish change for Feedback
-        $('.feedback-publish').on('change', function (e) {
+        //********** Make user to be in our team
+        $('.inOurTeamBtn').on('change', function (e) {
             e.preventDefault();
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'publishFeedback', {stat: stat});
+            active_deactive_action(this, 'user/inOurTeam', {stat: stat});
         });
         //**********
 
-        //********** Show in menu for Categories
-        $('.showInMenuParts').on('change', function (e) {
+        //********** UserUpgrade accept user to be marketer
+        $('.acceptMarketerBtn').on('change', function (e) {
             e.preventDefault();
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'showInMenu', {stat: stat});
+            active_deactive_action(this, 'user/acceptMarketer', {stat: stat});
         });
-        //**********
-
-        //********** Publish change for Plans
-        $('.plan-publish').on('change', function (e) {
-            e.preventDefault();
-            var btn = $(this);
-            var stat = btn.is(':checked') ? 1 : 0;
-
-            active_deactive_action(this, 'publishPlan', {stat: stat});
-        });
-        //**********
-
-        //********** Change plan status for ManagePlans
-        $.change_plan_status = function (selector, stat) {
-            active_deactive_action(selector, 'changePlanStatus', {stat: stat});
-        };
         //**********
 
         function active_deactive_action(selector, sendUrl, params, callback) {

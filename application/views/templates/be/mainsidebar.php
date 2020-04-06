@@ -9,7 +9,7 @@
         <div class="sidebar-user">
             <div class="category-content">
                 <div class="media">
-                    <a href="<?= base_url() . 'admin/editUser/' . @$identity->id; ?>"
+                    <a href="<?= base_url('admin/user/editUser/' . @$identity->id); ?>"
                        class="media-left">
                         <img src="<?= base_url($identity->image); ?>" class="img-fit"
                              alt="">
@@ -21,7 +21,7 @@
                         </a>
                         <div class="text-size-mini text-muted">
                             <div class="text-size-mini text-muted">
-                                <?= $identity->role_desc ?? "<i class='icon-dash text-danger'></i>"; ?>
+                                <?= $identity->role_desc[0] ?? "<i class='icon-dash text-danger'></i>"; ?>
                             </div>
                         </div>
                     </div>
@@ -247,7 +247,7 @@
                     </li>
 
                     <li>
-                        <a href="<?= base_url(); ?>admin/shop/mangeOrders">
+                        <a href="<?= base_url(); ?>admin/shop/manageOrders">
                             <i class="icon-cart"></i>
                             <span>مدیریت سفارشات</span>
                         </a>

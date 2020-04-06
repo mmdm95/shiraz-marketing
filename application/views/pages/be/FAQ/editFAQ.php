@@ -49,8 +49,6 @@
                     <div class="col-md-12">
                         <form action="<?= base_url(); ?>admin/editFAQ/<?= @$param[0]; ?>" method="post">
                             <?= $form_token; ?>
-                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
-                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
                             <div class="row">
                                 <div class="col-md-12">
@@ -60,11 +58,13 @@
                                             <div class="heading-elements">
                                                 <ul class="icons-list">
                                                     <li><a data-action="collapse"></a></li>
-                                                    <li><a data-action="close"></a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="panel panel-body border-top-primary text-center">
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
+
                                             <h6 class="no-margin text-semibold">
                                                 ویرایش سؤال
                                             </h6>
@@ -84,7 +84,11 @@
                                                               placeholder="پاسخ"><?= $faqValues['answer'] ?? $faqCurValues['answer'] ?? ''; ?></textarea>
                                                 </div>
                                                 <div class="text-right col-md-12">
-                                                    <button type="submit" class="btn btn-primary">
+                                                    <a href="<?= base_url('admin/manageFAQ'); ?>"
+                                                       class="btn btn-default mr-5">
+                                                        بازگشت
+                                                    </a>
+                                                    <button type="submit" class="btn btn-success">
                                                         ویرایش
                                                         <i class="icon-arrow-left12 position-right"></i>
                                                     </button>

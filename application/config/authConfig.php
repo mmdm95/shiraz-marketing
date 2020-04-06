@@ -8,6 +8,12 @@ defined('AUTH_ROLE_MARKETER') OR define('AUTH_ROLE_MARKETER', 4);
 defined('AUTH_ROLE_USER') OR define('AUTH_ROLE_USER', 5);
 defined('AUTH_ROLE_GUEST') OR define('AUTH_ROLE_GUEST', 6);
 
+// Accessibility constants
+defined('AUTH_ACCESS_CREATE') OR define('AUTH_ACCESS_CREATE', 1);
+defined('AUTH_ACCESS_READ') OR define('AUTH_ACCESS_READ', 2);
+defined('AUTH_ACCESS_UPDATE') OR define('AUTH_ACCESS_UPDATE', 3);
+defined('AUTH_ACCESS_DELETE') OR define('AUTH_ACCESS_DELETE', 4);
+
 return array(
     'tables' => [
         /*

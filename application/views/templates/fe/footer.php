@@ -25,6 +25,7 @@
                     </li>
                 </ul>
             </div>
+
             <div class="col-md-3 col-sm-6">
                 <h4 class="footer-section-header">
                     دسترسی سریع
@@ -41,6 +42,7 @@
                     </li>
                 </ul>
             </div>
+
             <div class="col-md-3 col-sm-6">
                 <h4 class="footer-section-header">
                     تماس با ما
@@ -54,14 +56,9 @@
                     </address>
                 </div>
             </div>
+
             <div class="col-md-3 col-sm-6 namad">
                 <div class="namad-carousel owl-carousel">
-                    <div>
-                        <img src="<?= asset_url('fe/images/tmp/namad.jpg'); ?>" alt="">
-                    </div>
-                    <div>
-                        <img src="<?= asset_url('fe/images/tmp/namad.jpg'); ?>" alt="">
-                    </div>
                     <div>
                         <img src="<?= asset_url('fe/images/tmp/namad.jpg'); ?>" alt="">
                     </div>

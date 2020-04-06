@@ -71,59 +71,70 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load categories data -->
-                                                <tr>
-                                                    <td width="50px">
-                                                    </td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td class="">
-                                                        تومان
-                                                    </td>
-                                                    <td align="center">
-                                                        <!--                                                        --><?php //if ($factor['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
-                                                        <!--                                                            <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-                                                        <!--                                                                 border-left-lg border-left-success">-->
-                                                        <!--                                                                    موفق-->
-                                                        <!--                                                                </span>-->
-                                                        <!--                                                        --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
-                                                        <!--                                                            <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-                                                        <!--                                                                 border-left-lg border-left-danger">-->
-                                                        <!--                                                                    ناموفق-->
-                                                        <!--                                                                </span>-->
-                                                        <!--                                                        --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
-                                                        <!--                                                            <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-                                                        <!--                                                                 border-left-lg border-left-grey-300">-->
-                                                        <!--                                                                    در انتظار پرداخت-->
-                                                        <!--                                                                </span>-->
-                                                        <!--                                                        --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
-                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
-                                                                 border-left-lg border-left-info">
-
+                                                <?php foreach ($orders as $key => $order): ?>
+                                                    <tr>
+                                                        <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= $order['order_code']; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= PAYMENT_METHODS[$order['payment_method']] ?: 'نامشخص'; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $order['payment_date']); ?>
+                                                        </td>
+                                                        <td class="info">
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['final_price'], true))); ?>
+                                                            تومان
+                                                        </td>
+                                                        <td align="center">
+                                                            <?php if ($order['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                border-left-lg border-left-success">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_SUCCESSFUL]; ?>
                                                                 </span>
-                                                        <!--                                                        --><?php //else: ?>
-                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_FAILED]; ?>
+                                                                </span>
+                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_NOT_PAYED]; ?>
+                                                                </span>
+                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-orange-400">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT]; ?>
+                                                                </span>
+                                                            <?php else: ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-grey-800">
                                                                     نامشخص
                                                                 </span>
-                                                        <!--                                                        --><?php //endif; ?>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-black">
-                                                                <a href="<?= base_url(); ?>user/viewOrder"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td style="width: 115px;" class="text-center">
+                                                            <ul class="icons-list">
+                                                                <li class="text-black">
+                                                                    <a href="<?= base_url('user/viewOrder/' . $order['id']); ?>"
+                                                                       title="مشاهده" data-popup="tooltip">
+                                                                        <i class="icon-eye"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

@@ -11,10 +11,11 @@ class ProductController extends AbstractController
     public function allAction($param)
     {
         $this->_shared();
-        $this->_manage_params($param);
         //-----
         $this->data['page_image'] = $this->setting['pages']['product']['topImage'] ?? '';
         $this->data['page_title'] = 'محصولات';
+        //-----
+        $this->_manage_params($param);
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'محصولات');
 
@@ -50,7 +51,10 @@ class ProductController extends AbstractController
             $extraParams['rId' . $k] = trim($item);
         }
         $extraPlaceholder = trim($extraPlaceholder, ',');
-        $this->data['product']['related'] = $extraPlaceholder != '' ? $productModel->getProducts('id IN (' . $extraPlaceholder . ')', $extraParams) : [];
+        $this->data['product']['related'] = $extraPlaceholder != ''
+            ? $model->select_it(null, self::TBL_PRODUCT, ['id', 'title', 'slug', 'image', 'place', 'price', 'discount_price'],
+                'publish=:pub AND available=:av AND id IN (' . $extraPlaceholder . ')', array_merge(['pub' => 1, 'av' => 1], $extraParams))
+            : [];
         // Get cart item with current product item
         $cartItems = $this->_fetch_cart_items();
         $this->data['curCartItem'] = h_array_search($cartItems, 'id', $param[0]);
@@ -93,6 +97,7 @@ class ProductController extends AbstractController
         $orderTypeKeys = array_keys($this->_order_types);
 
         $this->data['categoryParam'] = '';
+        $this->data['specialParam'] = '';
 
         $this->data['orderParam'] = 'newest';
         $this->data['orderText'] = $this->_order_type_globalization['newest'];
@@ -103,7 +108,39 @@ class ProductController extends AbstractController
             $param = array_map('strtolower', $param);
             if ($param[0] == 'category') {
                 if (isset($param[1])) {
-                    if ($param[1] == 'order') {
+                    if ($param[1] == 'offers') {
+                        $extraWhere .= ' AND p.is_special=:spec';
+                        $extraParams['spec'] = 1;
+                        $this->data['specialParam'] = $param[1];
+                        //-----
+                        if (isset($param[2])) {
+                            if ($param[2] == 'order') {
+                                if (isset($param[3])) {
+                                    if (in_array($param[3], $orderTypeKeys)) {
+                                        $orderParams = $this->_order_types[$param[3]];
+                                        $this->data['orderText'] = $this->_order_type_globalization[$param[3]];
+                                        $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[3]])[0];
+                                    }
+                                    if (isset($param[4])) {
+                                        if ($param[4] == 'page') {
+                                            if (isset($param[5])) {
+                                                if (is_numeric($param[5])) {
+                                                    $this->data['pagination']['page'] = $param[5];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if ($param[3] == 'page') {
+                                        if (isset($param[4])) {
+                                            if (is_numeric($param[4])) {
+                                                $this->data['pagination']['page'] = $param[4];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } elseif ($param[1] == 'order') {
                         if (isset($param[2])) {
                             if (in_array($param[2], $orderTypeKeys)) {
                                 $orderParams = $this->_order_types[$param[2]];
@@ -125,14 +162,61 @@ class ProductController extends AbstractController
                         $extraParams['cSlug'] = $param[1];
                         $extraParams['cPub'] = 1;
                         $this->data['categoryParam'] = $param[1];
+                        // Top image
+                        $tmpCat = $model->select_it(null, self::TBL_CATEGORY, [
+                            'image'
+                        ], 'slug=:slug AND publish=:pub', ['slug' => $param[1], 'pub' => 1]);
+                        if (count($tmpCat)) {
+                            $this->data['page_image'] = $tmpCat[0]['image'];
+                        }
                     } else {
                         $extraWhere .= ' AND p.category_id=:cId AND c.publish=:cPub';
                         $extraParams['cId'] = $param[1];
                         $extraParams['cPub'] = 1;
                         $this->data['categoryParam'] = $param[1];
+                        // Top image
+                        $tmpCat = $model->select_it(null, self::TBL_CATEGORY, [
+                            'image'
+                        ], 'id=:id AND publish=:pub', ['id' => $param[1], 'pub' => 1]);
+                        if (count($tmpCat)) {
+                            $this->data['page_image'] = $tmpCat[0]['image'];
+                        }
                     }
+                    //-----
                     if (isset($param[2])) {
-                        if ($param[2] == 'order') {
+                        if ($param[2] == 'offers') {
+                            $extraWhere .= ' AND p.is_special=:spec';
+                            $extraParams['spec'] = 1;
+                            $this->data['specialParam'] = $param[2];
+                            //-----
+                            if (isset($param[3])) {
+                                if ($param[3] == 'order') {
+                                    if (isset($param[4])) {
+                                        if (in_array($param[4], $orderTypeKeys)) {
+                                            $orderParams = $this->_order_types[$param[4]];
+                                            $this->data['orderText'] = $this->_order_type_globalization[$param[4]];
+                                            $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[4]])[0];
+                                        }
+                                        if (isset($param[5])) {
+                                            if ($param[5] == 'page') {
+                                                if (isset($param[6])) {
+                                                    if (is_numeric($param[6])) {
+                                                        $this->data['pagination']['page'] = $param[6];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if ($param[4] == 'page') {
+                                            if (isset($param[5])) {
+                                                if (is_numeric($param[5])) {
+                                                    $this->data['pagination']['page'] = $param[5];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } elseif ($param[2] == 'order') {
                             if (isset($param[3])) {
                                 if (in_array($param[3], $orderTypeKeys)) {
                                     $orderParams = $this->_order_types[$param[3]];
@@ -148,13 +232,43 @@ class ProductController extends AbstractController
                                         }
                                     }
                                 }
-                                if (isset($param[3])) {
-                                    if ($param[3] == 'page') {
-                                        if (isset($param[4])) {
-                                            if (is_numeric($param[4])) {
-                                                $this->data['pagination']['page'] = $param[4];
-                                            }
+                                if ($param[3] == 'page') {
+                                    if (isset($param[4])) {
+                                        if (is_numeric($param[4])) {
+                                            $this->data['pagination']['page'] = $param[4];
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } elseif ($param[0] == 'offers') {
+                $extraWhere .= ' AND p.is_special=:spec';
+                $extraParams['spec'] = 1;
+                $this->data['specialParam'] = $param[0];
+                //-----
+                if (isset($param[1])) {
+                    if ($param[1] == 'order') {
+                        if (isset($param[2])) {
+                            if (in_array($param[2], $orderTypeKeys)) {
+                                $orderParams = $this->_order_types[$param[2]];
+                                $this->data['orderText'] = $this->_order_type_globalization[$param[2]];
+                                $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[2]])[0];
+                            }
+                            if (isset($param[3])) {
+                                if ($param[3] == 'page') {
+                                    if (isset($param[4])) {
+                                        if (is_numeric($param[4])) {
+                                            $this->data['pagination']['page'] = $param[4];
+                                        }
+                                    }
+                                }
+                            }
+                            if ($param[2] == 'page') {
+                                if (isset($param[3])) {
+                                    if (is_numeric($param[3])) {
+                                        $this->data['pagination']['page'] = $param[3];
                                     }
                                 }
                             }

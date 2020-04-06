@@ -39,7 +39,7 @@
                                 دسته‌بندی‌ها
                             </a>
                         </li>
-                        <li class="active">افزودن دسته‌بندی جدید</li>
+                        <li class="active">ویرایش دسته‌بندی</li>
                     </ul>
 
                 </div>
@@ -51,8 +51,8 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/blog/addCategory" method="post">
-                            <!--                            --><?//= $data['form_token']; ?>
+                        <form action="<?= base_url('admin/blog/editCategory/' . $param[0]); ?>" method="post">
+                            <?= $form_token; ?>
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -66,56 +66,20 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <?php if (isset($errors) && count($errors)): ?>
-                                                <div class="alert alert-danger alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <ul class="list-unstyled">
-                                                        <?php foreach ($errors as $err): ?>
-                                                            <li>
-                                                                <i class="icon-dash" aria-hidden="true"></i>
-                                                                <?= $err; ?>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php elseif (isset($success)): ?>
-                                                <div class="alert alert-success alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <p>
-                                                        <?= $success; ?>
-                                                    </p>
-                                                </div>
-                                            <?php endif; ?>
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
-                                            <div class="form-group col-lg-6">
+                                            <div class="form-group col-lg-8">
                                                 <span class="text-danger">*</span>
                                                 <label>عنوان دسته:</label>
-                                                <input name="category_title" type="text" class="form-control"
+                                                <input name="title" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="">
-                                            </div>
-                                            <div class="form-group col-lg-6">
-                                                <span class="text-danger">*</span>
-                                                <label>دسته والد:</label>
-                                                <select class="select"
-                                                        name="parent_id">
-                                                    <option value="-1">انتخاب کنید</option>
-                                                    <option value="1"> مرد</option>
-                                                    <option value="2"> زن</option>
-                                                    <option value="2"> زن</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-lg-12">
-                                                <label>کلمات کلیدی:</label>
-                                                <input name="keywords" type="text"
-                                                       class="form-control" placeholder="Press Enter"
-                                                       data-role="tagsinput"
-                                                       value="<?= set_value($catVals['keywords'] ?? ''); ?>">
+                                                       value="<?= $catValues['title'] ?? $catTrueValues['name'] ?? '' ?>">
                                             </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="catStatus">وضعیت نمایش:</label>
                                                 <input type="checkbox" name="publish" id="catStatus"
-                                                       class="switchery" <?= set_value($catVals['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($catValues['publish'] ?? $catTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
                                             </div>
 
                                             <div class="text-right col-md-12 mt-20">
@@ -123,8 +87,8 @@
                                                    class="btn btn-default mr-5">
                                                     بازگشت
                                                 </a>
-                                                <button type="submit" class="btn btn-primary submit-button">
-                                                    ذخیره
+                                                <button type="submit" class="btn btn-success submit-button">
+                                                    ویرایش
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

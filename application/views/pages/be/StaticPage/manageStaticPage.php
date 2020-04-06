@@ -43,63 +43,60 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">نوشته‌های ثابت</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>عنوان نوشته</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load categories data -->
-<!--                                                --><?php //foreach ($pages as $key => $page): ?>
-                                                    <tr>
-                                                        <td width="50px">
-<!--                                                            --><?//= convertNumbersToPersian($key + 1); ?>
-                                                        </td>
-                                                        <td>
-                                                            <a href="" target="_blank">
-<!--                                                                --><?//= $page['title']; ?>
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">نوشته‌های ثابت</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>عنوان نوشته</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <!-- Load categories data -->
+                                        <?php foreach ($pages as $key => $page): ?>
+                                            <tr>
+                                                <td width="50px">
+                                                    <?= convertNumbersToPersian($key + 1); ?>
+                                                </td>
+                                                <td>
+                                                    <a href="<?= base_url('pages/' . $page['url_name']); ?>"
+                                                       target="_blank">
+                                                        <?= $page['title']; ?>
+                                                    </a>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list">
+                                                        <li class="text-primary-600">
+                                                            <a href="<?= base_url('admin/editStaticPage/' . $page['id']); ?>"
+                                                               title="ویرایش" data-popup="tooltip">
+                                                                <i class="icon-pencil7"></i>
                                                             </a>
-                                                        </td>
-                                                        <td style="width: 115px;" class="text-center">
-                                                            <ul class="icons-list">
-                                                                <li class="text-primary-600">
-                                                                    <a href="<?= base_url(); ?>/admin/editStaticPage"
-                                                                       title="ویرایش" data-popup="tooltip">
-                                                                        <i class="icon-pencil7"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="text-danger-600">
-                                                                    <a class="deleteStaticPageBtn"
-                                                                       title="حذف" data-popup="tooltip">
-                                                                        <input type="hidden"
-                                                                               value="">
-                                                                        <i class="icon-trash"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                                        </li>
+                                                        <li class="text-danger-600">
+                                                            <a class="deleteStaticPageBtn"
+                                                               title="حذف" data-popup="tooltip">
+                                                                <input type="hidden"
+                                                                       value="<?= $page['id']; ?>">
+                                                                <i class="icon-trash"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

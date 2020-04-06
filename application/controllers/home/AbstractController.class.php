@@ -11,6 +11,7 @@ use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use HPayment\PaymentException;
 use HSMS\rohamSMS;
 use HSMS\SMSException;
 use Model;
@@ -21,7 +22,7 @@ include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 abstract class AbstractController extends AbstractPaymentController
 {
     //-----
-    protected $couponPastDays = 30 * 24 * 60 * 60; // 1 month
+    protected $couponPastDays = 365 * 24 * 60 * 60; // 1 year
     //-----
     protected $haveCartAccess = false;
     protected $cartCookieName = 'cart__products_items_roham';
@@ -71,6 +72,10 @@ abstract class AbstractController extends AbstractPaymentController
         }
 
         if (!is_ajax()) {
+            $model = new Model();
+            $this->data['menuNavigation'] = $model->select_it(null, self::TBL_CATEGORY, ['name', 'slug', 'icon'],
+                'publish=:pub', ['pub' => 1]);
+
             // Cart items
             $this->data['cart_items'] = $this->fetchCardItemsAction();
         }
@@ -129,7 +134,224 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function forgetPasswordAction($param)
     {
+        if ($this->auth->isLoggedIn()) {
+            $this->error->show_404();
+        }
+
         $this->_shared();
+
+        $model = new Model();
+
+        $step = !isset($param[0]) || $param[0] != 'step' || !isset($param[1]) || !in_array($param[1], [1, 2, 3, 4]) ? 1 : $param[1];
+        $this->data['step'] = $step;
+
+        $this->data['errors'] = [];
+
+        switch ($step) {
+            case 1:
+                // Form submission
+                $this->load->library('HForm/Form');
+                $form = new Form();
+                $this->data['form_token'] = $form->csrfToken('userForgetPasswordStep1');
+                $form->setFieldsName(['username'])
+                    ->setMethod('post');
+                try {
+                    $form->beforeCheckCallback(function (&$values) use ($model, $form) {
+                        $values = array_map('trim', $values);
+
+                        $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
+                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
+                            $form->setError('کاربری با این نام شماره موبایل وجود ندارد!');
+                            return;
+                        }
+                    })->afterCheckCallback(function ($values) use ($model, $form) {
+                        $this->data['code'] = generateRandomString(6, GRS_NUMBER);
+                        $this->data['_username'] = $values['username'];
+
+                        $res = $model->update_it(self::TBL_USER, [
+                            'forgotten_password_code' => $this->data['code'],
+                            'forgotten_password_time' => time(),
+                        ], 'mobile=:username', ['username' => $values['username']]);
+
+                        if (!$res) {
+                            $form->setError('خطا در انجام عملیات!');
+                        }
+                    });
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+
+                $res = $form->checkForm()->isSuccess();
+                if ($form->isSubmit()) {
+                    if ($res) {
+                        $_SESSION['username_forget_password_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
+
+                        // Send SMS code goes here
+                        $this->load->library('HSMS/rohamSMS');
+                        $sms = new rohamSMS();
+                        try {
+                            $body = $this->setting['sms']['forgetPasswordCodeMsg'];
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['_username'], $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['code'], $this->data['code'], $body);
+                            $is_sent = $sms->set_numbers($this->data['_username'])->body($body)->send();
+
+                            $this->session->setFlash($this->messageSession, [
+                                'type' => self::FLASH_MESSAGE_TYPE_INFO,
+                                'icon' => self::FLASH_MESSAGE_ICON_INFO,
+                                'message' => 'پیامک فراموشی کلمه عبور برای شماره شما ارسال شد.',
+                            ]);
+                        } catch (SMSException $e) {
+                            die($e->getMessage());
+                        }
+
+                        // Unset data
+                        unset($this->data['code']);
+
+                        $this->redirect(base_url('forgetPassword/step/2'));
+                    } else {
+                        $this->data['errors'] = $form->getError();
+                        $this->data['fpValues'] = $form->getValues();
+                    }
+                }
+                break;
+            case 2:
+                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess'] ?? '');
+                if ($username == false) {
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                        'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                        'message' => ' شماره موبایل وارد نشده است!',
+                    ]);
+                    $this->redirect(base_url('forgetPassword/step/1'));
+                }
+
+                // Form submission
+                $this->load->library('HForm/Form');
+                $form = new Form();
+                $this->data['form_token'] = $form->csrfToken('userForgetPasswordStep2');
+                $form->setFieldsName(['code'])
+                    ->setMethod('post');
+                try {
+                    $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
+                        $values = array_map('trim', $values);
+
+                        $form->isRequired(['code'], 'فیلدهای ضروری را خالی نگذارید.');
+                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $username, 'active' => 0])) {
+                            $this->session->setFlash($this->messageSession, [
+                                'type' => self::FLASH_MESSAGE_TYPE_DANGER,
+                                'icon' => self::FLASH_MESSAGE_ICON_DANGER,
+                                'message' => 'پارامترهای ورودی دستکاری شده‌اند!',
+                            ]);
+                            $this->redirect(base_url('forgetPassword/step/1'));
+                        }
+                        $code = $model->select_it(null, self::TBL_USER, 'activation_code',
+                            'mobile=:username', ['username' => $username])[0]['activation_code'];
+                        if ($values['code'] != $code) {
+                            $form->setError('کد وارد شده نادرست است.');
+                        }
+                    })->afterCheckCallback(function () use ($model, $form, $username) {
+                        $res = $model->update_it(self::TBL_USER, [
+                            'active' => 1,
+                            'activation_code' => '',
+                        ], 'mobile=:username', ['username' => $username]);
+
+                        if (!$res) {
+                            $form->setError('خطا در انجام عملیات!');
+                        }
+                    });
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+
+                $res = $form->checkForm()->isSuccess();
+                if ($form->isSubmit()) {
+                    if ($res) {
+                        $_SESSION['username_forget_password_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK_STEP2');
+
+                        $this->redirect(base_url('forgetPassword/step/3'));
+                    } else {
+                        $this->data['errors'] = $form->getError();
+                        $this->data['fpValues'] = $form->getValues();
+                    }
+                }
+                break;
+            case 3:
+                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess_success'] ?? '');
+                if ($Ok != 'OK_STEP3') {
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_DANGER,
+                        'icon' => self::FLASH_MESSAGE_ICON_DANGER,
+                        'message' => 'مراحل به درستی انجام نشده‌اند.',
+                    ]);
+                    $this->redirect(base_url('forgetPassword/step/1'));
+                }
+                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess'] ?? '');
+                if ($username == false) {
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                        'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                        'message' => ' شماره موبایل وارد نشده است!',
+                    ]);
+                    $this->redirect(base_url('forgetPassword/step/1'));
+                }
+
+                // Form submission
+                $this->load->library('HForm/Form');
+                $form = new Form();
+                $this->data['form_token'] = $form->csrfToken('userForgetPasswordStep3');
+                $form->setFieldsName(['password', 're_password'])
+                    ->setMethod('post');
+                try {
+                    $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
+                        $values = array_map('trim', $values);
+
+                        $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.');
+                        $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                            ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
+
+                        if ($values['password'] != $values['re_password']) {
+                            $form->setError('کلمه عبور با تکرار آن مغایرت دارد.');
+                        }
+                    })->afterCheckCallback(function ($values) use ($model, $form, $username) {
+                        $res = $model->update_it(self::TBL_USER, [
+                            'password' => password_hash(trim($values['password']), PASSWORD_DEFAULT),
+                        ], 'mobile=:username', ['username' => $username]);
+
+                        if (!$res) {
+                            $form->setError('خطا در انجام عملیات!');
+                        }
+                    });
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+
+                $res = $form->checkForm()->isSuccess();
+                if ($form->isSubmit()) {
+                    if ($res) {
+                        $_SESSION['username_forget_password_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK_STEP3');
+
+                        // Unset data
+                        unset($_SESSION['username_forget_password_sess']);
+
+                        $this->redirect(base_url('forgetPassword/step/4'));
+                    } else {
+                        $this->data['errors'] = $form->getError();
+                        $this->data['fpValues'] = $form->getValues();
+                    }
+                }
+                break;
+            case 4:
+                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess_success'] ?? '');
+                if ($Ok != 'OK_STEP3') {
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_DANGER,
+                        'icon' => self::FLASH_MESSAGE_ICON_DANGER,
+                        'message' => 'مراحل به درستی انجام نشده‌اند.',
+                    ]);
+                    $this->redirect(base_url('forgetPassword/step/1'));
+                }
+                break;
+        }
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فراموشی کلمه عبور');
 
@@ -140,15 +362,159 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function activationAction($param)
     {
+        if ($this->auth->isLoggedIn()) {
+            $this->error->show_404();
+        }
+
         $this->_shared();
 
         $model = new Model();
-        $this->data['mobile'] = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess'] ?? '');
 
-        if (!isset($_SESSION['username_validation_sess']) || !isset($_SESSION['password_validation_sess']) ||
-            $this->data['mobile'] === false || !$model->is_exist('users', 'username=:u AND activation_code!=""',
-                ['u' => $this->data['mobile']])) {
-            $this->error->show_404();
+        $step = !isset($param[0]) || $param[0] != 'step' || !isset($param[1]) || !in_array($param[1], [1, 2, 3]) ? 1 : $param[1];
+        $this->data['step'] = $step;
+
+        $this->data['errors'] = [];
+
+        switch ($step) {
+            case 1:
+                // Form submission
+                $this->load->library('HForm/Form');
+                $form = new Form();
+                $this->data['form_token'] = $form->csrfToken('userActivationStep1');
+                $form->setFieldsName(['username'])
+                    ->setMethod('post');
+                try {
+                    $form->beforeCheckCallback(function (&$values) use ($model, $form) {
+                        $values = array_map('trim', $values);
+                        $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
+                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
+                            $form->setError('کاربری با این نام شماره موبایل وجود ندارد!');
+                            return;
+                        }
+                        if ($model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $values['username'], 'active' => 1])) {
+                            $form->setError('این حساب کاربری، فعال است.');
+                            return;
+                        }
+                    })->afterCheckCallback(function ($values) use ($model, $form) {
+                        $this->data['code'] = generateRandomString(6, GRS_NUMBER);
+                        $this->data['_username'] = $values['username'];
+
+                        $res = $model->update_it(self::TBL_USER, [
+                            'activation_code' => $this->data['code'],
+                            'activation_code_time' => time(),
+                        ], 'mobile=:username', ['username' => $values['username']]);
+
+                        if (!$res) {
+                            $form->setError('خطا در انجام عملیات!');
+                        }
+                    });
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+
+                $res = $form->checkForm()->isSuccess();
+                if ($form->isSubmit()) {
+                    if ($res) {
+                        $_SESSION['username_validation_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
+
+                        // Send SMS code goes here
+                        $this->load->library('HSMS/rohamSMS');
+                        $sms = new rohamSMS();
+                        try {
+                            $body = $this->setting['sms']['activationCodeMsg'];
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['_username'], $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['code'], $this->data['code'], $body);
+                            $is_sent = $sms->set_numbers($this->data['_username'])->body($body)->send();
+
+                            $this->session->setFlash($this->messageSession, [
+                                'type' => self::FLASH_MESSAGE_TYPE_INFO,
+                                'icon' => self::FLASH_MESSAGE_ICON_INFO,
+                                'message' => 'پیامک فعالسازی حساب کاربری برای شماره شما ارسال شد.',
+                            ]);
+                        } catch (SMSException $e) {
+                            die($e->getMessage());
+                        }
+
+                        // Unset data
+                        unset($this->data['code']);
+
+                        $this->redirect(base_url('activation/step/2'));
+                    } else {
+                        $this->data['errors'] = $form->getError();
+                        $this->data['acValues'] = $form->getValues();
+                    }
+                }
+                break;
+            case 2:
+                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess'] ?? '');
+                if ($username == false) {
+                    $this->session->setFlash($this->messageSession, [
+                        'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                        'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                        'message' => ' شماره موبایل وارد نشده است!',
+                    ]);
+                    $this->redirect(base_url('activation/step/1'));
+                }
+
+                // Form submission
+                $this->load->library('HForm/Form');
+                $form = new Form();
+                $this->data['form_token'] = $form->csrfToken('userActivationStep2');
+                $form->setFieldsName(['code'])
+                    ->setMethod('post');
+                try {
+                    $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
+                        $values = array_map('trim', $values);
+
+                        $form->isRequired(['code'], 'فیلدهای ضروری را خالی نگذارید.');
+                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $username, 'active' => 0])) {
+                            $this->session->setFlash($this->messageSession, [
+                                'type' => self::FLASH_MESSAGE_TYPE_DANGER,
+                                'icon' => self::FLASH_MESSAGE_ICON_DANGER,
+                                'message' => 'پارامترهای ورودی دستکاری شده‌اند!',
+                            ]);
+                            $this->redirect(base_url('activation/step/1'));
+                        }
+                        $code = $model->select_it(null, self::TBL_USER, 'activation_code',
+                            'mobile=:username', ['username' => $username])[0]['activation_code'];
+                        if ($values['code'] != $code) {
+                            $form->setError('کد وارد شده نادرست است.');
+                        }
+                    })->afterCheckCallback(function () use ($model, $form, $username) {
+                        $res = $model->update_it(self::TBL_USER, [
+                            'active' => 1,
+                            'activation_code' => '',
+                        ], 'mobile=:username', ['username' => $username]);
+
+                        if (!$res) {
+                            $form->setError('خطا در انجام عملیات!');
+                        }
+                    });
+                } catch (Exception $e) {
+                    die($e->getMessage());
+                }
+
+                $res = $form->checkForm()->isSuccess();
+                if ($form->isSubmit()) {
+                    if ($res) {
+                        $_SESSION['username_validation_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK');
+
+                        // Unset data
+                        unset($_SESSION['username_validation_sess']);
+
+                        $this->redirect(base_url('activation/step/3'));
+                    } else {
+                        $this->data['errors'] = $form->getError();
+                        $this->data['acValues'] = $form->getValues();
+                    }
+                }
+                break;
+            case 3:
+                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess_success'] ?? '');
+                if ($Ok != 'OK') {
+                    $this->redirect(base_url('activation/step/1'));
+                }
+                break;
         }
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'فعالسازی اکانت کاربری');
@@ -186,8 +552,6 @@ abstract class AbstractController extends AbstractPaymentController
 
         $model = new Model();
 
-        $this->load->helper('bank');
-
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token_register'] = $form->csrfToken('register');
@@ -207,9 +571,14 @@ abstract class AbstractController extends AbstractPaymentController
                     $form->setError('این شماره موبایل وجود دارد، لطفا دوباره تلاش کنید.');
                     return;
                 }
-                $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.');
                 $form->validatePersianMobile('username');
-                $form->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
+                $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                    ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
+
+                if ($values['password'] != $values['re_password']) {
+                    $form->setError('کلمه عبور با تکرار آن مغایرت دارد.');
+                }
+
                 $config = getConfig('config');
                 if (!isset($config['captcha_session_name']) ||
                     !isset($_SESSION[$config['captcha_session_name']][$param['captcha']]) ||
@@ -277,7 +646,7 @@ abstract class AbstractController extends AbstractPaymentController
 
                 $message = 'در حال پردازش عملیات ثبت نام';
                 $delay = 1;
-                $this->redirect(base_url('activation'), $message, $delay);
+                $this->redirect(base_url('activation/step/2'), $message, $delay);
             } else {
                 $this->data['registerErrors'] = $form->getError();
                 $this->data['registerValues'] = $form->getValues();
@@ -745,7 +1114,7 @@ abstract class AbstractController extends AbstractPaymentController
         $this->_render_page(['pages/fe/payment']);
     }
 
-    public function payResultAction()
+    public function payResultAction($param)
     {
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
@@ -789,7 +1158,8 @@ abstract class AbstractController extends AbstractPaymentController
             $res = $info;
             foreach ($saved_cart_items as $k => $v) {
                 $res['quantity'] = $v['quantity'] > $res['stock_count'] ? $res['stock_count'] : $v['quantity'];
-                $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - convertNumbersToPersian($res['discount_price'], true)) / convertNumbersToPersian($res['price'], true)) * 100);
+                $discount = $res['discount_until'] > time() ? convertNumbersToPersian($res['discount_price'], true) : 0;
+                $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - $discount) / convertNumbersToPersian($res['price'], true)) * 100);
 
                 $items[] = $res;
             }
@@ -1357,7 +1727,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $items = $model->select_it(null, self::TBL_ORDER_ITEM, ['product_id', 'product_count'], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 foreach ($items as $k => $item) {
                     try {
-                        $res = $model->update_it('products', [], [
+                        $res = $model->update_it('products', [], 'id=:id', ['id' => $item['product_id']], [
                             'stock_count' => 'stock_count+' . (int)$item['product_count'],
                             'sold_count' => 'sold_count-' . (int)$item['product_count'],
                         ]);

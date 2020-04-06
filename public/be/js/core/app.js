@@ -32,27 +32,13 @@ $(function () {
 
     //Add active class to nav-link based on url dynamically
     //Active class can be hard coded directly in html file also as required
-    var current = window.location.href;//.split("/").slice(-1)[0].replace(/^\/|\/$/g, '');
-
-    current = current.replace(baseUrl + 'admin/', "").split("/").slice(0)[0].replace(/^\/|\/$/g, '');
-    current = current.replace(/#+$/, "");
-
     $(sidebar).find('li a').each(function () {
         var $this = $(this), href = $this.attr('href');
 
-        if (current === "" || current === 'http:' || current === 'https:') {
-            //for root url
-            if (href) {
-                if (href.indexOf("index.php") !== -1) {
-                    $this.closest('li').addClass('active');
-                }
-            }
-        } else {
-            //for other url
-            if (href) {
-                if (href.indexOf(current) !== -1) {
-                    $this.closest('li').addClass('active');
-                }
+        if (href) {
+            if (href.indexOf(urlPlatform + '/' + urlController + '/' + urlAction) !== -1 ||
+                href.indexOf(urlPlatform + '/' + urlAction) !== -1) {
+                $this.closest('li').addClass('active');
             }
         }
     });
@@ -1135,9 +1121,10 @@ $(function () {
     (function ($) {
         'use strict';
 
+        var namespace = 'shiraz_marketing';
+
         $(function () {
             $.fn.toggler = function () {
-                var namespace = 'omega';
                 var inp_action_toggle = $(this);
                 inp_action_toggle.each(function () {
                     var $this, at_el, at, action;
@@ -1165,6 +1152,55 @@ $(function () {
                 });
             };
             $('.action-toggle').toggler();
+        });
+
+        $(function () {
+            var default_rout = baseUrl + 'admin/';
+
+            $('.cityLoader').on('change.' + namespace, function () {
+                var $this, target, province, options;
+                $this = $(this);
+                target = $this.data('target-for');
+                target = target && $(target) && $(target).length ? $(target) : null;
+                if (this.nodeName.toLowerCase() === 'select' && target) {
+                    province = $this.find(':selected');
+                    province = province ? province.val() : $this.find('option').first().val();
+                    $.ajax({
+                        url: default_rout + 'getCity',
+                        method: 'POST',
+                        data: {
+                            postedId: province
+                        }
+                    }).done(function (response) {
+                        // console.log(response);
+                        // console.log(JSON.parse(response));
+
+                        var res, cities;
+                        res = JSON.parse(response);
+                        if (res.success) {
+                            // Remove all options first
+                            target.find('.removable-city-option').remove();
+
+                            // Add each city to select
+                            cities = res.success.msg;
+                            var i, len, option;
+                            len = cities.length;
+                            for (i = 0; i < len; ++i) {
+                                option = createSelectOption(cities[i]['id'], cities[i]['name']);
+                                target.append(option);
+                            }
+
+                            var select2 = $('select');
+                            if (select2.data('select2')) select2.select2("destroy");
+                            select2.select2();
+                        }
+                    });
+                }
+            }).trigger('change.' + namespace);
+
+            function createSelectOption(value, text) {
+                return "<option value='" + value + "' class='removable-city-option'>" + text + "</option>";
+            }
         });
     })(jQuery);
 });

@@ -51,7 +51,8 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/blog/addBlog" method="post">
+                        <form action="<?= base_url('admin/blog/editBlog/' . $param[0]); ?>" method="post">
+                            <?= $form_token; ?>
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -65,26 +66,8 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <?php if (isset($errors) && count($errors)): ?>
-                                                <div class="alert alert-danger alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <ul class="list-unstyled">
-                                                        <?php foreach ($errors as $err): ?>
-                                                            <li>
-                                                                <i class="icon-dash" aria-hidden="true"></i>
-                                                                <?= $err; ?>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
-                                                </div>
-                                            <?php elseif (isset($success)): ?>
-                                                <div class="alert alert-success alert-styled-left alert-bordered
-                                                 no-border-top no-border-right no-border-bottom">
-                                                    <p>
-                                                        <?= $success; ?>
-                                                    </p>
-                                                </div>
-                                            <?php endif; ?>
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
                                             <div class="form-group col-lg-12">
                                                 <div class="cursor-pointer pick-file border border-lg border-default"
@@ -93,17 +76,16 @@
                                                      style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
                                                     <input class="image-file" type="hidden"
                                                            name="image"
-                                                           value="">
+                                                           value="<?= set_value($blogValues['image'] ?? $blogTrueValues['image'] ?? ''); ?>">
                                                     <div class="media stack-media-on-mobile">
                                                         <div class="media-left">
                                                             <div class="thumb">
                                                                 <a class="display-inline-block"
                                                                    style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
-                                                                    <img
-                                                                            src=""
-                                                                            class="img-rounded" alt=""
-                                                                            style="width: 100px; height: 100px; object-fit: contain;"
-                                                                            data-base-url="">
+                                                                    <img src="<?= set_value($blogValues['image'] ?? $blogTrueValues['image'] ?? '', '', base_url($blogValues['image'] ?? $blogTrueValues['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                         class="img-rounded" alt=""
+                                                                         style="width: 100px; height: 100px; object-fit: contain;"
+                                                                         data-base-url="<?= base_url(); ?>">
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -114,7 +96,7 @@
                                                                     انتخاب تصویر شاخص:
                                                                 </a>
                                                                 <a class="io-image-name display-block">
-
+                                                                    <?= basename($blogValues['image'] ?? $blogTrueValues['image'] ?? ''); ?>
                                                                 </a>
                                                             </h6>
                                                         </div>
@@ -126,15 +108,18 @@
                                                 <label>عنوان نوشته:</label>
                                                 <input name="title" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="<?= set_value($atcVals['title'] ?? ''); ?>">
+                                                       value="<?= set_value($blogValues['title'] ?? $blogTrueValues['title'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>دسته‌بندی:</label>
-                                                <select class="select-rtl" name="category_id">
-                                                    <option value=""
-                                                    </option>
-
+                                                <select class="select-rtl" name="category">
+                                                    <?php foreach ($categories as $key => $category): ?>
+                                                        <option value="<?= $category['id']; ?>"
+                                                            <?= set_value($blogValues['category'] ?? $blogTrueValues['category_id'] ?? '', $category['id'], 'selected', '', '=='); ?>>
+                                                            <?= $category['category_name']; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div>
                                             <div class="form-group col-lg-12">
@@ -143,7 +128,7 @@
                                                 <textarea rows="5" cols="12" class="form-control"
                                                           name="abstract"
                                                           style="min-height: 100px; resize: vertical;"
-                                                          placeholder="خلاصه"></textarea>
+                                                          placeholder="خلاصه"><?= $blogValues['abstract'] ?? $blogTrueValues['abstract'] ?? ''; ?></textarea>
                                             </div>
                                             <div class="form-group col-lg-12">
                                                 <span class="text-danger">*</span>
@@ -151,12 +136,12 @@
                                                 <input name="keywords" type="text"
                                                        class="form-control" placeholder="Press Enter"
                                                        data-role="tagsinput"
-                                                       value="<?= set_value($atcVals['keywords'] ?? ''); ?>">
+                                                       value="<?= set_value($blogValues['keywords'] ?? $blogTrueValues['keywords'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="catStatus">وضعیت انتشار:</label>
                                                 <input type="checkbox" name="publish" id="catStatus"
-                                                       class="switchery" <?= set_value($atcVals['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($blogValues['publish'] ?? $blogTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
                                             </div>
                                             <div class="row pt-20 no-padding-top">
                                                 <div class="form-group col-md-12 mt-12">
@@ -166,7 +151,7 @@
                                                             id="cntEditor"
                                                             class="form-control"
                                                             name="body"
-                                                            rows="10"><?= set_value($atcVals['body'] ?? ''); ?></textarea>
+                                                            rows="10"><?= set_value($blogValues['body'] ?? $blogTrueValues['body'] ?? ''); ?></textarea>
                                                 </div>
                                             </div>
 
@@ -175,8 +160,8 @@
                                                    class="btn btn-default mr-5">
                                                     بازگشت
                                                 </a>
-                                                <button type="submit" class="btn btn-primary submit-button">
-                                                    ذخیره
+                                                <button type="submit" class="btn btn-success submit-button">
+                                                    ویرایش
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

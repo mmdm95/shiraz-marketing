@@ -46,8 +46,8 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post"
-                              class="validation-form">
+                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post">
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="panel panel-white">
@@ -56,25 +56,32 @@
                                             <div class="heading-elements">
                                                 <ul class="icons-list">
                                                     <li><a data-action="collapse"></a></li>
-                                                    <li><a data-action="close"></a></li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <div class="form-group col-lg-8">
-                                                <span class="text-danger">*</span>
-                                                <label>مبلغ:</label>
-                                                <input name="price" type="text"
-                                                       class="form-control" placeholder="به تومان"
-                                                       value=""">
-                                            </div>
-                                            <div class="col-md-2 pt-20">
-                                                <button type="submit"
-                                                        class="btn btn-primary submit-button submit-button">
-                                                    ذخیره
-                                                    <i class="icon-arrow-left12 position-right"></i>
-                                                </button>
-                                            </div>
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $deposit_errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $deposit_success ?? null]); ?>
+
+                                            <form action="<?= base_url('admin/user/userDeposit/' . $param[0]); ?>"
+                                                  method="post">
+                                                <?= $form_token_deposit; ?>
+
+                                                <div class="form-group col-lg-12">
+                                                    <span class="text-danger">*</span>
+                                                    <label>مبلغ:</label>
+                                                    <input name="price" type="text"
+                                                           class="form-control" placeholder="به تومان"
+                                                           value="<?= $dValues['price'] ?? ''; ?>">
+                                                </div>
+                                                <div class="col-lg-12 text-right">
+                                                    <button type="submit"
+                                                            class="btn btn-success submit-button">
+                                                        <i class="icon-coin-dollar position-left"></i>
+                                                        افزایش اعتبار
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -150,7 +157,6 @@
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
                                             </ul>
                                         </div>
                                     </div>

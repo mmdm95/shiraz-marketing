@@ -43,64 +43,60 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">سؤالات</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>سؤال</th>
-                                                    <th>جواب</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <?php foreach ($faqValues as $key => $faq): ?>
-                                                    <tr>
-                                                        <td>
-                                                            <?= convertNumbersToPersian(($key + 1)); ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= $faq['question']; ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= $faq['answer']; ?>
-                                                        </td>
-                                                        <td style="width: 115px;" class="text-center">
-                                                            <ul class="icons-list">
-                                                                <li class="text-primary-600">
-                                                                    <a href="<?= base_url(); ?>admin/editFAQ/"
-                                                                       title="ویرایش" data-popup="tooltip">
-                                                                        <i class="icon-pencil7"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="text-danger-600">
-                                                                    <a class="deleteProductBtn"
-                                                                       title="حذف" data-popup="tooltip">
-                                                                        <input type="hidden"
-                                                                               value="<?= $faq['id']; ?>">
-                                                                        <i class="icon-trash"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">سؤالات</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>سؤال</th>
+                                            <th>جواب</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($faqValues as $key => $faq): ?>
+                                            <tr>
+                                                <td>
+                                                    <?= convertNumbersToPersian(($key + 1)); ?>
+                                                </td>
+                                                <td>
+                                                    <?= $faq['question']; ?>
+                                                </td>
+                                                <td>
+                                                    <?= $faq['answer']; ?>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list">
+                                                        <li class="text-primary-600">
+                                                            <a href="<?= base_url(); ?>admin/editFAQ/"
+                                                               title="ویرایش" data-popup="tooltip">
+                                                                <i class="icon-pencil7"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li class="text-danger-600">
+                                                            <a class="deleteFAQBtn"
+                                                               title="حذف" data-popup="tooltip">
+                                                                <input type="hidden"
+                                                                       value="<?= $faq['id']; ?>">
+                                                                <i class="icon-trash"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

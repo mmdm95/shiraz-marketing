@@ -3,6 +3,7 @@
 <!-- Main navbar -->
 <?php $this->view("templates/be/mainnavbar", $data); ?>
 <!-- /main navbar -->
+
 <!-- Page container -->
 <div class="page-container">
     <!-- Page content -->
@@ -12,6 +13,7 @@
         <!-- Main sidebar -->
         <?php $this->view("templates/be/mainsidebar", $data); ?>
         <!-- /main sidebar -->
+
         <!-- Main content -->
         <div class="content-wrapper">
             <!-- Page header -->
@@ -63,72 +65,64 @@
                                                     <th>کد سفارش</th>
                                                     <th>خریدار</th>
                                                     <th>تاریخ درخواست</th>
-                                                    <th>شماره فاکتور</th>
                                                     <th>نحوه پرداخت</th>
+                                                    <th>وضعیت</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load categories data -->
+                                                <?php foreach ($orders as $key => $order): ?>
                                                     <tr>
                                                         <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
+                                                            <?= $order['order_code']; ?>
                                                         </td>
                                                         <td>
+                                                            <?= $order['first_name'] . ' ' . $order['last_name']; ?>
                                                         </td>
                                                         <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $order['created_at']); ?>
                                                         </td>
                                                         <td>
+                                                            <?= OWN_PAYMENT_STATUSES[$order['payment_method']] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                         </td>
-                                                        <td align="center">
-<!--                                                            --><?php //if ($factor['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-success">-->
-<!--                                                                    موفق-->
-<!--                                                                </span>-->
-<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-danger">-->
-<!--                                                                    ناموفق-->
-<!--                                                                </span>-->
-<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-grey-300">-->
-<!--                                                                    در انتظار پرداخت-->
-<!--                                                                </span>-->
-<!--                                                            --><?php //elseif ($factor['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-info">-->
-<!--                                                                    --><?//= $factor['payment_title']; ?>
-<!--                                                                </span>-->
-<!--                                                            --><?php //else: ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-grey-800">-->
-<!--                                                                    نامشخص-->
-<!--                                                                </span>-->
-<!--                                                            --><?php //endif; ?>
+                                                        <td>
+                                                            <?php if ($order['status'] == 0): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-danger">مشاهده نشده</span>
+                                                            <?php elseif ($order['status'] == 1): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-info">مشاهده شده</span>
+                                                            <?php elseif ($order['status'] == 2): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-primary">پاسخ داده شده</span>
+                                                            <?php elseif ($order['status'] == 3): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-purple">مشاهده توسط کاربر</span>
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-black">
-                                                                    <a href="<?= base_url(); ?>admin/shop/viewReturnOrder/"
+                                                                    <a href="<?= base_url('admin/shop/viewReturnOrder/' . $order['order_code']); ?>"
                                                                        title="مشاهده" data-popup="tooltip">
                                                                         <i class="icon-eye"></i>
                                                                     </a>
                                                                 </li>
                                                                 <li class="text-danger-600">
-                                                                    <a class="deleteFactorBtn"
+                                                                    <a class="deleteReturnOrderBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="">
+                                                                               value="<?= $order['id']; ?>">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
-<!--                                                --><?php //endforeach; ?>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -139,6 +133,7 @@
                     </div>
                 </div>
                 <!-- /form centered -->
+
                 <!-- Footer -->
                 <?php $this->view("templates/be/copyright", $data); ?>
                 <!-- /footer -->

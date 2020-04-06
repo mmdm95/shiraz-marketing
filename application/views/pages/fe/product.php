@@ -19,6 +19,7 @@
                 <li class="breadcrumb-item active" aria-current="page">
                     <?= $orderText; ?>
                     محصولات
+                    <?= !empty($specialParam) ? 'ویژه' : ''; ?>
                 </li>
             </ol>
         </nav>
@@ -30,6 +31,7 @@
                 <div class="section-title-icon"></div>
                 <h1 class="section-title">
                     <?= $orderText; ?>
+                    <?= !empty($specialParam) ? 'ویژه' : ''; ?>
                 </h1>
             </div>
             <div class="d-sm-flex d-block align-items-center mb-4 justify-content-end">
@@ -43,15 +45,15 @@
                     </button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item <?= $orderParam == 'newest' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/newest">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/newest">
                             جدیدترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_discount' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_discount">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_discount">
                             پرتخفیفترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_view">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_view">
                             پربازدیدترین
                         </a>
                     </div>
@@ -64,6 +66,11 @@
                 <?php foreach ($products as $item): ?>
                     <div class="card-wrapper col-lg-4 col-md-6 col-12">
                         <div class="card">
+                            <?php if ($item['is_special'] == 1): ?>
+                                <div class="off-label">
+                                    ویژه
+                                </div>
+                            <?php endif; ?>
                             <div class="card-img">
                                 <div class="img-placeholder">
                                     <i class="la la-image" aria-hidden="true"></i>
@@ -77,14 +84,16 @@
                                 </span>
                             </div>
                             <div class="card-title">
-                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
+                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>"
+                                   title="<?= $item['title']; ?>">
                                     <?= $item['title']; ?>
                                 </a>
                             </div>
                             <div class="card-info">
                                 <div>
                                     <?php
-                                    $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - convertNumbersToPersian($item['discount_price'], true)) / convertNumbersToPersian($item['price'], true)) * 100);
+                                    $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : 0;
+                                    $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
                                     ?>
                                     <?php if ($discountPercentage != 0): ?>
                                         <span class="btn rounded-pill card-off-percentage">
@@ -130,7 +139,7 @@
                 'firstPage' => $pagination['firstPage'],
                 'lastPage' => $pagination['lastPage'],
                 'pageNo' => $pagination['page'],
-                'href' => base_url('product/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . '/order/' . $orderParam,
+                'href' => base_url('product/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . (!empty($specialParam) ? '/offers' : '') . '/order/' . $orderParam,
             ]); ?>
         <?php else: ?>
             <div class="box">

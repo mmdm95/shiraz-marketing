@@ -71,52 +71,62 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load categories data -->
-                                                <tr>
-                                                    <td width="50px">
-                                                    </td>
-                                                    <td class="info">
-                                                    </td>
-                                                    <td>
-                                                        تومان
-                                                        درصد
-                                                    </td>
-                                                    <td>
-                                                        تومان
-                                                    </td>
-                                                    <td>
-                                                        تومان
-                                                        <i class="icon-dash text-danger" aria-hidden="true"></i>
-                                                    </td>
-                                                    <td class="success">
-                                                    </td>
-                                                    <td class="danger">
-                                                    </td>
-                                                    <td align="center">
+                                                <?php foreach ($copValues as $key => $coupon): ?>
+                                                    <tr>
+                                                        <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
+                                                        </td>
+                                                        <td class="info">
+                                                            <?= $coupon['coupon_code']; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($coupon['price'], true))); ?>
+                                                            تومان
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($coupon['min_price'], true))); ?>
+                                                            تومان
+                                                        </td>
+                                                        <td>
+                                                            <?php if (!empty($coupon['max_price'])): ?>
+                                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($coupon['max_price'], true))); ?>
+                                                                تومان
+                                                            <?php else: ?>
+                                                                <i class="icon-dash text-danger" aria-hidden="true"></i>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td class="<?= $coupon['coupon_expire_time'] > time() ? 'success' : 'danger'; ?>">
+                                                            <?= jDateTime::date('Y/m/d', $coupon['coupon_expire_time']); ?>
+                                                        </td>
+                                                        <td align="center">
+                                                            <?php if ($coupon['publish'] == 1): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-success">فعال</span>
-                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                            <?php else: ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-danger">غیر فعال</span>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-primary-600">
-                                                                <a href="<?= base_url(); ?>admin/shop/editCoupon/"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteCouponBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td style="width: 115px;" class="text-center">
+                                                            <ul class="icons-list">
+                                                                <li class="text-primary-600">
+                                                                    <a href="<?= base_url('admin/shop/editCoupon/' . $coupon['id']); ?>"
+                                                                       title="ویرایش" data-popup="tooltip">
+                                                                        <i class="icon-pencil7"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="text-danger-600">
+                                                                    <a class="deleteCouponBtn"
+                                                                       title="حذف" data-popup="tooltip">
+                                                                        <input type="hidden"
+                                                                               value="<?= $coupon['id']; ?>">
+                                                                        <i class="icon-trash"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

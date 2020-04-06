@@ -33,12 +33,21 @@
             </div>
             <div class="extra-container">
                 <div class="login-register">
-                    <a href="<?= base_url('login'); ?>" class="btn login">
-                        ورود
-                    </a>
-                    <a href="<?= base_url('register'); ?>" class="btn register">
-                        عضویت
-                    </a>
+                    <?php if ($auth->isLoggedIn()): ?>
+                        <a href="<?= base_url('user/dashboard'); ?>" class="btn login">
+                            داشبورد
+                        </a>
+                        <a href="<?= base_url('logout'); ?>" class="btn register">
+                            خروج
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= base_url('login'); ?>" class="btn login">
+                            ورود
+                        </a>
+                        <a href="<?= base_url('register'); ?>" class="btn register">
+                            عضویت
+                        </a>
+                    <?php endif; ?>
                 </div>
                 <div class="basket-container">
                     <div class="menu-icon mobile-search-icon" id="mobileSearchIcon">

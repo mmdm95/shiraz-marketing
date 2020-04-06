@@ -46,7 +46,7 @@ $helper->log('    Description - ' . $spreadsheet->getProperties()->getDescriptio
 $helper->log('    Keywords: - ' . $spreadsheet->getProperties()->getKeywords());
 
 $helper->log('Extended (Application) Properties:');
-$helper->log('    BlogCategory - ' . $spreadsheet->getProperties()->getCategory());
+$helper->log('    Category - ' . $spreadsheet->getProperties()->getCategory());
 $helper->log('    Company - ' . $spreadsheet->getProperties()->getCompany());
 $helper->log('    Manager - ' . $spreadsheet->getProperties()->getManager());
 

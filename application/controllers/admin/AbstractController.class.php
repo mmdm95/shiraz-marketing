@@ -28,8 +28,11 @@ abstract class AbstractController extends AbstractPaymentController
             echo $e;
         }
 
-        if (ACTION != 'login' && !$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
+        try {
+            if (ACTION != 'login' && (!$this->auth->isLoggedIn() || !$this->auth->isInAdminRole())) {
+                $this->redirect(base_url('admin/login'));
+            }
+        } catch (HAException $e) {
         }
 
         // Load file helper .e.g: read_json, etc.

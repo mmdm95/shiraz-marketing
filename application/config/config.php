@@ -1,8 +1,25 @@
 <?php
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
-// App version
-defined('APP_VERSION') OR define('APP_VERSION', '0.0.1');
+/**
+ * App version
+ * Use semantic-versioning (AKA SemVer) here
+ * Numbers are Major.Minor.Patch[-a or -b]
+ * -a stands for alpha
+ * -b stands for beta
+ * -rc stands for release candidate
+ *
+ * Note:
+ *   Please use below options instead of -b and -a and -rc
+ *     0 for alpha (status)
+ *     1 for beta (status)
+ *     2 for release candidate
+ *     3 for (final) release
+ *   ie.
+ *     1.2.5.0 instead of 1.2.5-a
+ *     1.2.5.0.1 instead of 1.2.5-a1 (I'm not sure)
+ */
+defined('APP_VERSION') OR define('APP_VERSION', '1.0.0');
 
 //===============================================
 
@@ -20,8 +37,9 @@ defined('DEF_ACTION') OR define('DEF_ACTION', 'index');
 //===============================================
 
 // Save The Keys In Your Configuration File
-defined('MAIN_KEY') OR define('MAIN_KEY', 'Lk5Uz3slx3BrAghS1aaW5AYgWZRV0tIX5eI0yPchFz4=');
-defined('ASSURED_KEY') OR define('ASSURED_KEY', 'EZ44mFi3TlAey1b2w4Y7lVDuqO+SRxGXsa7nctnr/JmMrA2vN6EJhrvdVZbxaQs5jpSe34X3ejFK/o9+Y5c83w==');
+// Note: You must enter a base64 string
+defined('MAIN_KEY') OR define('MAIN_KEY', 'ZClpMnB4LjVjZzhWVWxxQjNqYUhXYkB2PD8wIzF1c0RKcjlSKC0hNjp5b3xDJS93ZjRtNw==');
+defined('ASSURED_KEY') OR define('ASSURED_KEY', 'NG9pP0VMemJqQXRyOjdQL18xV2xlO3hrWWc8MyM+MmRjW2YkNi01dndVWClEQHUwRihoXUJaLm5cT3BzISw4UkNISX45K1R8JiVxSnlNYVY=');
 
 //===============================================
 
@@ -31,11 +49,21 @@ defined('PROFILE_DEFAULT_IMAGE') OR define('PROFILE_DEFAULT_IMAGE', 'public/fe/i
 // Default users profile image directory
 defined('PROFILE_IMAGE_DIR') OR define('PROFILE_IMAGE_DIR', 'public/uploads/users/profileImages/');
 
+// Default superset for users
+defined('DEFAULT_SUPERSET') OR define('DEFAULT_SUPERSET', 'M-1000002');
+
 // My custom payment status
 defined('OWN_PAYMENT_STATUS_SUCCESSFUL') OR define('OWN_PAYMENT_STATUS_SUCCESSFUL', 1);
 defined('OWN_PAYMENT_STATUS_FAILED') OR define('OWN_PAYMENT_STATUS_FAILED', 0);
 defined('OWN_PAYMENT_STATUS_NOT_PAYED') OR define('OWN_PAYMENT_STATUS_NOT_PAYED', -9);
 defined('OWN_PAYMENT_STATUS_WAIT') OR define('OWN_PAYMENT_STATUS_WAIT', -8);
+// My custom payment status array
+defined('OWN_PAYMENT_STATUSES') OR define('OWN_PAYMENT_STATUSES', [
+    OWN_PAYMENT_STATUS_SUCCESSFUL => 'پرداخت شده',
+    OWN_PAYMENT_STATUS_FAILED => 'پرداخت ناموفق',
+    OWN_PAYMENT_STATUS_NOT_PAYED => 'پرداخت نشده',
+    OWN_PAYMENT_STATUS_WAIT => 'در انتظار پرداخت'
+]);
 
 // My custom order code prefix
 defined('ITEMS_EACH_PAGE_DEFAULT') OR define('ITEMS_EACH_PAGE_DEFAULT', 24);
@@ -45,6 +73,7 @@ defined('SMS_REPLACEMENT_CHARS') OR define('SMS_REPLACEMENT_CHARS', [
     'mobile' => '@mobile@',
     'code' => '@code@',
     'orderCode' => '@orderCode@',
+    'status' => '@status@',
 ]);
 
 // My custom order code prefix
@@ -72,6 +101,13 @@ defined('PAYMENT_METHOD_WALLET') OR define('PAYMENT_METHOD_WALLET', 1);
 defined('PAYMENT_METHOD_GATEWAY') OR define('PAYMENT_METHOD_GATEWAY', 2);
 defined('PAYMENT_METHOD_IN_PLACE') OR define('PAYMENT_METHOD_IN_PLACE', 3);
 defined('PAYMENT_METHOD_RECEIPT') OR define('PAYMENT_METHOD_RECEIPT', 4);
+// Payment methods array
+defined('PAYMENT_METHODS') OR define('PAYMENT_METHODS', [
+    PAYMENT_METHOD_WALLET => 'کیف پول',
+    PAYMENT_METHOD_GATEWAY => 'درگاه پرداخت',
+    PAYMENT_METHOD_IN_PLACE => 'درب منزل',
+    PAYMENT_METHOD_RECEIPT => 'رسید بانکی'
+]);
 
 // ُ Factor exportation type
 defined('FACTOR_EXPORTATION_TYPE_BUY') OR define('FACTOR_EXPORTATION_TYPE_BUY', 1);
@@ -135,8 +171,7 @@ return array(
     //$routes = array(
     //    'hello/*' => 'index'
     //);
-    'routes' => array(
-//        'blog/(:any)' => 'comingSoon',
+    'routes' => array(//        'blog/(:any)' => 'comingSoon',
     ),
 
     //===============================================

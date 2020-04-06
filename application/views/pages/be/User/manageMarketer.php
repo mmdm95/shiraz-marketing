@@ -48,7 +48,6 @@
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
-                                                <li><a data-action="close"></a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -62,65 +61,82 @@
                                                     <th>نام کاربری</th>
                                                     <th>تاریخ ثبت</th>
                                                     <th>فعال/غیرفعال</th>
+                                                    <th>تیم ما</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                        <input type="hidden" value="">
-                                                        <input type="checkbox"
-                                                               class="switchery uActiveDeactiveBtn"/>
-                                                    </td>
-                                                    <td style="width: 115px;" class="text-center">
-                                                        <ul class="icons-list">
-                                                            <li class="text-green-800 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/userProfileAction"
-                                                                   title="مشاهده" data-popup="tooltip">
-                                                                    <i class="icon-eye"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-black-600">
-                                                                <a href="<?= base_url(); ?>/admin/user/changePassword"
-                                                                   title="تغییر رمز عبور" data-popup="tooltip">
-                                                                    <i class="icon-key"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-warning-800">
-                                                                <a href="<?= base_url(); ?>/admin/user/userDeposit"
-                                                                   title="کیف پول" data-popup="tooltip">
-                                                                    <i class="icon-wallet"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                        <ul class="icons-list mt-10">
-                                                            <li class="text-primary-600 mr-5">
-                                                                <a href="<?= base_url(); ?>/admin/user/editUser"
-                                                                   title="ویرایش" data-popup="tooltip">
-                                                                    <i class="icon-pencil7"></i>
-                                                                </a>
-                                                            </li>
-                                                            <li class="text-danger-600">
-                                                                <a class="deleteUserBtn"
-                                                                   title="حذف" data-popup="tooltip">
-                                                                    <input type="hidden"
-                                                                           value="">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </td>
-                                                </tr>
-
+                                                <?php foreach ($marketers as $key => $marketer): ?>
+                                                    <tr>
+                                                        <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php if (!empty($marketer['first_name']) || !empty($marketer['last_name'])): ?>
+                                                                <?= $marketer['first_name'] . ' ' . $marketer['last_name']; ?>
+                                                            <?php else: ?>
+                                                                <i class="icon-minus text-danger"
+                                                                   aria-hidden="true"></i>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian($marketer['username']); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $marketer['created_at']); ?>
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" value="<?= $marketer['id']; ?>">
+                                                            <input type="checkbox"
+                                                                   class="switchery uActiveDeactiveBtn"
+                                                                <?= set_value($marketer['active'] ?? '', 1, 'checked', '', '=='); ?> />
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" value="<?= $marketer['id']; ?>">
+                                                            <input type="checkbox"
+                                                                   class="switchery inOurTeamBtn"
+                                                                <?= set_value($marketer['is_in_team'] ?? '', 1, 'checked', '', '=='); ?> />
+                                                        </td>
+                                                        <td style="width: 115px;" class="text-center">
+                                                            <ul class="icons-list">
+                                                                <li class="text-green-800 mr-5">
+                                                                    <a href="<?= base_url('admin/user/userProfile/' . $marketer['id']); ?>"
+                                                                       title="مشاهده" data-popup="tooltip">
+                                                                        <i class="icon-eye"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="text-black-600">
+                                                                    <a href="<?= base_url('admin/user/changePassword/' . $marketer['id']); ?>"
+                                                                       title="تغییر رمز عبور" data-popup="tooltip">
+                                                                        <i class="icon-key"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="text-warning-800">
+                                                                    <a href="<?= base_url('admin/user/userDeposit/' . $marketer['id']); ?>"
+                                                                       title="کیف پول" data-popup="tooltip">
+                                                                        <i class="icon-wallet"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                            <ul class="icons-list mt-10">
+                                                                <li class="text-primary-600 mr-5">
+                                                                    <a href="<?= base_url('admin/user/editUser/' . $marketer['id']); ?>"
+                                                                       title="ویرایش" data-popup="tooltip">
+                                                                        <i class="icon-pencil7"></i>
+                                                                    </a>
+                                                                </li>
+                                                                <li class="text-danger-600">
+                                                                    <a class="deleteMarketerBtn"
+                                                                       title="حذف از لیست بازاریابان" data-popup="tooltip">
+                                                                        <input type="hidden"
+                                                                               value="<?= $marketer['id']; ?>">
+                                                                        <i class="icon-trash"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

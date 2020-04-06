@@ -50,8 +50,8 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/shop/addCoupon" method="post">
-                            <!--                            --><?//= $data['form_token']; ?>
+                        <form action="<?= base_url('admin/shop/editCoupon/' . $param[0]); ?>" method="post">
+                            <?= $form_token; ?>
 
                             <div class="row">
                                 <div class="col-md-9">
@@ -65,70 +65,65 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
+                                            <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                            <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
-                                            <div class="form-group col-lg-4">
+                                            <div class="form-group col-lg-3">
                                                 <span class="text-danger">*</span>
                                                 <label>کد کوپن:</label>
                                                 <input name="code" type="text" class="form-control"
                                                        placeholder="اجباری" maxlength="20"
-                                                       value="">
+                                                       value="<?= $coValues['code'] ?? $coTrueValues['coupon_code'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-8">
+                                            <div class="form-group col-lg-5">
                                                 <span class="text-danger">*</span>
                                                 <label>عنوان:</label>
                                                 <input name="title" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="">
+                                                       value="<?= $coValues['title'] ?? $coTrueValues['title'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-7">
+                                            <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>قیمت:</label>
-                                                <input name="amount" type="text" class="form-control"
+                                                <input name="price" type="text" class="form-control"
                                                        placeholder="اجباری"
-                                                       value="">
-                                            </div>
-                                            <div class="form-group col-lg-5">
-                                                <span class="text-danger">*</span>
-                                                <label>انتخاب واحد:</label>
-                                                <select class="select-no-search" name="unit">
-                                                    <option value="1">
-                                                        تومان
-                                                    </option>
-                                                    <option value="2">
-                                                        درصد
-                                                    </option>
-                                                </select>
+                                                       value="<?= $coValues['price'] ?? $coTrueValues['price'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="text-danger">*</span>
                                                 <label>حداقل قیمت اعمال تخفیف:</label>
-                                                <input name="min-price" type="text" class="form-control"
+                                                <input name="min_price" type="text" class="form-control"
                                                        placeholder="به تومان"
-                                                       value="">
+                                                       value="<?= $coValues['min_price'] ?? $coTrueValues['min_price'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>حداکثر قیمت اعمال تخفیف:</label>
-                                                <input name="max-price" type="text" class="form-control"
+                                                <input name="max_price" type="text" class="form-control"
                                                        placeholder="به تومان"
-                                                       value="">
+                                                       value="<?= $coValues['max_price'] ?? $coTrueValues['max_price'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>تاریخ انقضا:</label>
                                                 <input type="hidden" name="expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
-                                                       placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
-                                                       value="">
+                                                       placeholder="تاریخ انقضا" readonly
+                                                       data-alt-field="#altDateField" data-time="true"
+                                                       value="<?= $coValues['expire'] ?? $coTrueValues['expire_time'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="coStatus">وضعیت فعالسازی:</label>
-                                                <input type="checkbox" name="status" id="coStatus"
-                                                       class="switchery" />
+                                                <input type="checkbox" name="publish" id="coStatus"
+                                                       class="switchery" <?= set_value($coValues['publish'] ?? $coTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
                                             </div>
 
 
                                             <div class="text-right col-md-12 mt-20">
-                                                <button type="submit" class="btn btn-primary submit-button">
-                                                    ذخیره
+                                                <a href="<?= base_url('admin/shop/manageCoupon'); ?>"
+                                                   class="btn btn-default mr-5">
+                                                    بازگشت
+                                                </a>
+                                                <button type="submit" class="btn btn-success submit-button">
+                                                    ویرایش
                                                     <i class="icon-arrow-left12 position-right"></i>
                                                 </button>
                                             </div>

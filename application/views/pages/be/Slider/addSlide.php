@@ -48,120 +48,85 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <form action="" method="post">
+                        <form action="<?= base_url('admin/addSlide'); ?>" method="post">
+                            <?= $form_token; ?>
 
-                                    <div class="panel panel-body border-top-primary">
-                                        <h6 class="no-margin text-semibold text-center">
-                                            افزودن اسلاید
-                                        </h6>
-                                        <p class="text-muted content-group-sm text-center">
-                                        </p>
-                                        <div class="row">
-                                            <div class="alert alert-danger">
-                                                <ul>
-                                                    <li>
+                            <div class="panel panel-body border-top-primary">
+                                <h6 class="no-margin text-semibold text-center">
+                                    افزودن اسلاید
+                                </h6>
+                                <p class="text-muted content-group-sm text-center">
+                                </p>
+                                <div class="row">
+                                    <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
+                                    <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
 
-                                                    </li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="alert alert-success">
-                                                <p>
-                                                </p>
-                                            </div>
-
-                                            <div class="col-md-8 col-md-push-2 mt-10">
-                                                <div class="cursor-pointer pick-file" data-toggle="modal"
-                                                     data-target="#modal_full"
-                                                     style="border: dashed 2px #ddd; padding: 0 10px 10px 0; box-sizing: border-box;">
-                                                    <input class="image-file" type="hidden"
-                                                           name="s-image" value="">
-                                                    <div class="media stack-media-on-mobile">
-                                                        <div class="media-left">
-                                                            <div class="thumb">
-                                                                <a class="display-block"
-                                                                   style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
-                                                                    <img
-                                                                            src=""
-                                                                            class="img-rounded" alt=""
-                                                                            style="width: 100px; height: 100px; object-fit: contain;"
-                                                                            data-base-url="">
-                                                                </a>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="media-body">
-                                                            <h6 class="media-heading">
-                                                                <a class="text-grey-300">
-                                                                    <span class="text-danger">*</span>
-                                                                    انتخاب تصویر:
-                                                                </a>
-                                                                <a class="io-image-name display-block">
-                                                                </a>
-                                                            </h6>
-                                                        </div>
+                                    <div class="col-md-8 col-md-push-2 mt-10">
+                                        <div class="cursor-pointer pick-file border border-lg border-default"
+                                             data-toggle="modal"
+                                             data-target="#modal_full"
+                                             style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                            <input class="image-file" type="hidden"
+                                                   name="image"
+                                                   value="<?= $slideValues['image'] ?? ''; ?>">
+                                            <div class="media stack-media-on-mobile">
+                                                <div class="media-left">
+                                                    <div class="thumb">
+                                                        <a class="display-inline-block"
+                                                           style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                            <img src="<?= set_value($slideValues['image'] ?? '', '', base_url($slideValues['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                 class="img-rounded" alt=""
+                                                                 style="width: 100px; height: 100px; object-fit: contain;"
+                                                                 data-base-url="<?= base_url(); ?>">
+                                                        </a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-12"></div>
-                                            <div class="form-group col-md-5 mt-10">
-                                                <label>
-                                                    آدرس لینک:
-                                                </label>
-                                                <input name="s-btn-url"
-                                                       type="url"
-                                                       class="form-control"
-                                                       placeholder="مثال: www.spsroham.ir/contactUs"
-                                                       value="">
-                                            </div>
-                                            <div class="text-right col-md-12">
-                                                <button type="submit" class="btn btn-primary">
-                                                    افزودن
-                                                    <i class="icon-arrow-left12 position-right"></i>
-                                                </button>
+                                                <div class="media-body">
+                                                    <h6 class="media-heading">
+                                                        <a class="text-grey-300">
+                                                            <span class="text-danger">*</span>
+                                                            انتخاب تصویر:
+                                                        </a>
+                                                        <a class="io-image-name display-block">
+                                                            <?= basename($slideValues['image'] ?? ''); ?>
+                                                        </a>
+                                                    </h6>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
-                                <!-- Standard width modal -->
-                                <div id="modal_full" class="modal fade">
-                                    <div class="modal-dialog modal-full">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal">&times;
-                                                </button>
-                                                <h5 class="modal-title">
-                                                    انتخاب فایل
-                                                </h5>
-                                            </div>
-
-                                            <div id="files-body" class="modal-body">
-                                                <?php include VIEW_PATH . 'templates/efm-view.php'; ?>
-                                            </div>
-
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">
-                                                    <i class="icon-cancel-circle2 position-left" aria-hidden="true"></i>
-                                                    لغو
-                                                </button>
-                                                <button id="file-ok" type="button" class="btn btn-primary"
-                                                        data-dismiss="modal">
-                                                    <i class="icon-checkmark-circle position-left"
-                                                       aria-hidden="true"></i>
-                                                    انتخاب
-                                                </button>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-12"></div>
+                                    <div class="form-group col-md-5 mt-10">
+                                        <label>
+                                            آدرس لینک:
+                                        </label>
+                                        <input name="url"
+                                               type="url"
+                                               class="form-control"
+                                               placeholder="مثال: www.spsroham.ir/contactUs"
+                                               value="<?= $slideValues['url'] ?? ''; ?>">
+                                    </div>
+                                    <div class="text-right col-md-12">
+                                        <a href="<?= base_url('admin/manageSlider'); ?>"
+                                           class="btn btn-default mr-5">
+                                            بازگشت
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            ذخیره
+                                            <i class="icon-arrow-left12 position-right"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <!-- /standard width modal -->
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <!-- /form centered -->
+
+                <!-- file-picker -->
+                <?php $this->view("templates/be/file-picker", $data); ?>
+                <!-- /file-picker -->
+
                 <!-- Footer -->
                 <?php $this->view("templates/be/copyright", $data); ?>
                 <!-- /footer -->

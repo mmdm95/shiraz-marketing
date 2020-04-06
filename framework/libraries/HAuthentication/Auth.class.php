@@ -183,20 +183,29 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
         }
         if (count($roleId)) {
-            $roleId = $roleId[0][$this->authData->columns->user_role->role_id->column];
+            $roleId = array_column($roleId, $this->authData->columns->user_role->role_id->column);
             $row[$this->authData->columns->user_role->role_id->column] = $roleId;
 
+            $where = '';
+            $params = [];
+
+            foreach ($roleId as $k => $id) {
+                $where .= ':id' . ($k + 1) . ',';
+                $params['id' . ($k + 1)] = $id;
+            }
+
+            $where = trim($where, ',');
+
             $role = $this->getDataFromDB($this->authData->tables->role, '*',
-                "{$this->authData->columns->role->id->column}=:id",
-                ['id' => $roleId]);
+                "{$this->authData->columns->role->id->column} IN (" . $where . ")",
+                $params);
             if (count($role)) {
-                $role = $role[0];
-                $row['role_name'] = $role[$this->authData->columns->role->name->column];
-                $row['role_desc'] = $role[$this->authData->columns->role->description->column];
+                $row['role_name'] = array_column($role, $this->authData->columns->role->name->column);
+                $row['role_desc'] = array_column($role, $this->authData->columns->role->description->column);
             }
 
             if ($checkAdminRoles) {
-                if (!$this->isInAdminRole($role[$this->authData->columns->role->name->column])) {
+                if (!$this->isInAdminRole($username)) {
                     return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
                 }
             }
@@ -582,6 +591,42 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     }
 
     /**
+     * Check if a user [or current user if <i>$username</i> is <b>null</b>] has a role or not
+     *
+     * @param array|string|int $role
+     * @param string|int|null $username
+     * @return bool|array
+     *
+     * @throws HAException
+     *
+     */
+    public function hasUserRole($role, $username = null)
+    {
+        if (is_null($username)) {
+            $username = $this->_getCurrentUserID();
+        }
+        $result = $this->_checkUserParams($username);
+        if (isset($result['err'])) {
+            return $result;
+        }
+        $uId = $result[0];
+        if (is_array($role)) {
+            foreach ($role as $r) {
+                $roleId = $this->_fetchRole($r);
+                $roleId = $roleId[0][$this->authData->columns->role->id->column];
+                if ($this->_hasUR($uId, $roleId)) {
+                    return true;
+                }
+            }
+        } elseif (is_string($role) || is_numeric($role)) {
+            $roleId = $this->_fetchRole($role);
+            $roleId = $roleId[0][$this->authData->columns->role->id->column];
+            return $this->_hasUR($uId, $roleId);
+        }
+        return false;
+    }
+
+    /**
      * Check if current user's role is allow specific privilege to specific resource
      * For role-based applications
      *
@@ -655,8 +700,8 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     protected function _checkUserParams($username, $resource = null, $privilege = null)
     {
         if ((!is_string($username) && !is_numeric($username)) ||
-            (!is_string($resource) && !is_numeric($resource)) ||
-            (!is_string($privilege) && !is_numeric($privilege))) {
+            (!is_null($resource) && !is_string($resource) && !is_numeric($resource)) ||
+            (!is_null($privilege) && !is_string($privilege) && !is_numeric($privilege))) {
             throw new HAException('نوع داده‌های وارد شده صحیح نمی‌باشد.');
         }
 
@@ -729,18 +774,30 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
      */
     protected function _removeUR($uId, $roleId)
     {
-        if ($this->existsDataInDB($this->authData->tables->user_role,
-            "{$this->authData->columns->user_role->user_id->column}=:uId AND {$this->authData->columns->user_role->role_id->column}=:roleId", [
-                'uId' => $uId,
-                'roleId' => $roleId
-            ])
-        ) {
+        if ($this->_hasUR($uId, $roleId)) {
             $this->removeDataFromDB($this->authData->tables->user_role,
                 "{$this->authData->columns->user_role->user_id->column}=:uId AND {$this->authData->columns->user_role->role_id->column}=:roleId", [
                     'uId' => $uId,
                     'paId' => $roleId
                 ]);
         }
+    }
+
+    /**
+     * Check if a specific user id has specific role id
+     *
+     * @param $uId
+     * @param $roleId
+     * @return bool
+     *
+     */
+    protected function _hasUR($uId, $roleId)
+    {
+        return $this->existsDataInDB($this->authData->tables->user_role,
+            "{$this->authData->columns->user_role->user_id->column}=:uId AND {$this->authData->columns->user_role->role_id->column}=:roleId", [
+                'uId' => $uId,
+                'roleId' => $roleId
+            ]);
     }
 
     /**
@@ -881,7 +938,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     /**
      * Get current/loggedIn user's role
      *
-     * @return string
+     * @return array | array of string
      *
      * @throws HAException
      *
@@ -889,12 +946,23 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     public function getCurrentUserRole()
     {
         $roleId = $this->getCurrentUserRoleID();
+
+        $where = '';
+        $params = [];
+
+        foreach ($roleId as $k => $id) {
+            $where .= ':id' . ($k + 1) . ',';
+            $params['id' . ($k + 1)] = $id;
+        }
+
+        $where = trim($where, ',');
+
         $role = $this->getDataFromDB($this->authData->tables->role, ['*'],
-            "{$this->authData->columns->role->id->column}=:roleId", ['roleId' => $roleId]);
+            "{$this->authData->columns->role->id->column} IN (" . $where . ")", $params);
         if (!count($role)) {
             throw new HAException('نقش مورد نظر وجود ندارد!');
         }
-        $role = $role[0][$this->authData->columns->role->name->column];
+        $role = array_column($role, $this->authData->columns->role->name->column);
 
         return $role;
     }
@@ -902,7 +970,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     /**
      * Get current/loggedIn user's role's id
      *
-     * @return int
+     * @return array | array of int
      *
      * @throws HAException
      *
@@ -915,7 +983,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
         if (!count($roleId)) {
             throw new HAException('کاربر فاقد نقش است!');
         }
-        $roleId = $roleId[0][$this->authData->columns->user_role->role_id->column];
+        $roleId = array_column($roleId, $this->authData->columns->user_role->role_id->column);
 
         return $roleId;
     }
@@ -945,26 +1013,17 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
      * Check if $role is in admin roles
      * If $role is not set, then check current user
      *
-     * @param null|int|string $role
+     * @param null $username
      * @return mixed
      *
      * @throws HAException
      */
-    public function isInAdminRole($role = null)
+    public function isInAdminRole($username = null)
     {
-        if (!is_numeric($role) && !is_string($role)) {
-            throw new HAException('نقش وارد شده باید از نوع رشته یا عدد باشد.');
-        }
-        if (empty($role)) {
-            $role = $this->getCurrentUserRole();
-        } else {
-            $role = $this->_fetchRole($role);
-        }
-
-        if (!count($role)) return false;
-
-        if (in_array($role[0][$this->authData->columns->role->name->column], $this->authData->data->admin_roles)) {
-            return true;
+        foreach ($this->authData->data->admin_roles as $adminRole) {
+            if ($this->hasUserRole($adminRole, $username)) {
+                return true;
+            }
         }
         return false;
     }

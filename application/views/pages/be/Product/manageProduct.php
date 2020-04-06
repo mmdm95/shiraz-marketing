@@ -66,55 +66,75 @@
                                                     <th>تعداد موجود</th>
                                                     <th>تعداد فروخته شده</th>
                                                     <th>وضعیت نمایش</th>
+                                                    <th>وضعیت موجودی</th>
+                                                    <th>ثبت کننده</th>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load categories data -->
-<!--                                                --><?php //foreach ($products as $key => $product): ?>
+                                                <?php foreach ($products as $key => $product): ?>
                                                     <tr>
                                                         <td width="50px">
-<!--                                                            --><?//= convertNumbersToPersian($key + 1); ?>
+                                                            <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td width="100px">
-                                                            <a data-url=""
+                                                            <a data-url="<?= base_url($product['image']); ?>"
                                                                data-popup="lightbox">
                                                                 <img src=""
-                                                                     data-src=""
-                                                                     alt=""
+                                                                     data-src="<?= base_url() . $product['image']; ?>"
+                                                                     alt="<?= $product['title']; ?>"
                                                                      class="img-rounded img-preview lazy">
                                                             </a>
                                                         </td>
                                                         <td>
-<!--                                                            <a href="--><?//= base_url('product/' . $product['product_code'] . '/' . url_title($product['latin_title'])); ?><!--">-->
-<!--                                                                --><?//= $product['product_title']; ?>
-<!--                                                                <span class="text-muted display-block text-size-small mt-5">-->
-<!--                                                                    --><?//= $product['latin_title'] ?>
-<!--                                                                </span>-->
-<!--                                                            </a>-->
+                                                            <a href="<?= base_url('product/detail/' . $product['id'] . '/' . $product['slug']); ?>"
+                                                               target="_blank">
+                                                                <?= $product['title']; ?>
+                                                            </a>
+                                                            <?php if ($product['is_special'] == 1): ?>
+                                                                <span class="label label-danger ml-5">ویژه</span>
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td>
-<!--                                                            --><?//= $product['category']; ?>
+                                                            <?= $product['category_name']; ?>
                                                         </td>
-                                                        <td class="" align="center">
-<!--                                                            --><?//= convertNumbersToPersian($product['stock_count']); ?>
+                                                        <td class="success" align="center">
+                                                            <?= convertNumbersToPersian($product['stock_count']); ?>
                                                         </td>
                                                         <td class="info" align="center">
-<!--                                                            --><?//= convertNumbersToPersian($product['sold_count']); ?>
+                                                            <?= convertNumbersToPersian($product['sold_count']); ?>
                                                         </td>
                                                         <td>
-<!--                                                            --><?php //if ($product['publish'] == 1): ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-success">فعال</span>-->
-<!--                                                            --><?php //else: ?>
-<!--                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left-->
-<!--                                                                 border-left-lg border-left-danger">غیر فعال</span>-->
-<!--                                                            --><?php //endif; ?>
+                                                            <?php if ($product['publish'] == 1): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-success">فعال</span>
+                                                            <?php else: ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                border-left-lg border-left-danger">غیر فعال</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td width="100px">
+                                                            <input type="hidden" value="<?= $product['id']; ?>">
+                                                            <input type="checkbox"
+                                                                   class="switchery productAvailability"
+                                                                <?= set_value($product['available'] ?? '', 1, 'checked', '', '=='); ?> />
+                                                        </td>
+                                                        <td>
+                                                            <?php if (!empty($product['username'])): ?>
+                                                                <?php if (!empty($product['user_first_name']) || !empty($product['user_last_name'])): ?>
+                                                                    <?= $product['user_first_name'] . ' ' . $product['user_last_name']; ?>
+                                                                <?php else: ?>
+                                                                    <?= $product['username']; ?>
+                                                                <?php endif; ?>
+                                                            <?php else: ?>
+                                                                <i class="icon-minus2 text-danger"
+                                                                   aria-hidden="true"></i>
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-primary-600">
-                                                                    <a href="<?= base_url(); ?>admin/shop/editProduct/"
+                                                                    <a href="<?= base_url('admin/shop/editProduct/' . $product['id']); ?>"
                                                                        title="ویرایش" data-popup="tooltip">
                                                                         <i class="icon-pencil7"></i>
                                                                     </a>
@@ -123,14 +143,14 @@
                                                                     <a class="deleteProductBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="">
+                                                                               value="<?= $product['id']; ?>">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>
                                                             </ul>
                                                         </td>
                                                     </tr>
-<!--                                                --><?php //endforeach; ?>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

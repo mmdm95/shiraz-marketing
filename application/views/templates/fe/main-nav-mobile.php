@@ -8,40 +8,33 @@
     </div>
     <div class="login-register col align-content-around">
         <div class="row">
-            <a href="<?= base_url('login'); ?>" class="btn login col">
-                ورود
-            </a>
-            <a href="<?= base_url('register'); ?>" class="btn register col">
-                عضویت
-            </a>
+            <?php if ($auth->isLoggedIn()): ?>
+                <a href="<?= base_url('user/dashboard'); ?>" class="btn login col">
+                    داشبورد
+                </a>
+                <a href="<?= base_url('logout'); ?>" class="btn register col">
+                    خروج
+                </a>
+            <?php else: ?>
+                <a href="<?= base_url('login'); ?>" class="btn login col">
+                    ورود
+                </a>
+                <a href="<?= base_url('register'); ?>" class="btn register col">
+                    عضویت
+                </a>
+            <?php endif; ?>
         </div>
     </div>
     <div class="nav-main-mobile-items rtl-text">
-        <nav class="nav flex-column">
-            <a class="nav-item active" href="#">
-                <i class="la la-building-o nav-item-icon"></i>
-                <span class="nav-item-text">
-                    رستوران و کافی شاپ
-                </span>
-            </a>
-            <a class="nav-item" href="#">
-                <i class="la la-heartbeat nav-item-icon"></i>
-                <span class="nav-item-text">
-                    سلامتی و پزشکی
-                </span>
-            </a>
-            <a class="nav-item" href="#">
-                <i class="la la-graduation-cap nav-item-icon"></i>
-                <span class="nav-item-text">
-                    آموزش
-                </span>
-            </a>
-            <a class="nav-item disabled" href="#" tabindex="-1" aria-disabled="true">
-                <i class="la la-smile-o nav-item-icon"></i>
-                <span class="nav-item-text">
-                    تفریحی و ورزشی
-                </span>
-            </a>
-        </nav>
+        <?php if (count($menuNavigation)): ?>
+            <nav class="nav flex-column">
+                <?php foreach ($menuNavigation as $item): ?>
+                    <a class="nav-item active" href="<?= base_url('product/all/category/' . $item['slug']); ?>">
+                        <i class="<?= $item['icon']; ?> nav-item-icon"></i>
+                        <span class="nav-item-text"><?= $item['name']; ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </nav>
+        <?php endif; ?>
     </div>
 </nav>

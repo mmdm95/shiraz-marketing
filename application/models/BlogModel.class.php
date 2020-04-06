@@ -12,12 +12,13 @@ class BlogModel extends HModel
         $this->db = $this->getDb();
     }
 
-    public function getAllBlog($where = '', $bindParams = [], $limit = null, $offset = 0, $orderBy = ['p.id DESC'])
+    public function getAllBlog($where = '', $bindParams = [], $limit = null, $offset = 0, $orderBy = ['b.id DESC'])
     {
         $select = $this->select();
         $select->cols([
             'b.image', 'b.title', 'b.slug', 'b.abstract', 'b.view_count',
-            'b.created_at', 'b.updated_at', 'b.category_id', 'c.name AS category_name'
+            'b.created_at', 'b.updated_at', 'b.category_id', 'c.name AS category_name',
+            'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name'
         ])->from($this->table . ' AS b');
 
         try {
@@ -25,6 +26,10 @@ class BlogModel extends HModel
                 'LEFT',
                 AbstractPaymentController::TBL_BLOG_CATEGORY . ' AS c',
                 'c.id=b.category_id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER . ' AS u',
+                'u.id=b.created_by'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());

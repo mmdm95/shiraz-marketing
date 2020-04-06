@@ -9,28 +9,23 @@ class OrderModel extends HModel
     {
         parent::__construct();
 
-        $this->table = 'factors AS f';
+        $this->table = AbstractPaymentController::TBL_ORDER;
         $this->db = $this->getDb();
     }
 
-    public function getFactors($where = '', $bindValues = [], $limit = null, $offset = 0)
+    public function getOrders($where = '', $bindValues = [], $limit = null, $offset = 0)
     {
         $select = $this->select();
         $select->cols([
-            'f.id', 'f.user_id AS u_id', 'f.factor_code', 'f.username AS f_username', 'f.full_name AS f_full_name', 'f.options AS f_options',
-            'f.payed_amount', 'f.total_amount', 'f.created_at', 'p.id AS p_id', 'p.title', 'p.slug', 'p.image AS p_image',
-            'u.id AS u_id', 'u.username', 'u.full_name', 'u.image AS u_image'
-        ])->from($this->table);
+            'o.id', 'o.order_code', 'o.first_name', 'o.last_name', 'o.payment_date', 'o.order_date',
+            'o.final_price', 'o.payment_status', 'ss.name AS send_status_name', 'ss.badge',
+        ])->from($this->table . ' AS o');
 
         try {
             $select->join(
                 'LEFT',
-                'plans AS p',
-                'f.plan_id=p.id'
-            )->join(
-                'LEFT',
-                'users AS u',
-                'f.user_id=u.id'
+                AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
+                'ss.id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -51,37 +46,129 @@ class OrderModel extends HModel
         return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
     }
 
-    public function getBuyers($params)
+    public function getSingleOrder($where, $bindValues = [])
     {
         $select = $this->select();
         $select->cols([
-            '*', 'f.options AS options', 'f.full_name AS f_full_name', 'f.created_at AS f_created_at', 'f.username AS f_username',
-            'u.image AS u_image', 'p.image AS p_image'
-        ])->from('factors AS f');
+            'o.*', 'ss.name AS send_status_name', 'ss.badge',
+        ])->from($this->table . ' AS o');
 
         try {
             $select->join(
-                'INNER',
-                'plans AS p',
-                'p.id=f.plan_id'
-            )->join(
                 'LEFT',
-                'users AS u',
-                'f.user_id=u.id'
+                AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
+                'ss.id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
         }
 
-        if (isset($params['plan_id'])) {
-            $select->where('f.plan_id=:pId')->bindValues(['pId' => $params['plan_id']]);
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
         }
-        if (isset($params['payed']) && (bool)$params['payed']) {
-            $select->where('f.payed_amount IS NOT NULL AND f.payed_amount>:pa')->bindValues(['pa' => 0]);
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
         }
 
-        $select->groupBy(['f.id']);
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0];
+        return [];
+    }
+
+    public function getOrderProducts($where, $bindValues = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'oi.*', 'p.title', 'p.image',
+        ])->from(AbstractPaymentController::TBL_ORDER_ITEM . ' AS oi');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_PRODUCT . ' AS p',
+                'p.id=oi.product_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        $select->where($where);
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
+        }
 
         return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
+
+    public function getReturnOrders($where = '', $bindValues = [], $limit = null, $offset = 0)
+    {
+        $select = $this->select();
+        $select->cols([
+            'o.id', 'o.order_code', 'o.first_name', 'o.last_name', 'o.payment_date', 'o.order_date',
+            'o.final_price', 'o.payment_status', 'o.payment_method', 'ss.name AS send_status_name', 'ss.badge',
+            'ro.description', 'ro.status', 'ro.created_at'
+        ])->from($this->table . ' AS o');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
+                'ss.id=o.send_status'
+            )->join(
+                'RIGHT',
+                AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
+                'ro.order_code=o.order_code'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
+        }
+
+        if (!empty($limit) && is_numeric($limit)) {
+            $select->limit((int)$limit);
+        }
+        $select->offset((int)$offset);
+
+        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
+
+    public function getSingleReturnOrder($where, $bindValues = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'o.*', 'ss.name AS send_status_name', 'ss.badge', 'ro.description', 'ro.status',
+            'ro.created_at', 'ro.id AS return_order_id', 'ro.respond', 'ro.respond_at'
+        ])->from($this->table . ' AS o');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
+                'ss.id=o.send_status'
+            )->join(
+                'RIGHT',
+                AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
+                'ro.order_code=o.order_code'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
+        }
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0];
+        return [];
     }
 }

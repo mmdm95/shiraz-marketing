@@ -43,73 +43,80 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">پیام‌ها</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>فرستنده</th>
-                                                    <th>عنوان</th>
-                                                    <th>تاریخ ارسال نظر</th>
-                                                    <th>وضعیت نظر</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <!-- Load categories data -->
-                                                    <tr>
-                                                        <td width="50px">
-                                                        </td>
-                                                        <td>
-                                                        </td>
-                                                        <td>
-                                                        </td>
-                                                        <td>
-                                                        </td>
-                                                        <td>
-<!--                                                            --><?php //if ($contact['status'] == 1): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">پیام‌ها</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>فرستنده</th>
+                                            <th>عنوان</th>
+                                            <th>تاریخ ارسال نظر</th>
+                                            <th>وضعیت نظر</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($cuValues as $key => $contact): ?>
+                                            <tr>
+                                                <td width="50px">
+                                                    <?= convertNumbersToPersian($key + 1); ?>
+                                                </td>
+                                                <td>
+                                                    <?php if (!empty($contact['user_code'])): ?>
+                                                        <a href="<?= base_url('admin/user/userProfile/' . $contact['user_code']); ?>">
+                                                            <?= $contact['first_name'] . ' ' . ($contact['last_name'] ?? ''); ?>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <?= $contact['first_name'] . ' ' . ($contact['last_name'] ?? ''); ?>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <?= $contact['title']; ?>
+                                                </td>
+                                                <td>
+                                                    <?= jDateTime::date('j F Y در ساعت H:i', $contact['created_at']); ?>
+                                                </td>
+                                                <td>
+                                                    <?php if ($contact['status'] == 1): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-info">مشاهده شده</span>
-<!--                                                            --><?php //else: ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                    <?php else: ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-danger">مشاهده نشده</span>
-<!--                                                            --><?php //endif; ?>
-                                                        </td>
-                                                        <td style="width: 115px;" class="text-center">
-                                                            <ul class="icons-list">
-                                                                <li class="text-black">
-                                                                    <a href="<?= base_url(); ?>/admin/viewContact/"
-                                                                       title="مشاهده" data-popup="tooltip">
-                                                                        <i class="icon-eye"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="text-danger-600">
-                                                                    <a class="deleteContactBtn"
-                                                                       title="حذف" data-popup="tooltip">
-                                                                        <input type="hidden"
-                                                                               value="">
-                                                                        <i class="icon-trash"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list">
+                                                        <li class="text-black">
+                                                            <a href="<?= base_url('admin/viewContact/' . $contact['id']); ?>"
+                                                               title="مشاهده" data-popup="tooltip">
+                                                                <i class="icon-eye"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li class="text-danger-600">
+                                                            <a class="deleteContactBtn"
+                                                               title="حذف" data-popup="tooltip">
+                                                                <input type="hidden"
+                                                                       value="<?= $contact['id']; ?>">
+                                                                <i class="icon-trash"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

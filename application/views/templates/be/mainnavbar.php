@@ -27,23 +27,23 @@
             <li class="dropdown dropdown-user">
                 <a class="dropdown-toggle" data-toggle="dropdown">
                     <img class="img-sm img-fit" style="max-height: none;"
-                         src="<?= '';//base_url("{$identity->image}"); ?>" alt="">
+                         src="<?= base_url("{$identity->image}"); ?>" alt="">
                     <span>
-                        <?= '';//set_value($identity->first_name ?? '', '', null, $identity->username); ?>
+                        <?= set_value($identity->first_name ?? '', '', null, $identity->mobile); ?>
                     </span>
                     <i class="caret"></i>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <a href="<?= base_url('admin/editUser/' );//. @$identity->id); ?>">
+                        <a href="<?= base_url('admin/user/editUser/' . $identity->id); ?>">
                             <i class="icon-file-eye"></i>
                             تغییر مشخصات
                         </a>
                     </li>
                     <li class="divider"></li>
-                    <?php if ($auth->isAllow('setting', 2)): ?>
-                    <li><a href="<?= base_url(); ?>admin/setting"><i class="icon-cog5"></i>تنظیمات سایت</a></li>
+                    <?php if ($auth->isAllow('setting', AUTH_ACCESS_READ)): ?>
+                        <li><a href="<?= base_url(); ?>admin/setting"><i class="icon-cog5"></i>تنظیمات سایت</a></li>
                     <?php endif; ?>
                     <li><a href="<?= base_url('admin/logout'); ?>"><i class="icon-switch2"></i> خروج</a></li>
                 </ul>

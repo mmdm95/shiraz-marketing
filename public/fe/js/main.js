@@ -373,7 +373,7 @@
         });
 
         // logo carousel
-        $(".similar-items").owlCarousel({
+        $(".items-slider-col-3").owlCarousel({
             items: 3,
             nav: true,
             dots: false,
@@ -391,6 +391,30 @@
                 },
                 991: {
                     items: 4
+                }
+            },
+            navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
+        });
+
+        // logo carousel
+        $(".items-slider-col-4").owlCarousel({
+            items: 3,
+            nav: true,
+            dots: false,
+            rtl: true,
+            margin: 25,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                575: {
+                    items: 2
+                },
+                767: {
+                    items: 2
+                },
+                991: {
+                    items: 3
                 }
             },
             navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],

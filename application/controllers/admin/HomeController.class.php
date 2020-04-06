@@ -47,41 +47,139 @@ class HomeController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
         $this->_render_page('pages/be/StaticPage/manageStaticPage');
-
     }
 
     public function addStaticPageAction()
     {
+        $model = new Model();
+
+        $this->data['errors'] = [];
+        $this->data['spValues'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('addStaticPage');
+        $form->setFieldsName(['title', 'url_name', 'body'])
+            ->xssOption('body', ['style', 'href', 'src', 'target', 'class'], ['video'])
+            ->setMethod('post');
+
+        try {
+            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+                $form->isRequired(['title', 'url_name', 'body'], 'فیلدهای ضروری را خالی نگذارید.');
+
+                if ($model->is_exist(self::TBL_STATIC_PAGES, 'url_name=:url', ['url' => trim($values['url_name'])])) {
+                    $form->setError('این آدرس وجود دارد. لطفا دوباره تلاش کنید.');
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->insert_it(self::TBL_STATIC_PAGES, [
+                    'title' => $values['title'],
+                    'body' => $values['body'],
+                    'url_name' => trim($values['url_name'])
+                ]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['spValues'] = $form->getValues();
+            }
+        }
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن مطالب ثابت');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
-
-        $this->_render_page('pages/be/StaticPage/addStaticPage');
-
+        $this->_render_page([
+            'pages/be/StaticPage/addStaticPage',
+            'templates/be/browser-tiny-func'
+        ]);
     }
 
-    public function editStaticPageAction()
+    public function editStaticPageAction($param)
     {
+        $model = new Model();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_STATIC_PAGES, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/manageStaticPage'));
+        }
+
+        $this->data['param'] = $param;
+
+        $this->data['errors'] = [];
+        $this->data['spValues'] = [];
+
+        $this->data['spValues'] = $model->select_it(null, self::TBL_STATIC_PAGES, ['url_name'], 'id=:id', ['id' => $param[0]])[0];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('editStaticPage');
+        $form->setFieldsName(['title', 'url_name', 'body'])
+            ->xssOption('body', ['style', 'href', 'src', 'target', 'class'], ['video'])
+            ->setMethod('post');
+
+        try {
+            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+                $form->isRequired(['title', 'url_name'], 'فیلدهای ضروری را خالی نگذارید.');
+
+                if ($this->data['spValues']['url_name'] != $values['url_name']) {
+                    if ($model->is_exist(self::TBL_STATIC_PAGES, 'url_name=:url', ['url' => $values['url_name']])) {
+                        $form->setError('این آدرس وجود دارد. لطفا دوباره تلاش کنید.');
+                    }
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->update_it(self::TBL_STATIC_PAGES, [
+                    'title' => $values['title'],
+                    'body' => $values['body'],
+                    'url_name' => trim($values['url_name'])
+                ], 'id=:id', ['id' => $this->data['param'][0]]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+            }
+        }
+
+        $this->data['spTrueValues'] = $model->select_it(null, self::TBL_STATIC_PAGES, '*', 'id=:id', ['id' => $param[0]])[0];
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش مطالب ثابت');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
-
-        $this->_render_page('pages/be/StaticPage/editStaticPage');
-
+        $this->_render_page([
+            'pages/be/StaticPage/editStaticPage',
+            'templates/be/browser-tiny-func'
+        ]);
     }
 
     public function deleteStaticPageAction()
     {
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $model = new Model();
@@ -89,7 +187,7 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_STATIC_PAGES;
         if (!isset($id)) {
-            message('error', 200, 'نوشته نامعتبر است.');
+            message('error', 200, 'شناسه نوشته نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
             message('error', 200, 'نوشته وجود ندارد.');
@@ -114,7 +212,6 @@ class HomeController extends AbstractController
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت سؤالات متداول');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
@@ -220,7 +317,7 @@ class HomeController extends AbstractController
     public function deleteFAQAction()
     {
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            $this->error->access_denied();
         }
 
         $model = new Model();
@@ -228,7 +325,7 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_FAQ;
         if (!isset($id)) {
-            message('error', 200, 'پیام نامعتبر است.');
+            message('error', 200, 'شناسه پیام نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
             message('error', 200, 'سوال وجود ندارد.');
@@ -246,51 +343,196 @@ class HomeController extends AbstractController
 
     public function manageSliderAction()
     {
+        $model = new Model();
+        $this->data['slideValues'] = $model->select_it(null, self::TBL_MAIN_SLIDER, '*',
+            null, null, null, ['id DESC']);
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیریت اسلاید‌ها');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/media/fancybox.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
 
-        $this->_render_page('pages/be/slider/manageSlider');
+        $this->_render_page('pages/be/Slider/manageSlider');
     }
 
     public function addSlideAction()
     {
+        $model = new Model();
+
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('addSlide');
+        $form->setFieldsName(['image', 'url'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+                $form->isRequired(['image', 'url'], 'فیلدهای ضروری را خالی نگذارید.');
+
+                // Validate image
+                if (!file_exists($values['image'])) {
+                    $form->setError('تصویر شاخص نامعتبر است.');
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->insert_it(self::TBL_MAIN_SLIDER, [
+                    'image' => trim($values['image']),
+                    'link' => trim($values['url']),
+                ]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['slideValues'] = $form->getValues();
+            }
+        }
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن اسلاید جدید');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+        $this->load->helper('easy file manager');
+        //Security options
+        $this->data['upload']['allow_upload'] = allow_upload(false);
+        $this->data['upload']['allow_create_folder'] = allow_create_folder(false);
+        $this->data['upload']['allow_direct_link'] = allow_direct_link();
+        $this->data['upload']['MAX_UPLOAD_SIZE'] = max_upload_size();
 
-        $this->_render_page('pages/be/slider/addSlide');
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
+
+        $this->_render_page([
+            'pages/be/Slider/addSlide',
+            'templates/be/efm',
+        ]);
     }
 
-    public function editSlideAction()
+    public function editSlideAction($param)
     {
+        $model = new Model();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_MAIN_SLIDER, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/manageSlider'));
+        }
+
+        $this->data['param'] = $param;
+
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('editSlide');
+        $form->setFieldsName(['image', 'url'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+                $form->isRequired(['image', 'url'], 'فیلدهای ضروری را خالی نگذارید.');
+
+                // Validate image
+                if (!file_exists($values['image'])) {
+                    $form->setError('تصویر نامعتبر است.');
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->update_it(self::TBL_MAIN_SLIDER, [
+                    'image' => trim($values['image']),
+                    'link' => trim($values['url']),
+                ], 'id=:id', ['id' => $this->data['param'][0]]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['slideValues'] = $form->getValues();
+            }
+        }
+
+        $this->data['slideTrueValues'] = $model->select_it(null, self::TBL_MAIN_SLIDER, '*', 'id=:id', ['id' => $param[0]])[0];
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش اسلاید');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+        $this->load->helper('easy file manager');
+        //Security options
+        $this->data['upload']['allow_upload'] = allow_upload(false);
+        $this->data['upload']['allow_create_folder'] = allow_create_folder(false);
+        $this->data['upload']['allow_direct_link'] = allow_direct_link();
+        $this->data['upload']['MAX_UPLOAD_SIZE'] = max_upload_size();
 
-        $this->_render_page('pages/be/slider/editSlide');
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/efm.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
+
+        $this->_render_page([
+            'pages/be/Slider/editSlide',
+            'templates/be/efm',
+        ]);
+    }
+
+    public function deleteSlideAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = self::TBL_MAIN_SLIDER;
+        if (!isset($id)) {
+            message('error', 200, 'شناسه اسلاید نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+            message('error', 200, 'اسلاید وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
+        if ($res) {
+            message('success', 200, 'اسلاید با موفقیت حذف شد.');
+        }
+
+        message('error', 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
 
     public function manageContactUsAction()
     {
+        $model = new Model();
+        $this->data['cuValues'] = $model->select_it(null, self::TBL_CONTACT_US, [
+            'id', 'user_code', 'first_name', 'last_name', 'title', 'status', 'created_at',
+        ], null, null, null, ['created_at DESC']);
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ارتباط با ما');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
@@ -298,27 +540,62 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/ContactUs/manageContactUs');
     }
 
-    public function viewContactAction()
+    public function viewContactAction($param)
     {
+        $model = new Model();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_CONTACT_US, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/manageContactUs'));
+        }
+
+        $this->data['contact'] = $model->select_it(null, self::TBL_CONTACT_US, '*', 'id =:id', ['id' => $param[0]])[0];
+        if ($this->data['contact']['status'] == 0) {
+            $model->update_it(self::TBL_CONTACT_US, ['status' => 1], 'id=:id', ['id' => $param[0]]);
+        }
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده پیام');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
-
         $this->_render_page('pages/be/ContactUs/viewContact');
+    }
+
+    public function deleteContactAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = self::TBL_CONTACT_US;
+        if (!isset($id)) {
+            message('error', 200, 'شناسه پیام نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+            message('error', 200, 'پیام وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
+        if ($res) {
+            message('success', 200, 'پیام با موفقیت حذف شد.');
+        }
+
+        message('error', 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
 
     public function manageComplaintsAction()
     {
+        $model = new Model();
+        $this->data['comValues'] = $model->select_it(null, self::TBL_COMPLAINT, [
+            'id', 'first_name', 'last_name', 'title', 'status', 'created_at',
+        ], null, null, null, ['created_at DESC']);
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'شکایات');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
@@ -326,29 +603,56 @@ class HomeController extends AbstractController
         $this->_render_page('pages/be/Complaint/manageComplaint');
     }
 
-    public function viewComplaintAction()
+    public function viewComplaintAction($param)
     {
+        $model = new Model();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_COMPLAINT, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/manageComplaint'));
+        }
+
+        $this->data['complaint'] = $model->select_it(null, self::TBL_COMPLAINT, '*', 'id =:id', ['id' => $param[0]])[0];
+        if ($this->data['complaint']['status'] == 0) {
+            $model->update_it(self::TBL_COMPLAINT, ['status' => 1], 'id=:id', ['id' => $param[0]]);
+        }
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده شکایت');
 
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
-
         $this->_render_page('pages/be/Complaint/viewComplaint');
+    }
+
+    public function deleteComplaintAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = self::TBL_COMPLAINT;
+        if (!isset($id)) {
+            message('error', 200, 'شناسه شکایت نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+            message('error', 200, 'شکایت وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
+        if ($res) {
+            message('success', 200, 'شکایت با موفقیت حذف شد.');
+        }
+
+        message('error', 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
 
     public function settingAction()
     {
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect(base_url('admin/login'));
-        }
-
         try {
-            if (!$this->auth->isAllow('setting', 2)) {
+            if (!$this->auth->isAllow('setting', AUTH_ACCESS_READ)) {
                 $this->error->access_denied();
             }
         } catch (HAException $e) {
@@ -363,7 +667,9 @@ class HomeController extends AbstractController
         $formMain = new Form();
         $this->data['errors_main'] = [];
         $this->data['form_token_main'] = $formMain->csrfToken('settingMain');
-        $formMain->setFieldsName(['fav', 'logo', 'title', 'desc', 'keywords'])->setMethod('post');
+        $formMain->setFieldsName(['fav', 'logo', 'title', 'showMenuIcon', 'desc', 'keywords'])
+            ->setDefaults('showMenuIcon', 'on')
+            ->setMethod('post');
         try {
             $formMain->beforeCheckCallback(function ($values) use ($formMain) {
                 $formMain->isRequired(['logo', 'title'], 'فیلدهای ضروری را خالی نگذارید.');
@@ -377,6 +683,7 @@ class HomeController extends AbstractController
                 $this->data['setting']['main']['favIcon'] = $values['fav'];
                 $this->data['setting']['main']['logo'] = $values['logo'];
                 $this->data['setting']['main']['title'] = $values['title'];
+                $this->data['setting']['main']['showMenuIcon'] = $values['showMenuIcon'];
                 $this->data['setting']['main']['description'] = $values['desc'];
                 $this->data['setting']['main']['keywords'] = $values['keywords'];
 
@@ -397,6 +704,7 @@ class HomeController extends AbstractController
                 $this->data['success_main'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors_main'] = $formMain->getError();
+                $this->data['values_main'] = $formMain->getValues();
             }
         }
 
@@ -404,28 +712,31 @@ class HomeController extends AbstractController
         $formImages = new Form();
         $this->data['errors_images'] = [];
         $this->data['form_token_images'] = $formImages->csrfToken('settingImages');
-        $formImages->setFieldsName([
-            'imgTop', 'showMiddle', 'imgMiddle', 'middleTitle', 'middleDesc'
-        ])->setDefaults('showMiddle', 'off')
-            ->setMethod('post', [], ['showMiddle']);
+        $formImages->setFieldsName(['imgProduct', 'imgBlog', 'imgFAQ', 'imgContact', 'imgComplaint'])
+            ->setMethod('post');
         try {
             $formImages->beforeCheckCallback(function (&$values) use ($formImages) {
-                if ($values['imgTop'] != '' && !file_exists($values['imgTop'])) {
-                    $values['imgTop'] = '';
+                if ($values['imgProduct'] != '' && !file_exists($values['imgProduct'])) {
+                    $values['imgProduct'] = '';
                 }
-                if ($values['imgMiddle'] != '' && !file_exists($values['imgMiddle'])) {
-                    $values['imgMiddle'] = '';
+                if ($values['imgBlog'] != '' && !file_exists($values['imgBlog'])) {
+                    $values['imgBlog'] = '';
+                }
+                if ($values['imgFAQ'] != '' && !file_exists($values['imgFAQ'])) {
+                    $values['imgFAQ'] = '';
+                }
+                if ($values['imgContact'] != '' && !file_exists($values['imgContact'])) {
+                    $values['imgContact'] = '';
+                }
+                if ($values['imgComplaint'] != '' && !file_exists($values['imgComplaint'])) {
+                    $values['imgComplaint'] = '';
                 }
             })->afterCheckCallback(function ($values) use ($formImages) {
-                $props = array_map(function ($val1, $val2) {
-                    return ['title' => $val1, 'desc' => $val2];
-                }, $values['middleTitle'], $values['middleDesc']);
-                //-----
-                $this->data['setting']['pages']['index']['topImage']['image'] = $values['imgTop'];
-                //-----
-                $this->data['setting']['pages']['index']['middlePart']['show'] = $formImages->isChecked('showMiddle') ? 1 : 0;
-                $this->data['setting']['pages']['index']['middlePart']['image'] = $values['imgMiddle'];
-                $this->data['setting']['pages']['index']['middlePart']['properties'] = $props;
+                $this->data['setting']['pages']['product']['topImage'] = $values['imgProduct'];
+                $this->data['setting']['pages']['blog']['topImage'] = $values['imgBlog'];
+                $this->data['setting']['pages']['faq']['topImage'] = $values['imgFAQ'];
+                $this->data['setting']['pages']['contactUs']['topImage'] = $values['imgContact'];
+                $this->data['setting']['pages']['complaint']['topImage'] = $values['imgComplaint'];
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);
@@ -444,43 +755,115 @@ class HomeController extends AbstractController
                 $this->data['success_images'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors_images'] = $formImages->getError();
+                $this->data['values_images'] = $formImages->getValues();
             }
         }
 
-        // Others panel setting form submit
-        $formImages = new Form();
-        $this->data['errors_others'] = [];
-        $this->data['form_token_others'] = $formImages->csrfToken('settingOthers');
-        $formImages->setFieldsName([
-            'otherImgTop',
-        ])->setMethod('post');
+        // Index panel setting form submit
+        $formIndex = new Form();
+        $this->data['errors_index'] = [];
+        $this->data['form_token_index'] = $formIndex->csrfToken('settingIndexPage');
+        $formIndex->setFieldsName(['indexPagePanel'])
+            ->setDefaults('showOurTeam', 'off')
+            ->setMethod('post', [], ['showOurTeam']);
         try {
-            $formImages->beforeCheckCallback(function (&$values) use ($formImages) {
-                if ($values['otherImgTop'] != '' && !file_exists($values['otherImgTop'])) {
-                    $values['otherImgTop'] = '';
-                }
-            })->afterCheckCallback(function ($values) use ($formImages) {
+            $formImages->afterCheckCallback(function () use ($formIndex) {
                 //-----
-                $this->data['setting']['pages']['all']['topImage']['image'] = $values['otherImgTop'];
+                $this->data['setting']['pages']['index']['showOurTeam'] = $formIndex->isChecked('showOurTeam') ? 1 : 0;
                 //-----
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);
 
                 if (!$res) {
-                    $formImages->setError('خطا در انجام عملیات!');
+                    $formIndex->setError('خطا در انجام عملیات!');
                 }
             });
         } catch (Exception $e) {
             die($e->getMessage());
         }
 
-        $res = $formImages->checkForm()->isSuccess();
-        if ($formImages->isSubmit()) {
+        $res = $formIndex->checkForm()->isSuccess();
+        if ($formIndex->isSubmit()) {
             if ($res) {
-                $this->data['success_others'] = 'عملیات با موفقیت انجام شد.';
+                $this->data['success_index'] = 'عملیات با موفقیت انجام شد.';
             } else {
-                $this->data['errors_others'] = $formImages->getError();
+                $this->data['errors_index'] = $formIndex->getError();
+            }
+        }
+
+        // SMS panel setting form submit
+        $form = new Form();
+        $this->data['errors_sms'] = [];
+        $this->data['form_token_sms'] = $form->csrfToken('settingSMS');
+        $form->setFieldsName([
+            'smsActivation', 'smsForgetPassword', 'smsProductReg', 'smsStatus'
+        ])->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($form) {
+                $form->isRequired(['smsActivation', 'smsForgetPassword', 'smsProductReg', 'smsStatus'], 'فیلدهای مربوط به پیامک همگی اجباری هستند.');
+            })->afterCheckCallback(function ($values) use ($form) {
+                $this->data['setting']['sms']['activationCodeMsg'] = trim($values['smsActivation']);
+                $this->data['setting']['sms']['forgetPasswordCodeMsg'] = trim($values['smsForgetPassword']);
+                $this->data['setting']['sms']['productRegistrationMsg'] = trim($values['smsProductReg']);
+                $this->data['setting']['sms']['changeStatusMsg'] = trim($values['smsStatus']);
+
+                $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
+                $res = write_json(CORE_PATH . 'config.json', $this->setting);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success_sms'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors_sms'] = $form->getError();
+                $this->data['values_sms'] = $form->getValues();
+            }
+        }
+
+        // Cart panel setting form submit
+        $form = new Form();
+        $this->data['errors_cart'] = [];
+        $this->data['form_token_cart'] = $form->csrfToken('settingCart');
+        $form->setFieldsName([
+            'cart_priceArea1', 'cart_priceArea1', 'cart_priceFree', 'cart_desc'
+        ])->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($form) {
+                $form->validate('numeric', ['cart_priceArea1', 'cart_priceArea2'], 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
+                $form->validate('numeric', ['cart_priceFree'], 'حداقل قیمت رایگان شدن هزینه ارسال باید از نوع عدد باشد.');
+            })->afterCheckCallback(function ($values) use ($form) {
+                $this->data['setting']['cart']['shipping_price']['area1'] = abs((int)$values['cart_priceArea1']);
+                $this->data['setting']['cart']['shipping_price']['area2'] = abs((int)$values['cart_priceArea2']);
+                $this->data['setting']['cart']['description'] = trim($values['cart_desc']);
+                $this->data['setting']['cart']['shipping_free_price'] = abs((int)$values['cart_priceFree']);
+
+                $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
+                $res = write_json(CORE_PATH . 'config.json', $this->setting);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success_cart'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors_cart'] = $form->getError();
+                $this->data['values_cart'] = $form->getValues();
             }
         }
 
@@ -489,18 +872,12 @@ class HomeController extends AbstractController
         $this->data['errors_contact'] = [];
         $this->data['form_token_contact'] = $form->csrfToken('settingContact');
         $form->setFieldsName([
-            'contact-desc', 'contact-mobile',
-            'contact-socialEmail', 'contact-telegram', 'contact-instagram', 'contact-facebook',
+            'contact_desc', 'contact_mobile',
         ])->setMethod('post');
         try {
             $form->afterCheckCallback(function ($values) use ($form) {
-                $this->data['setting']['contact']['description'] = $values['contact-desc'];
-                $this->data['setting']['contact']['mobiles'] = $values['contact-mobile'];
-                //-----
-                $this->data['setting']['contact']['socials']['email'] = $values['contact-socialEmail'];
-                $this->data['setting']['contact']['socials']['telegram'] = $values['contact-telegram'];
-                $this->data['setting']['contact']['socials']['instagram'] = $values['contact-instagram'];
-                $this->data['setting']['contact']['socials']['facebook'] = $values['contact-facebook'];
+                $this->data['setting']['contact']['description'] = $values['contact_desc'];
+                $this->data['setting']['contact']['mobiles'] = $values['contact_mobile'];
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);
@@ -519,6 +896,7 @@ class HomeController extends AbstractController
                 $this->data['success_contact'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors_contact'] = $form->getError();
+                $this->data['values_contact'] = $form->getValues();
             }
         }
 
@@ -528,7 +906,8 @@ class HomeController extends AbstractController
         $this->data['form_token_footer'] = $form->csrfToken('settingFooter');
         $form->setFieldsName([
             'footer_1_title', 'footer_1_text', 'footer_1_link',
-            'socialEmail', 'telegram', 'instagram', 'facebook',
+            'namad1', 'namad2',
+            'telegram', 'instagram', 'facebook',
         ])->setMethod('post');
         try {
             $form->afterCheckCallback(function ($values) use ($form) {
@@ -538,9 +917,6 @@ class HomeController extends AbstractController
                 $sec2 = array_map(function ($val1, $val2) {
                     return ['text' => $val1, 'link' => $val2];
                 }, $values['footer_1_text'][1], $values['footer_1_link'][1]);
-                $sec3 = array_map(function ($val1, $val2) {
-                    return ['text' => $val1, 'link' => $val2];
-                }, $values['footer_1_text'][2], $values['footer_1_link'][2]);
 
                 $this->data['setting']['footer']['sections']['section_1']['title'] = $values['footer_1_title'][0];
                 $this->data['setting']['footer']['sections']['section_1']['links'] = $sec1;
@@ -548,10 +924,9 @@ class HomeController extends AbstractController
                 $this->data['setting']['footer']['sections']['section_2']['title'] = $values['footer_1_title'][1];
                 $this->data['setting']['footer']['sections']['section_2']['links'] = $sec2;
 
-                $this->data['setting']['footer']['sections']['section_3']['title'] = $values['footer_1_title'][2];
-                $this->data['setting']['footer']['sections']['section_3']['links'] = $sec3;
+                $this->data['setting']['footer']['namad']['namad1'] = trim($values['namad1']);
+                $this->data['setting']['footer']['namad']['namad2'] = trim($values['namad2']);
 
-                $this->data['setting']['footer']['socials']['email'] = $values['socialEmail'];
                 $this->data['setting']['footer']['socials']['telegram'] = $values['telegram'];
                 $this->data['setting']['footer']['socials']['instagram'] = $values['instagram'];
                 $this->data['setting']['footer']['socials']['facebook'] = $values['facebook'];
@@ -573,6 +948,46 @@ class HomeController extends AbstractController
                 $this->data['success_footer'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors_footer'] = $form->getError();
+                $this->data['values_footer'] = $form->getValues();
+            }
+        }
+
+        // Other panel setting form submit
+        $form = new Form();
+        $this->data['errors_other'] = [];
+        $this->data['form_token_other'] = $form->csrfToken('settingOther');
+        $form->setFieldsName([
+            'productEachPage', 'blogEachPage'
+        ])->setMethod('post');
+        try {
+            $form->afterCheckCallback(function ($values) use ($form) {
+                $pep = (int)$values['productEachPage'];
+                $pep = $pep >= 0 || $pep <= 96 ? $pep : 0;
+                //-----
+                $bep = (int)$values['blogEachPage'];
+                $bep = $bep >= 0 || $bep <= 96 ? $bep : 0;
+                //-----
+                $this->data['setting']['product']['itemsEachPage'] = $pep;
+                $this->data['setting']['blog']['itemsEachPage'] = $bep;
+
+                $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
+                $res = write_json(CORE_PATH . 'config.json', $this->setting);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success_other'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors_other'] = $form->getError();
+                $this->data['values_other'] = $form->getValues();
             }
         }
 
@@ -591,7 +1006,7 @@ class HomeController extends AbstractController
 
         // Extra js
         $this->data['js'][] = $this->asset->script('be/js/plugins/forms/tags/tagsinput.min.js');
-        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
+//        $this->data['js'][] = $this->asset->script('be/js/tinymce/tinymce.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pick.file.js');
 
         // Base configuration
@@ -599,7 +1014,7 @@ class HomeController extends AbstractController
         $this->data['title'] = titleMaker(' - ', set_value($this->setting['main']['title'] ?? ''), 'پنل مدیریت', 'تنظیمات');
 
         $this->_render_page([
-            'templates/be/browser-tiny-func',
+//            'templates/be/browser-tiny-func',
             'pages/be/setting',
             'templates/be/efm'
         ]);
