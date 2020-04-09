@@ -253,7 +253,7 @@
                                             <h3 class="no-margin">
                                                 <?= convertNumbersToPersian(''); ?>
                                             </h3>
-                                            سفارش‌های انجام شده
+                                            سفارش‌های تحویل شده
                                         </div>
                                     </div>
                                 </div>
