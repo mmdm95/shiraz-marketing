@@ -44,8 +44,9 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="row">
-                            <form action="<?= base_url(); ?>admin/blog/addCategory" method="post">
-                                <!--                            --><? //= $data['form_token']; ?>
+                            <form action="<?= base_url(); ?>admin/report/orderReport" method="post">
+                                <?= $form_token; ?>
+
                                 <div class="col-md-12">
                                     <div class="panel panel-white">
                                         <div class="panel-heading">
@@ -145,12 +146,12 @@
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li>
-                                                        <button id="file-ok" type="button" class="btn btn-success"
-                                                                data-dismiss="modal">
-                                                            <i class="icon-file-excel position-left"
-                                                               aria-hidden="true"></i>
-                                                            فایل اکسل
-                                                        </button>
+                                                    <button id="file-ok" type="button" class="btn btn-success"
+                                                            data-dismiss="modal">
+                                                        <i class="icon-file-excel position-left"
+                                                           aria-hidden="true"></i>
+                                                        فایل اکسل
+                                                    </button>
                                                 </li>
 
                                             </ul>

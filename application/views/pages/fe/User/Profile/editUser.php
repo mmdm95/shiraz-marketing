@@ -41,7 +41,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url('user/editUser/' . $param[0]); ?>" method="post">
+                        <form action="<?= base_url('user/editUser'); ?>" method="post">
                             <?= $form_token; ?>
 
                             <div class="row">
@@ -199,7 +199,7 @@
                                                 <input type="hidden" name="birth_date" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ تولد" readonly data-alt-field="#altDateField"
-                                                       value="<?= $uValues['birth_date'] ?? $uTrueValues['birth_date'] ?? '' ?>">
+                                                       value="<?= date('Y/m/d H:i', $uValues['birth_date'] ?? $uTrueValues['birth_date'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <span class="note-size bg-green mr-5 mt-5 pull-lef"></span>

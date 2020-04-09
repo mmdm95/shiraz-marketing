@@ -147,4 +147,38 @@ class BlogModel extends HModel
         if (count($res)) return $res[0];
         return [];
     }
+
+    public function getBlogCount($where = '', $bindParams = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'COUNT(*) AS count'
+        ])->from($this->table . ' AS b');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_BLOG_CATEGORY . ' AS c',
+                'c.id=b.category_id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER . ' AS u',
+                'u.id=b.created_by'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
+        $select->groupBy(['b.id']);
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0]['count'];
+        return 0;
+    }
 }

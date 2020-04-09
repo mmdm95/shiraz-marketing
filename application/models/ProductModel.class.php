@@ -15,9 +15,10 @@ class ProductModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.discount_until', 'p.stock_count', 'p.max_cart_count',
-            'p.place', 'p.available', 'p.category_id', 'p.is_special', 'c.slug AS category_slug', 'c.name AS category_name',
-            'c.icon AS category_icon', 'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name',
+            'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.price', 'p.discount_until', 'p.stock_count',
+            'p.max_cart_count', 'p.place', 'p.available', 'p.category_id', 'p.is_special', 'p.sold_count', 'p.product_type',
+            'p.publish', 'c.slug AS category_slug', 'c.name AS category_name', 'c.icon AS category_icon',
+            'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name',
         ])->from($this->table . ' AS p');
 
         try {
@@ -81,5 +82,78 @@ class ProductModel extends HModel
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0];
         return [];
+    }
+
+    public function getProductsCount($where = '', $bindParams = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'COUNT(*) AS count'
+        ])->from($this->table . ' AS p');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_CATEGORY . ' AS c',
+                'c.id=p.category_id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER . ' AS u',
+                'u.id=p.created_by'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
+        $select->groupBy(['p.id']);
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0]['count'];
+        return 0;
+    }
+
+    public function getProductsReward($orderCode)
+    {
+        $model = new Model();
+        if (empty($orderCode) || $model->is_exist(AbstractPaymentController::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode])) return 0;
+        //-----
+        $productsID = $model->select_it(null, AbstractPaymentController::TBL_ORDER_ITEM, 'product_id',
+            'order_code=:oc', ['oc' => $orderCode]);
+        if (!count($productsID)) return 0;
+        //-----
+        $productsID = array_column($productsID, 'product_id');
+        //-----
+        $select = $this->select();
+        $select->cols([
+            'SUM(p.reward*oi.product_price) AS all_reward',
+        ])->from($this->table . ' AS p');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_ORDER_ITEM . ' AS oi',
+                'oi.product_id=p.id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        $where = 'p.id IN (';
+        $bindParams = [];
+        foreach ($productsID as $k => $id) {
+            $where .= ':id' . ($k + 1) . ' AND ';
+            $bindParams['id' . ($k + 1)] = $id;
+        }
+        $where = trim(trim($where, 'AND '));
+        $select->where($where)->bindValues($bindParams);
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        return $res[0]['all_reward'];
     }
 }

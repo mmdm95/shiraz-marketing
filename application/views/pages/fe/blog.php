@@ -16,6 +16,12 @@
                 <li class="breadcrumb-item">
                     <a href="<?= base_url('blog/all'); ?>" class="btn-link-black">همه اخبار و اطلاعیه‌ها</a>
                 </li>
+                <?php if (!empty($tagParam)): ?>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        برچسب
+                        <?= $tagParam; ?>
+                    </li>
+                <?php endif; ?>
                 <li class="breadcrumb-item active" aria-current="page">
                     <?= $orderText; ?>
                 </li>
@@ -65,11 +71,11 @@
                     </button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item <?= $orderParam == 'newest' ? 'active' : ''; ?>"
-                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/newest">
+                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?>/order/newest">
                             جدیدترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
-                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?>/order/most_view">
+                           href="<?= base_url('blog/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?>/order/most_view">
                             پربازدیدترین
                         </a>
                     </div>
@@ -136,7 +142,7 @@
                 'firstPage' => $pagination['firstPage'],
                 'lastPage' => $pagination['lastPage'],
                 'pageNo' => $pagination['page'],
-                'href' => base_url('blog/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . '/order/' . $orderParam,
+                'href' => base_url('blog/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . (!empty($tagParam) ? '/tag/' . $tagParam : '') . '/order/' . $orderParam,
             ]); ?>
         <?php else: ?>
             <div class="box">

@@ -21,9 +21,8 @@ class ShopController extends AbstractController
 {
     public function manageCategoryAction()
     {
-        $model = new Model();
-        $this->data['catValues'] = $model->select_it(null, self::TBL_CATEGORY, '*',
-            null, null, null, ['id DESC']);
+        $categoryModel = new CategoryModel();
+        $this->data['catValues'] = $categoryModel->getCategories();
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده دسته‌بندی‌ها');
@@ -52,7 +51,11 @@ class ShopController extends AbstractController
             ->setMethod('post', [], ['publish']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'icon'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 // Validate image
@@ -70,7 +73,7 @@ class ShopController extends AbstractController
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $res = $model->insert_it(self::TBL_CATEGORY, [
                     'name' => $values['title'],
-                    'slug' => url_title($values['name']),
+                    'slug' => url_title($values['title']),
                     'parent_id' => 0, // Change if need in future
                     'image' => $values['image'],
                     'icon' => $values['icon'],
@@ -141,7 +144,11 @@ class ShopController extends AbstractController
             ->setMethod('post', [], ['publish']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'icon'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 // Validate image
@@ -160,7 +167,7 @@ class ShopController extends AbstractController
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $res = $model->update_it(self::TBL_CATEGORY, [
                     'name' => $values['title'],
-                    'slug' => url_title($values['name']),
+                    'slug' => url_title($values['title']),
                     'parent_id' => 0, // Change if need in future
                     'image' => $values['image'],
                     'icon' => $values['icon'],
@@ -267,7 +274,11 @@ class ShopController extends AbstractController
             ->setMethod('post', [], ['publish']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validate('numeric', ['price', 'min_price'], 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -353,7 +364,11 @@ class ShopController extends AbstractController
             ->setMethod('post', [], ['publish']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validate('numeric', ['price', 'min_price'], 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -491,10 +506,15 @@ class ShopController extends AbstractController
             'publish', 'is_special', 'imageGallery', 'related', 'description'])
             ->setDefaults('publish', 'off')
             ->setDefaults('is_special', 'off')
+            ->setDefaults('related', [0 => 0])
             ->setMethod('post', [], ['publish', 'is_special']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'category', 'product_type', 'city', 'place', 'price',
                     'discount_price', 'discount_expire', 'stock_count', 'max_basket_count', 'description'], 'فیلدهای ضروری را خالی نگذارید.');
 
@@ -536,9 +556,11 @@ class ShopController extends AbstractController
                     return $model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $product]);
                 });
             })->afterCheckCallback(function ($values) use ($model, $form) {
+                $model->transactionBegin();
+
                 $res = $model->insert_it(self::TBL_PRODUCT, [
                     'title' => $values['title'],
-                    'slug' => url_title($values['name']),
+                    'slug' => url_title($values['title']),
                     'image' => $values['image'],
                     'city_id' => $values['city'],
                     'place' => $values['place'],
@@ -568,6 +590,7 @@ class ShopController extends AbstractController
                 }
 
                 if (!$res || !$res3) {
+                    $model->transactionRollback();
                     $form->setError('خطا در انجام عملیات!');
                 } else {
                     $model->transactionComplete();
@@ -639,12 +662,17 @@ class ShopController extends AbstractController
         $form->setFieldsName(['image', 'title', 'category', 'product_type', 'city', 'place', 'price',
             'discount_price', 'discount_expire', 'reward', 'stock_count', 'max_basket_count', 'keywords',
             'publish', 'is_special', 'imageGallery', 'related', 'description'])
-            ->setDefaults('publish', 'off')
-            ->setDefaults('is_special', 'off')
+            ->setDefaults('publish', 0)
+            ->setDefaults('is_special', 0)
+            ->setDefaults('related', [0 => 0])
             ->setMethod('post', [], ['publish', 'is_special']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'category', 'product_type', 'city', 'place', 'price',
                     'discount_price', 'discount_expire', 'stock_count', 'max_basket_count', 'description'], 'فیلدهای ضروری را خالی نگذارید.');
 
@@ -686,9 +714,11 @@ class ShopController extends AbstractController
                     return $model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $product]);
                 });
             })->afterCheckCallback(function ($values) use ($model, $form) {
+                $model->transactionBegin();
+
                 $res = $model->update_it(self::TBL_PRODUCT, [
                     'title' => $values['title'],
-                    'slug' => url_title($values['name']),
+                    'slug' => url_title($values['title']),
                     'image' => $values['image'],
                     'city_id' => $values['city'],
                     'place' => $values['place'],
@@ -709,6 +739,7 @@ class ShopController extends AbstractController
                     'created_at' => time(),
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
 
+                $res2 = $model->delete_it(self::TBL_PRODUCT_GALLERY, 'product_id=:id', ['id' => $this->data['param'][0]]);
                 $res3 = false;
                 foreach ($values['imageGallery'] as $img) {
                     $res3 = $model->insert_it(self::TBL_PRODUCT_GALLERY, [
@@ -717,7 +748,8 @@ class ShopController extends AbstractController
                     ]);
                 }
 
-                if (!$res || !$res3) {
+                if (!$res || !$res2 || !$res3) {
+                    $model->transactionRollback();
                     $form->setError('خطا در انجام عملیات!');
                 } else {
                     $model->transactionComplete();
@@ -739,8 +771,8 @@ class ShopController extends AbstractController
 
         $this->data['pTrueValues'] = $model->select_it(null, self::TBL_PRODUCT, '*', 'id=:id', ['id' => $param[0]])[0];
         $this->data['pTrueValues']['related'] = explode(',', $this->data['pTrueValues']['related']);
-        $this->data['pTrueValues']['imageGallery'] = $model->select_it(null, self::TBL_PRODUCT_GALLERY, ['image'],
-            'product_id=:id', ['id' => $param[0]]);
+        $this->data['pTrueValues']['imageGallery'] = array_column($model->select_it(null, self::TBL_PRODUCT_GALLERY, ['image'],
+            'product_id=:id', ['id' => $param[0]]), 'image');
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش محصول‌');
@@ -795,14 +827,14 @@ class ShopController extends AbstractController
                     'delete' => 1
                 ], 'id=:id', ['id' => $id]);
             }
-        } catch (HAException $e) {
-            message('error', 200, 'عملیات با خطا مواجه شد.');
-        }
-        if ($res) {
-            message('success', 200, 'محصول با موفقیت حذف شد.');
-        }
+            if ($res) {
+                message('success', 200, 'محصول با موفقیت حذف شد.');
+            }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+            message('error', 200, 'عملیات با خطا مواجه شد.');
+        } catch (HAException $e) {
+            message('error', 200, 'امکان حذف محصول وجود ندارد.');
+        }
     }
 
     public function availableProductAction()
@@ -935,7 +967,7 @@ class ShopController extends AbstractController
         }
 
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name']);
-        $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['mobile', 'payment_status', 'send_status'], 'id=:id', ['id' => $param[0]])[0];
+        $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['order_code', 'mobile', 'payment_status', 'send_status'], 'id=:id', ['id' => $param[0]])[0];
 
         $this->data['param'] = $param;
 
@@ -948,8 +980,12 @@ class ShopController extends AbstractController
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
-                if (!in_array($values['send_status'], $this->data['status'])) {
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
+                if (!in_array($values['send_status'], array_column($this->data['status'], 'id'))) {
                     $form->setError('وضعیت ارسال انتخاب شده نامعتبر است.');
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
@@ -964,10 +1000,12 @@ class ShopController extends AbstractController
                         $sms = new rohamSMS();
 
                         try {
+                            $status = array_column($this->data['status'], 'id')[$values['send_status']];
                             $body = $this->setting['sms']['changeStatusMsg'];
-                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['_username'], $body);
-                            $body = str_replace(SMS_REPLACEMENT_CHARS['code'], $this->data['code'], $body);
-                            $is_sent = $sms->set_numbers($this->data['_mobile'])->body($body)->send();
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['order']['mobile'], $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $this->data['order']['order_code'], $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['status'], $status, $body);
+                            $is_sent = $sms->set_numbers($this->data['order']['mobile'])->body($body)->send();
                         } catch (SMSException $e) {
                             die($e->getMessage());
                         }
@@ -998,7 +1036,11 @@ class ShopController extends AbstractController
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 if (!in_array($values['payment_status'], array_keys(OWN_PAYMENT_STATUSES))) {
                     $form->setError('وضعیت پرداخت انتخاب شده نامعتبر است.');
                     return;

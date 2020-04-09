@@ -36,7 +36,7 @@
 
                 <ul class="dropdown-menu dropdown-menu-right">
                     <li>
-                        <a href="<?= base_url('user/editUser/' . @$identity->id); ?>">
+                        <a href="<?= base_url('user/editUser'); ?>">
                             <i class="icon-file-eye"></i>
                             تغییر مشخصات
                         </a>

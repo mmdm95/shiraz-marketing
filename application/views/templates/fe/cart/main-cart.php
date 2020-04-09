@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="shopping-cart-item-count__wrapper">
                                     <select class="shopping-cart-item-count input-select2 form-control">
-                                        <?php for ($i = 1; $i <= $item['max_cart_count']; $i++): ?>
+                                        <?php for ($i = 1; $i <= $item['max_cart_count'] && $i <= $item['stock_count']; $i++): ?>
                                             <option value="<?= $i; ?>" <?= $i == $item['quantity'] ? 'selected' : ''; ?>>
                                                 <?= convertNumbersToPersian($i); ?>
                                                 عدد
@@ -103,7 +103,7 @@
                                     <?php if ($discount == 0): ?>
                                         <i class="la la-minus" aria-hidden="true"></i>
                                     <?php else: ?>
-                                        <?= convertNumbersToPersian(number_format($totalAmount - $totalDiscountedAmount)); ?>
+                                        <?= convertNumbersToPersian(number_format($discount)); ?>
                                         تومان
                                     <?php endif; ?>
                                 </div>
@@ -113,7 +113,7 @@
                                     هزینه ارسال :
                                 </div>
                                 <div class="text-dark">
-                                    <?php if ($totalDiscountedAmount > 100000): ?>
+                                    <?php if ($totalDiscountedAmount > (int)$setting['cart']['shipping_free_price']): ?>
                                         رایگان
                                     <?php else: ?>
                                         وابسته به آدرس
@@ -138,6 +138,14 @@
                     </div>
                 </div>
             </div>
+
+            <?php if (isset($setting['cart']['description']) && !empty($setting['cart']['description'])): ?>
+                <div class="box">
+                    <div class="box-body">
+                        <?= $setting['cart']['description'] ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php else: ?>

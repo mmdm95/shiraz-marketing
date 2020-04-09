@@ -17,8 +17,17 @@
                 <div class="page-header-content border-bottom border-bottom-success">
                     <div class="page-title">
                         <h5>
-                            <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مشاهده کیف پول کاربر</span>
+                            <i class="icon-circle position-left"></i>
+                            <span class="text-semibold">
+                                مشاهده کیف پول
+                                <a href="<?= base_url('admin/user/userProfile/' . $param[0]); ?>">
+                                    <?php if (!empty($user['first_name']) || !empty($user['last_name'])): ?>
+                                        <?= $user['first_name'] . ' ' . $user['last_name']; ?>
+                                    <?php else: ?>
+                                        <?= $user['mobile']; ?>
+                                    <?php endif; ?>
+                                </a>
+                            </span>
                         </h5>
                     </div>
                 </div>
@@ -46,48 +55,44 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/editUser/<?= @$data['param'][0]; ?>" method="post">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="panel panel-white">
-                                        <div class="panel-heading">
-                                            <h6 class="panel-title">شارژ کیف پول کاربر</h6>
-                                            <div class="heading-elements">
-                                                <ul class="icons-list">
-                                                    <li><a data-action="collapse"></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="panel-body">
-                                            <?php $this->view("templates/be/alert/error", ['errors' => $deposit_errors ?? null]); ?>
-                                            <?php $this->view("templates/be/alert/success", ['success' => $deposit_success ?? null]); ?>
-
-                                            <form action="<?= base_url('admin/user/userDeposit/' . $param[0]); ?>"
-                                                  method="post">
-                                                <?= $form_token_deposit; ?>
-
-                                                <div class="form-group col-lg-12">
-                                                    <span class="text-danger">*</span>
-                                                    <label>مبلغ:</label>
-                                                    <input name="price" type="text"
-                                                           class="form-control" placeholder="به تومان"
-                                                           value="<?= $dValues['price'] ?? ''; ?>">
-                                                </div>
-                                                <div class="col-lg-12 text-right">
-                                                    <button type="submit"
-                                                            class="btn btn-success submit-button">
-                                                        <i class="icon-coin-dollar position-left"></i>
-                                                        افزایش اعتبار
-                                                    </button>
-                                                </div>
-                                            </form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="panel panel-white">
+                                    <div class="panel-heading">
+                                        <h6 class="panel-title">شارژ کیف پول کاربر</h6>
+                                        <div class="heading-elements">
+                                            <ul class="icons-list">
+                                                <li><a data-action="collapse"></a></li>
+                                            </ul>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="panel-body">
+                                        <?php $this->view("templates/be/alert/error", ['errors' => $deposit_errors ?? null]); ?>
+                                        <?php $this->view("templates/be/alert/success", ['success' => $deposit_success ?? null]); ?>
 
+                                        <form action="<?= base_url('admin/user/userDeposit/' . $param[0]); ?>"
+                                              method="post">
+                                            <?= $form_token_deposit; ?>
+
+                                            <div class="form-group col-lg-12">
+                                                <span class="text-danger">*</span>
+                                                <label>مبلغ:</label>
+                                                <input name="price" type="text" required
+                                                       class="form-control" placeholder="به تومان"
+                                                       value="<?= $dValues['price'] ?? ''; ?>">
+                                            </div>
+                                            <div class="col-lg-12 text-right">
+                                                <button type="submit"
+                                                        class="btn btn-success submit-button">
+                                                    <i class="icon-coin-dollar position-left"></i>
+                                                    افزایش اعتبار
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -111,10 +116,11 @@
                                                         واریزی:
                                                     </small>
                                                     <strong>
-                                                        <?php if (isset($factor['payment_info']['payment_code'])): ?>
-                                                            <?= $factor['payment_info']['payment_code']; ?>
+                                                        <?php if ($user['total_income'] != 0): ?>
+                                                            <?= convertNumbersToPersian(number_format($user['total_income'])); ?>
+                                                            تومان
                                                         <?php else: ?>
-                                                            <i class="icon-dash text-danger"></i>
+                                                            ندارد
                                                         <?php endif; ?>
                                                     </strong>
                                                 </h6>
@@ -125,7 +131,12 @@
                                                         برداشت:
                                                     </small>
                                                     <strong>
-
+                                                        <?php if ($user['total_outcome'] != 0): ?>
+                                                            <?= convertNumbersToPersian(number_format($user['total_outcome'])); ?>
+                                                            تومان
+                                                        <?php else: ?>
+                                                            ندارد
+                                                        <?php endif; ?>
                                                     </strong>
                                                 </h6>
                                             </div>
@@ -136,6 +147,7 @@
                                                         موجودی:
                                                     </small>
                                                     <strong>
+                                                        <?= convertNumbersToPersian(number_format($user['balance'])); ?>
                                                         تومان
                                                     </strong>
                                                 </h6>
@@ -166,29 +178,48 @@
                                                 <thead>
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>کد تراکنش</th>
                                                     <th>واریز کننده</th>
                                                     <th>مبلغ تراکنش</th>
-                                                    <th>نوع و توضیح تراکنش</th>
+                                                    <th>توضیح تراکنش</th>
                                                     <th>تاریخ تراکنش</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <!-- Load users data -->
-                                                <tr>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                </tr>
+                                                <?php foreach ($user['transactions'] as $key => $transaction): ?>
+                                                    <tr>
+                                                        <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php if ($transaction['deposit_type'] == DEPOSIT_TYPE_OTHER): ?>
+                                                                <?php if (!empty($transaction['first_name']) || !empty($transaction['last_name'])): ?>
+                                                                    <?= $transaction['first_name'] . ' ' . $transaction['last_name']; ?>
+                                                                <?php else: ?>
+                                                                    <?= $transaction['mobile']; ?>
+                                                                <?php endif; ?>
+                                                                <small class="display-block">
+                                                                    <?= $transaction['role_name'] ?: ''; ?>
+                                                                </small>
+                                                            <?php elseif ($transaction['deposit_type'] == DEPOSIT_TYPE_SELF): ?>
+                                                                کاربر
+                                                            <?php elseif ($transaction['deposit_type'] == DEPOSIT_TYPE_REWARD): ?>
+                                                                پاداش خرید
+                                                            <?php else: ?>
+                                                                <i class="icon-minus2 text-danger"
+                                                                   aria-hidden="true"></i>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian(number_format($transaction['deposit_price'])); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= $transaction['description'] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $transaction['deposit_date']); ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
                                                 </tbody>
                                             </table>
                                         </div>

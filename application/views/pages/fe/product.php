@@ -16,6 +16,12 @@
                 <li class="breadcrumb-item">
                     <a href="<?= base_url('product/all'); ?>" class="btn-link-black">همه محصولات</a>
                 </li>
+                <?php if (!empty($tagParam)): ?>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        برچسب
+                        <?= $tagParam; ?>
+                    </li>
+                <?php endif; ?>
                 <li class="breadcrumb-item active" aria-current="page">
                     <?= $orderText; ?>
                     محصولات
@@ -45,15 +51,15 @@
                     </button>
                     <div class="dropdown-menu">
                         <a class="dropdown-item <?= $orderParam == 'newest' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/newest">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/newest">
                             جدیدترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_discount' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_discount">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_discount">
                             پرتخفیفترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
-                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_view">
+                           href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_view">
                             پربازدیدترین
                         </a>
                     </div>
@@ -92,7 +98,7 @@
                             <div class="card-info">
                                 <div>
                                     <?php
-                                    $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : 0;
+                                    $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
                                     $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
                                     ?>
                                     <?php if ($discountPercentage != 0): ?>
@@ -139,7 +145,7 @@
                 'firstPage' => $pagination['firstPage'],
                 'lastPage' => $pagination['lastPage'],
                 'pageNo' => $pagination['page'],
-                'href' => base_url('product/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . (!empty($specialParam) ? '/offers' : '') . '/order/' . $orderParam,
+                'href' => base_url('product/all') . (!empty($categoryParam) ? '/category/' . $categoryParam : '') . (!empty($tagParam) ? '/tag/' . $tagParam : '') . (!empty($specialParam) ? '/offers' : '') . '/order/' . $orderParam,
             ]); ?>
         <?php else: ?>
             <div class="box">

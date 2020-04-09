@@ -79,7 +79,7 @@
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <a href="<?= base_url('admin/user/editUser/' . $user['id']); ?>"
+                                    <a href="<?= base_url('admin/user/editUser'); ?>"
                                        class="btn btn-warning display-inline-block pull-right mt-5">
                                         <i class="icon-pencil position-left"></i>
                                         تکمیل اطلاعات کاربر

@@ -22,12 +22,24 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn()) {
             $this->redirect(base_url('admin/login'));
         }
-
-        // Base configuration
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
         $this->data['todayDate'] = jDateTime::date('l d F Y') . ' - ' . date('d F');
 
         $model = new Model();
+        $userModel = new UserModel();
+
+        $this->data['unreadContacts'] = $model->it_count(self::TBL_CONTACT_US, 'status=:status', ['status' => 0]);
+        //-----
+        $this->data['userAllCount'] = $userModel->getUsersCount('r.id!=:role', ['role' => AUTH_ROLE_SUPER_USER]);
+        $this->data['userCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_USER]);
+        $this->data['marketerCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
+        $this->data['userAllDeactiveCount'] = $userModel->getUsersCount('r.id!=:role AND r.id IN (:role1,:role2) AND u.active=:active',
+            ['role' => AUTH_ROLE_SUPER_USER, 'role1' => AUTH_ROLE_USER, 'role2' => AUTH_ROLE_MARKETER, 'active' => 0]);
+        //-----
+        $this->data['staticPageCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+        $this->data['categoryCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
 
         $this->_render_page('pages/be/index');
     }
@@ -668,7 +680,7 @@ class HomeController extends AbstractController
         $this->data['errors_main'] = [];
         $this->data['form_token_main'] = $formMain->csrfToken('settingMain');
         $formMain->setFieldsName(['fav', 'logo', 'title', 'showMenuIcon', 'desc', 'keywords'])
-            ->setDefaults('showMenuIcon', 'on')
+            ->setDefaults('showMenuIcon', 0)
             ->setMethod('post');
         try {
             $formMain->beforeCheckCallback(function ($values) use ($formMain) {
@@ -683,7 +695,7 @@ class HomeController extends AbstractController
                 $this->data['setting']['main']['favIcon'] = $values['fav'];
                 $this->data['setting']['main']['logo'] = $values['logo'];
                 $this->data['setting']['main']['title'] = $values['title'];
-                $this->data['setting']['main']['showMenuIcon'] = $values['showMenuIcon'];
+                $this->data['setting']['main']['showMenuIcon'] = $formMain->isChecked('showMenuIcon') ? 1 : 0;
                 $this->data['setting']['main']['description'] = $values['desc'];
                 $this->data['setting']['main']['keywords'] = $values['keywords'];
 
@@ -763,12 +775,11 @@ class HomeController extends AbstractController
         $formIndex = new Form();
         $this->data['errors_index'] = [];
         $this->data['form_token_index'] = $formIndex->csrfToken('settingIndexPage');
-        $formIndex->setFieldsName(['indexPagePanel'])
-            ->setDefaults('showOurTeam', 'off')
+        $formIndex->setFieldsName(['indexPagePanel', 'showOurTeam'])
+            ->setDefaults('showOurTeam', 0)
             ->setMethod('post', [], ['showOurTeam']);
         try {
-            $formImages->afterCheckCallback(function () use ($formIndex) {
-                //-----
+            $formIndex->afterCheckCallback(function () use ($formIndex) {
                 $this->data['setting']['pages']['index']['showOurTeam'] = $formIndex->isChecked('showOurTeam') ? 1 : 0;
                 //-----
 
@@ -834,12 +845,13 @@ class HomeController extends AbstractController
         $this->data['errors_cart'] = [];
         $this->data['form_token_cart'] = $form->csrfToken('settingCart');
         $form->setFieldsName([
-            'cart_priceArea1', 'cart_priceArea1', 'cart_priceFree', 'cart_desc'
+            'cart_priceArea1', 'cart_priceArea2', 'cart_priceFree', 'cart_desc'
         ])->setMethod('post');
         try {
             $form->beforeCheckCallback(function () use ($form) {
-                $form->validate('numeric', ['cart_priceArea1', 'cart_priceArea2'], 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
-                $form->validate('numeric', ['cart_priceFree'], 'حداقل قیمت رایگان شدن هزینه ارسال باید از نوع عدد باشد.');
+                $form->validate('numeric', 'cart_priceArea1', 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
+                $form->validate('numeric', 'cart_priceArea2', 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
+                $form->validate('numeric', 'cart_priceFree', 'حداقل قیمت رایگان شدن هزینه ارسال باید از نوع عدد باشد.');
             })->afterCheckCallback(function ($values) use ($form) {
                 $this->data['setting']['cart']['shipping_price']['area1'] = abs((int)$values['cart_priceArea1']);
                 $this->data['setting']['cart']['shipping_price']['area2'] = abs((int)$values['cart_priceArea2']);
@@ -907,8 +919,9 @@ class HomeController extends AbstractController
         $form->setFieldsName([
             'footer_1_title', 'footer_1_text', 'footer_1_link',
             'namad1', 'namad2',
-            'telegram', 'instagram', 'facebook',
-        ])->setMethod('post');
+            'telegram', 'instagram', 'whatsapp',
+        ])->xssExcludeVariables(['namad1', 'namd2'])
+            ->setMethod('post');
         try {
             $form->afterCheckCallback(function ($values) use ($form) {
                 $sec1 = array_map(function ($val1, $val2) {
@@ -924,12 +937,12 @@ class HomeController extends AbstractController
                 $this->data['setting']['footer']['sections']['section_2']['title'] = $values['footer_1_title'][1];
                 $this->data['setting']['footer']['sections']['section_2']['links'] = $sec2;
 
-                $this->data['setting']['footer']['namad']['namad1'] = trim($values['namad1']);
-                $this->data['setting']['footer']['namad']['namad2'] = trim($values['namad2']);
+                $this->data['setting']['footer']['namad']['namad1'] = htmlentities(trim($values['namad1']));
+                $this->data['setting']['footer']['namad']['namad2'] = htmlentities(trim($values['namad2']));
 
                 $this->data['setting']['footer']['socials']['telegram'] = $values['telegram'];
                 $this->data['setting']['footer']['socials']['instagram'] = $values['instagram'];
-                $this->data['setting']['footer']['socials']['facebook'] = $values['facebook'];
+                $this->data['setting']['footer']['socials']['whatsapp'] = $values['whatsapp'];
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);

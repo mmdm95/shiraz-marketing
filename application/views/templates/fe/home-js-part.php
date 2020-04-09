@@ -17,6 +17,8 @@
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/countdown.min.js?<?= app_version(); ?>"></script>
 <!-- main Js -->
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/main.js?<?= app_version(); ?>"></script>
+<!-- cart Js -->
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/cartJs.js?<?= app_version(); ?>"></script>
 <!-- endinject-->
 
 <!-- plugins:js -->

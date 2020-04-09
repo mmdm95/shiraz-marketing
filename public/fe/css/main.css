@@ -270,6 +270,8 @@ ul.list-persian {
 .badge {
     padding: .4rem .75rem;
     font-size: 85%;
+    font-weight: normal;
+    font-family: var(--font-medium);
 }
 
 /****************************************
@@ -863,10 +865,10 @@ a {
     position: absolute;
     top: -5px;
     left: calc(100% - 10px);
-    font-size: 1.25rem;
+    font-size: 1rem;
     min-width: 24px;
     height: 24px;
-    padding: 3px;
+    padding: 6px 3px;
     background-color: var(--success);
     border-radius: 50rem;
     white-space: nowrap;
@@ -1276,16 +1278,35 @@ a {
     margin: 25px 0;
 }
 
+.separator.solid {
+    width: 100%;
+    height: 1px;
+    background: var(--darker-bg);
+    margin: 25px 0;
+}
+
 .separator.secondary {
     background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+}
+
+.separator.solid.secondary {
+    background: var(--secondary-color);
 }
 
 .separator.primary {
     background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
 }
 
+.separator.solid.primary {
+    background: var(--primary-color);
+}
+
 .separator.success {
     background: linear-gradient(90deg, transparent, var(--success), transparent);
+}
+
+.separator.solid.success {
+    background: var(--success);
 }
 
 /*********** Back to top ************/
@@ -1406,7 +1427,7 @@ a {
 }
 
 .main-input__wrapper.has-extra-icon .form-control {
-    padding-left: 120px;
+    padding-left: 90px;
 }
 
 .main-input__wrapper .input-icon {
@@ -1733,6 +1754,49 @@ a {
     text-decoration: line-through;
     font-size: .95rem;
     text-align: center;
+}
+
+.card .card-timer {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 100%;
+    padding: .625rem 1rem;
+    font-size: 13px;
+    border-top: 1px solid var(--darker-bg);
+}
+
+.card .card-timer [countdown] {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+}
+
+.card .card-timer [data-days],
+.card .card-timer [data-hours],
+.card .card-timer [data-minutes],
+.card .card-timer [data-seconds] {
+    font-family: var(--font-medium);
+    display: block;
+    text-align: center;
+    color: var(--danger);
+    font-size: 16px;
 }
 
 /*********** News card ************/
@@ -2243,12 +2307,14 @@ a {
 
 .step-container .step-item.active::after,
 .step-container .step-item.done::after,
+.step-container .step-item.wait::after,
 .step-container .step-item.failed::after {
     font-family: var(--font-medium);
 }
 
 .step-container .step-item.active,
 .step-container .step-item.done,
+.step-container .step-item.wait,
 .step-container .step-item.failed {
     width: 50px;
     height: 50px;
@@ -2257,6 +2323,7 @@ a {
 
 .step-container .step-item.active *,
 .step-container .step-item.done *,
+.step-container .step-item.wait *,
 .step-container .step-item.failed * {
     visibility: visible;
     opacity: 1;
@@ -2270,6 +2337,11 @@ a {
 .step-container .step-item.done,
 .step-container .step-separator.done {
     background-color: var(--success);
+}
+
+.step-container .step-item.wait,
+.step-container .step-separator.wait {
+    background-color: var(--warning);
 }
 
 .step-container .step-item.failed,
@@ -2400,7 +2472,7 @@ a {
     position: relative;
     width: 100%;
     margin-top: var(--gap-card);
-    padding: 70px 0 90px;
+    padding: 70px 0 70px;
     background-color: var(--darker-bg);
 }
 
@@ -2437,6 +2509,10 @@ a {
     z-index: 2;
 }
 
+.page-all-header__wrapper .main-input__wrapper {
+    z-index: 2;
+}
+
 /*********** Each page breadcrumb ************/
 
 .page-breadcrumb .breadcrumb {
@@ -2461,6 +2537,31 @@ a {
 .rtl-text .page-breadcrumb .breadcrumb-item + .breadcrumb-item {
     padding-right: .5rem;
     padding-left: 0;
+}
+
+/*********** Page index ************/
+
+.our-team .box {
+    text-align: center;
+}
+
+.our-team .our-team-img {
+    display: block;
+    width: 100px !important;
+    height: 100px;
+    border-radius: 50% !important;
+    object-fit: cover;
+    margin: 0 auto 1.25rem;
+}
+
+.our-team .our-team-name {
+    font-size: 1.25rem;
+    margin: 0 auto .625rem;
+    font-family: var(--font-medium);
+}
+
+.our-team .our-team-geo {
+    color: var(--secondary);
 }
 
 /*********** Page faq ************/

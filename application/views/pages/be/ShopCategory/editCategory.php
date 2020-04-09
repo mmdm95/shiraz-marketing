@@ -14,8 +14,8 @@
             var showIcon = function (icon) {
                 var originalOption = icon.element;
                 if (!icon.id) return icon.text;
-                var $icon = "<span class='display-inline-block la-2x pull-right" + $(originalOption).attr('data-icon') +
-                    "'></span>" + icon.text;
+                var $icon = "<i class='display-inline-block la-2x " + $(originalOption).attr('data-icon') +
+                    "' aria-hidden='true'></i>" + icon.text;
 
                 return $icon;
             };
@@ -83,7 +83,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url('admin/blog/editCategory/' . $param[0]); ?>" method="post">
+                        <form action="<?= base_url('admin/shop/editCategory/' . $param[0]); ?>" method="post">
                             <?= $form_token; ?>
 
                             <div class="row">
@@ -151,6 +151,10 @@
                                                         <option value="<?= $icon['id']; ?>"
                                                                 data-icon="<?= $icon['name']; ?>"
                                                             <?= set_value($catValues['icon'] ?? $catTrueValues['icon'] ?? '', $icon['id'], 'selected', '', '=='); ?>>
+                                                            <?php
+                                                            $split = explode(' ', $icon['name']);
+                                                            echo $split[1] ?? $split[0] ?? '';
+                                                            ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -158,7 +162,7 @@
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="catStatus">وضعیت نمایش:</label>
                                                 <input type="checkbox" name="publish" id="catStatus"
-                                                       class="switchery" <?= set_value($catValues['publish'] ?? $catTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($catValues['publish'] ?? $catTrueValues['publish'] ?? '', 1, 'checked', '', '=='); ?> />
                                             </div>
 
                                             <div class="text-right col-md-12 mt-20">

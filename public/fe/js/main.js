@@ -29,14 +29,18 @@
 
         var
             loader = "<div class='loader-modal'>\
-                        <div></div>\
-                        <div></div>\
-                        <div></div>\
+                        <div class='loading'>\
+                            <div></div>\
+                            <div></div>\
+                            <div></div>\
+                        </div>\
                       </div>",
             loader_little = "<div class='loader-modal loader-little'>\
-                                <div></div>\
-                                <div></div>\
-                                <div></div>\
+                                <div class='loading'>\
+                                    <div></div>\
+                                    <div></div>\
+                                    <div></div>\
+                                </div>\
                              </div>";
 
         var defDoneFn, defFailFn, defAlwaysFn;
@@ -152,7 +156,7 @@
                 }, 300);
         };
         _this.removeLoader = function () {
-            body.find('.custom-loader-modal').fadeOut(300, function () {
+            body.find('.loader-modal').fadeOut(300, function () {
                 $(this).remove()
             });
         };
@@ -265,7 +269,7 @@
             }
         };
         _this.log = function (context, ...parameters) {
-            console.log(context, parameters)
+            console.log(context, parameters);
         };
 
         //------------------------------
@@ -310,6 +314,33 @@
             autoplay: true,
             autoplayTimeout: 10000,
             autoplayHoverPause: true,
+            rtl: true,
+            navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
+        });
+
+        $('.our-team').owlCarousel({
+            items: 6,
+            margin: 25,
+            dots: false,
+            nav: true,
+            loop: true,
+            autoplay: true,
+            autoplayTimeout: 10000,
+            autoplayHoverPause: true,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                575: {
+                    items: 2
+                },
+                767: {
+                    items: 2
+                },
+                991: {
+                    items: 3
+                }
+            },
             rtl: true,
             navText: ['<span class="i la la-angle-right"></span>', '<span class="i la la-angle-left"></span>'],
         });

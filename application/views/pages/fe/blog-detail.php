@@ -88,7 +88,7 @@
                                 ?>
                                 <?php foreach ($keywords as $keyword): ?>
                                     <li class="list-inline-item">
-                                        <a href="<?= base_url('blog/search/tag/' . trim($keyword)); ?>"
+                                        <a href="<?= base_url('blog/all/tag/' . trim($keyword)); ?>"
                                            class="btn btn-outline-secondary">
                                             <?= trim($keyword); ?>
                                         </a>

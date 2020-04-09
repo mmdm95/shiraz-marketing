@@ -40,13 +40,16 @@ abstract class AbstractController extends AbstractPaymentController
 
         // Read settings once
         $this->setting = read_json(CORE_PATH . 'config.json');
+        if(empty($this->setting)) {
+            $this->setting = [];
+        }
 
         // Read identity and store in data to pass in views
         $this->data['auth'] = $this->auth;
         $this->data['identity'] = $this->auth->getIdentity();
 
         // Config(s)
-        $this->data['favIcon'] = $this->setting['main']['favIcon'] ? base_url($this->setting['main']['favIcon']) : '';
+        $this->data['favIcon'] = !empty($this->setting['main']['favIcon']) ? base_url($this->setting['main']['favIcon']) : '';
         $this->data['logo'] = $this->setting['main']['logo'] ?? '';
 
         // Extra js

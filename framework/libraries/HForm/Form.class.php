@@ -120,6 +120,14 @@ class Form implements HIForm
     protected $xss = null;
 
     /**
+     * Store excluded fields from xss
+     *
+     * @var array
+     *
+     */
+    protected $xssExcluded = [];
+
+    /**
      * Store option for xss
      *
      * @var array
@@ -340,6 +348,29 @@ class Form implements HIForm
     }
 
     /**
+     * Exclude field(s) name to don't use xss on them
+     *
+     * @param array|string $name
+     * @return Form
+     */
+    public function xssExcludeVariables($name)
+    {
+        if (is_string($name)) {
+            if (!in_array($name, $this->xssExcluded)) {
+                $this->xssExcluded[] = $name;
+            }
+        } else if (is_array($name)) {
+            foreach ($name as $item) {
+                if (!in_array($item, $this->xssExcluded)) {
+                    $this->xssExcluded[] = $item;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Set field name xss option to allow some evil attributes and don't catch xss script
      *
      * @param string $name
@@ -409,7 +440,7 @@ class Form implements HIForm
      * Validate $name field with error message $msg with type of $type
      *
      * @param string $type
-     * @param string|array $name
+     * @param string $name
      * @param string $msg - to not show the error put empty string in this and be sure remove empty messages is set to true
      * @param callable|null $callback - use for doing something if validate is failed
      * @return Form
@@ -1904,7 +1935,7 @@ class Form implements HIForm
         }
 
         // Check $value xss script(s) and remove it(them)
-        if ($this->useXss && $xss && isset($value)) {
+        if ($this->useXss && $xss && isset($value) && !in_array($name, $this->xssExcluded)) {
             $evil = false;
             $evilTag = false;
 

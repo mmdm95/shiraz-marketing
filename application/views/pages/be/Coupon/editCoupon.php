@@ -108,12 +108,12 @@
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly
                                                        data-alt-field="#altDateField" data-time="true"
-                                                       value="<?= $coValues['expire'] ?? $coTrueValues['expire_time'] ?? ''; ?>">
+                                                       value="<?= date('Y/m/d H:i', $coValues['expire'] ?? $coTrueValues['expire_time'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="coStatus">وضعیت فعالسازی:</label>
                                                 <input type="checkbox" name="publish" id="coStatus"
-                                                       class="switchery" <?= set_value($coValues['publish'] ?? $coTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($coValues['publish'] ?? $coTrueValues['publish'] ?? '', 1, 'checked', '', '=='); ?> />
                                             </div>
 
 

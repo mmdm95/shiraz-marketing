@@ -37,11 +37,11 @@
                                            placeholder="برای مثال: ۰۹۱۷xxxxxxx"
                                            value="<?= $registerValues['username'] ?? ''; ?>">
                                     <span class="input-icon right">
-                                    <i class="la la-user"></i>
-                                </span>
+                                        <i class="la la-user"></i>
+                                    </span>
                                     <span class="input-icon left clear-icon">
-                                    <i class="la la-times"></i>
-                                </span>
+                                        <i class="la la-times"></i>
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -52,8 +52,7 @@
                                 </span>
                                     :
                                 </label>
-                                <div class="clearfix"></div>
-                                <div class="main-input__wrapper">
+                                <div class="main-input__wrapper has-extra-icon">
                                     <input type="password" id="r-password" class="form-control" name="password"
                                            placeholder="کلمه عبور">
                                     <span class="input-icon right">
@@ -75,8 +74,7 @@
                                     </span>
                                     :
                                 </label>
-                                <div class="clearfix"></div>
-                                <div class="main-input__wrapper">
+                                <div class="main-input__wrapper has-extra-icon">
                                     <input type="password" id="r-rePassword" class="form-control" name="re_password"
                                            placeholder="تکرار کلمه عبور">
                                     <span class="input-icon right">

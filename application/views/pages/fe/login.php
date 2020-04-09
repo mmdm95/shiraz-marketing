@@ -53,7 +53,7 @@
                                         کلمه عبور خود را فراموش کردم
                                     </a>
                                 </div>
-                                <div class="main-input__wrapper">
+                                <div class="main-input__wrapper has-extra-icon">
                                     <input type="password" id="l-password" class="form-control" name="password"
                                            placeholder="کلمه عبور">
                                     <span class="input-icon right">

@@ -49,7 +49,11 @@ class BlogController extends AbstractController
 
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if(is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['title'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 if ($model->is_exist(self::TBL_BLOG_CATEGORY, 'name=:title', ['title' => trim($values['title'])])) {
@@ -116,7 +120,11 @@ class BlogController extends AbstractController
 
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if(is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['title'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 if ($this->data['catTrueValues']['name'] != $values['title'] &&
@@ -254,7 +262,11 @@ class BlogController extends AbstractController
 
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if(is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'category', 'abstract', 'body', 'keywords'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 // Validate main image
@@ -349,7 +361,11 @@ class BlogController extends AbstractController
 
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if(is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['image', 'title', 'category', 'abstract', 'body', 'keywords'], 'فیلدهای ضروری را خالی نگذارید.');
 
                 // Validate main image

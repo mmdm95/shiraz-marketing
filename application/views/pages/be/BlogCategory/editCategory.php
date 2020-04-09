@@ -79,7 +79,7 @@
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="catStatus">وضعیت نمایش:</label>
                                                 <input type="checkbox" name="publish" id="catStatus"
-                                                       class="switchery" <?= set_value($catValues['publish'] ?? $catTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($catValues['publish'] ?? $catTrueValues['publish'] ?? '', 1, 'checked', '', '=='); ?> />
                                             </div>
 
                                             <div class="text-right col-md-12 mt-20">

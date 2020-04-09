@@ -141,7 +141,7 @@
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="catStatus">وضعیت انتشار:</label>
                                                 <input type="checkbox" name="publish" id="catStatus"
-                                                       class="switchery" <?= set_value($blogValues['publish'] ?? $blogTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?> />
+                                                       class="switchery" <?= set_value($blogValues['publish'] ?? $blogTrueValues['publish'] ?? '', 1, 'checked', '', '=='); ?> />
                                             </div>
                                             <div class="row pt-20 no-padding-top">
                                                 <div class="form-group col-md-12 mt-12">

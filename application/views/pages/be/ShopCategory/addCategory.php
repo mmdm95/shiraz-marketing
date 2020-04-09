@@ -14,8 +14,8 @@
             var showIcon = function (icon) {
                 var originalOption = icon.element;
                 if (!icon.id) return icon.text;
-                var $icon = "<span class='display-inline-block la-2x pull-right" + $(originalOption).attr('data-icon') +
-                    "'></span>" + icon.text;
+                var $icon = "<i class='display-inline-block la-2x " + $(originalOption).attr('data-icon') +
+                    "' aria-hidden='true'></i>" + icon.text;
 
                 return $icon;
             };
@@ -151,6 +151,10 @@
                                                         <option value="<?= $icon['id']; ?>"
                                                                 data-icon="<?= $icon['name']; ?>"
                                                             <?= set_value($catValues['icon'] ?? '', $icon['id'], 'selected', '', '=='); ?>>
+                                                            <?php
+                                                            $split = explode(' ', $icon['name']);
+                                                            echo $split[1] ?? $split[0] ?? '';
+                                                            ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>

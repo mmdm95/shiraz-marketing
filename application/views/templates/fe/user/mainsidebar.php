@@ -9,13 +9,13 @@
         <div class="sidebar-user">
             <div class="category-content">
                 <div class="media">
-                    <a href="<?= base_url() . 'user/editUser/' . @$identity->id; ?>"
+                    <a href="<?= base_url() . 'user/editUser'; ?>"
                        class="media-left">
                         <img src="<?= base_url($identity->image); ?>" class="img-fit"
                              alt="">
                     </a>
                     <div class="media-body">
-                        <a href="<?= base_url() . 'user/editUser/' . @$identity->id; ?>"
+                        <a href="<?= base_url() . 'user/editUser'; ?>"
                            class="media-heading text-semibold">
                             <?= set_value($identity->first_name ?? '', '', null, $identity->mobile); ?>
                         </a>

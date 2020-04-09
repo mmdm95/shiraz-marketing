@@ -30,7 +30,7 @@
             <nav class="nav flex-column">
                 <?php foreach ($menuNavigation as $item): ?>
                     <a class="nav-item active" href="<?= base_url('product/all/category/' . $item['slug']); ?>">
-                        <i class="<?= $item['icon']; ?> nav-item-icon"></i>
+                        <i class="<?= $item['icon_name']; ?> nav-item-icon"></i>
                         <span class="nav-item-text"><?= $item['name']; ?></span>
                     </a>
                 <?php endforeach; ?>

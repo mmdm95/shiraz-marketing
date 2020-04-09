@@ -171,4 +171,45 @@ class OrderModel extends HModel
         if (count($res)) return $res[0];
         return [];
     }
+
+    public function getUserDeposit($where, $bindValues = [], $limit = null, $offset = 0)
+    {
+        $select = $this->select();
+        $select->cols([
+            'ud.id', 'ud.payer_id AS payer', 'ud.deposit_price', 'ud.description', 'ud.deposit_type',
+            'ud.deposit_date', 'u.first_name', 'u.last_name', 'u.mobile', 'r.description AS role_name'
+        ])->from(AbstractPaymentController::TBL_USER_ACCOUNT_DEPOSIT . ' AS ud');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER . ' AS u',
+                'u.id=ud.user_id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER_ROLE . ' AS ur',
+                'ur.user_id=ud.user_id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_ROLE . ' AS r',
+                'r.id=ur.role_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
+        }
+
+        if (!empty($limit) && is_numeric($limit)) {
+            $select->limit((int)$limit);
+        }
+        $select->offset((int)$offset);
+
+        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
 }

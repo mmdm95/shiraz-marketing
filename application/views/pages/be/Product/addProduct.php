@@ -50,7 +50,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/addProduct" method="post">
+                        <form action="<?= base_url('admin/shop/addProduct'); ?>" method="post">
                             <?= $form_token; ?>
 
                             <div class="row">
@@ -190,7 +190,7 @@
                                                 <input type="hidden" name="discount_expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
-                                                       value="<?= $pValues['discount_expire'] ?? ''; ?>">
+                                                       value="<?= date('Y/m/d H:i', $pValues['discount_expire'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <label>پاداش خرید:</label>

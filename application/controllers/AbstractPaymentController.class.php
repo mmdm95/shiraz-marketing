@@ -54,7 +54,7 @@ abstract class AbstractPaymentController extends HController
     protected $gatewaySuccessCode;
 
     // Define all tables' name for convenient
-    // 24 table(s)
+    // 25 table(s)
     const TBL_BLOG = 'blog';
     const TBL_BLOG_CATEGORY = 'blog_categories';
     const TBL_CATEGORY = 'categories';
@@ -78,6 +78,7 @@ abstract class AbstractPaymentController extends HController
     const TBL_USER = 'users';
     const TBL_USER_ROLE = 'users_roles';
     const TBL_USER_ACCOUNT = 'user_accounts';
+    const TBL_USER_ACCOUNT_BUY = 'user_accounts_buy';
     const TBL_USER_ACCOUNT_DEPOSIT = 'user_account_deposit';
 
     //-----

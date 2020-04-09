@@ -62,7 +62,7 @@
                                 </h6>
 
                                 <?php if ($user['flag_info'] == 1 && $user['flag_marketer_request'] == 0): ?>
-                                    <form action="<?= base_url('user/userProfile/' . $user['id']); ?>"
+                                    <form action="<?= base_url('user/userProfile'); ?>"
                                           method="post">
                                         <?= $form_token; ?>
 
@@ -74,7 +74,7 @@
                                     </form>
                                 <?php endif; ?>
                                 <?php if ($user['flag_info'] != 1): ?>
-                                    <a href="<?= base_url('user/editUser/' . $user['id']); ?>"
+                                    <a href="<?= base_url('user/editUser'); ?>"
                                        class="btn btn-warning display-inline-block pull-right mt-5">
                                         <i class="icon-pencil position-left"></i>
                                         تکمیل اطلاعات کاربر

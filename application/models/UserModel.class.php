@@ -94,6 +94,39 @@ class UserModel extends HModel
         return [];
     }
 
+    public function getUsersCount($where = '', $bindParams = [])
+    {
+        $select = $this->select();
+        $select->cols(['COUNT(*) AS count'])->from($this->table . ' AS u');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_USER_ROLE . ' AS ur',
+                'ur.user_id=u.id'
+            )->join(
+                'LEFT',
+                AbstractPaymentController::TBL_ROLE . ' AS r',
+                'r.id=ur.role_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if(count($res)) {
+            return $res[0]['count'];
+        }
+        return 0;
+    }
+
     public function getNewUserCode($startCode = '1000001')
     {
         $model = new Model();

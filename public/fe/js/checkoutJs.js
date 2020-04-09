@@ -82,14 +82,14 @@
             });
         }
 
-        function quantitySelectInputChange () {
+        function quantitySelectInputChange() {
             var $this, qnt, p_id;
             quantity_select_input.off('change.' + namespace).on('change.' + namespace, function (e) {
                 $this = $(this);
                 p_id = $this.closest('.shopping-cart-item').data('product-id');
                 qnt = $this.find(':selected');
                 qnt = qnt ? qnt.val() : $this.find('option').first().val();
-                if(qnt && p_id) {
+                if (qnt && p_id) {
                     ajax_obj.postedId = p_id;
                     ajax_obj.quantity = qnt;
                     doUpdate();
@@ -106,7 +106,7 @@
                 //-----
                 shop.question(null, function () {
                     p_id = $this.closest('.shopping-cart-item').data('product-id');
-                    if(p_id) {
+                    if (p_id) {
                         ajax_obj.postedId = p_id;
                         doDelete();
                     }
@@ -120,6 +120,17 @@
             //-----
             removeItemClick();
             quantitySelectInputChange();
+            //-----
+            $(".input-select2").select2({
+                multiple: false,
+                width: "100%",
+                placeholder: "انتخاب کنید",
+                containerCssClass: "form-control",
+                minimumResultsForSearch: 12,
+                dir: 'rtl',
+            });
+            // enable bootstrap tooltip
+            $('[data-toggle="tooltip"]').tooltip();
         }
 
         //------------------------------

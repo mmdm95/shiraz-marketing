@@ -7,14 +7,12 @@
         //---------- Variables ---------
         //------------------------------
         var
-            address_radio,
-            current_contact_item,
-            //-----
-            shipping_radio,
-            shipping_info_container,
-            //-----
-            shipping_information_url,
             price_calculate_url,
+            check_off_code_url,
+            //-----
+            discount_inp,
+            discount_btn,
+            discount_delete_btn,
             //-----
             shopping_side_card;
 
@@ -25,79 +23,50 @@
             //-----
             ajax_obj = {};
 
-        shipping_information_url = baseUrl + 'shippingInformation';
         price_calculate_url = baseUrl + 'shoppingSideCard';
+        check_off_code_url = baseUrl + 'checkCouponCode';
 
         //------------------------------
         //---------- Functions ---------
         //------------------------------
-        function addressRadioChange() {
-            var selected, id, the_address, addresses_keys;
-            addresses_keys = Object.keys(addresses);
-
-            address_radio.on('change.' + namespace, function () {
-                selected = $('input[type="radio"][name="addrRadio"]:checked');
-                id = selected.val();
-                //-----
-                if ($.inArray(id, addresses_keys) !== -1) {
-                    the_address = addresses[id][0];
-                    // change text of address information
-                    current_contact_item.find('.checkout-contact-btn-edit').attr('href', baseUrl + 'user/editAddress/' + id + '?back_url=' + baseUrl + 'shopping')
-                        .end().find('.full-name').html(the_address['receiver'])
-                        .end().find('.mobile-phone').html(the_address['phone'])
-                        .end().find('.post-code').html(the_address['postal_code'])
-                        .end().find('.state').html(the_address['province'])
-                        .end().find('.city').html(the_address['city'])
-                        .end().find('.address-part').html(the_address['address']);
-                }
-            });
-        }
-
-        function shippingRadioChange() {
-            var $this, selected, code;
-
-            shipping_radio.on('change.' + namespace, function () {
-                selected = $('input[type="radio"][name="shipping-radio"]:checked');
-                code = selected.val();
-                // Do ajax to get changed shipping information
-                shop.ajaxRequest({
-                    url: shipping_information_url,
-                    method: 'POST',
-                    data: {
-                        postedCode: code
-                    }
-                }, function (response) {
-                    // console.log(response);
-                    var res = JSON.parse(response);
-
-                    shop.isInProgress = false;
-                    shop.showLoader = false;
-
-                    shop.processAjaxData(res, function (content) {
-                        shipping_info_container.html(content);
-                    });
-
-                    // Another ajax for change shopping side price
-                    if(res.success) {
+        function discountBtnClick() {
+            var $this, code;
+            discount_inp.on('click.' + namespace, function () {
+                $this = $(this);
+                if (!$this.is(':disabled')) {
+                    code = discount_inp.val();
+                    if ($.trim(code) !== '') {
                         shop.ajaxRequest({
-                            url: price_calculate_url,
+                            url: check_off_code_url,
                             method: 'POST',
                             data: {
                                 postedCode: code
                             }
-                        }, function (response2) {
-                            // console.log(response2);
-                            shop.processAjaxData(JSON.parse(response2), function (content2) {
-                                shopping_side_card.html(content2);
+                        }, function (response) {
+                            var res = JSON.parse(response);
+                            // console.log(response);
+                            // console.log(JSON.parse(response));
+                            shop.processAjaxData(res, function (content) {
+                                if (res.success) {
+                                    shopping_side_card.html(content);
+                                    // Disable edit/click the/on input/button
+                                    discount_inp.attr('readonly', 'readonly');
+                                    $this.attr('disabled', 'disabled');
+                                    // Call repeater function
+                                    repeaterCaller();
+                                }
                             });
-
-                            repeaterCaller();
+                        }, null, function () {
+                            // Do nothing
                         });
-                        shop.showLoader = true;
                     }
-                }, null, function () {
-                    // Do nothing
-                });
+                }
+            });
+        }
+
+        function discountDeleteBtnClick() {
+            discount_delete_btn.on('click.' + namespace, function () {
+                discount_inp.attr('readonly', false).val('');
             });
         }
 
@@ -113,16 +82,14 @@
         }
 
         function functionsCaller() {
-            address_radio = $('input[type="radio"][name="addrRadio"]');
-            current_contact_item = $('#current-contact-item');
+            shopping_side_card = $('#main_sidebar__wrapper');
             //-----
-            shipping_radio = $('input[type="radio"][name="shipping-radio"]');
-            shipping_info_container = $('#shippingInformation');
+            discount_inp = $('input[name="coupon_code"]');
+            discount_btn = $('#couponChecker');
+            discount_delete_btn = $('#couponDelete');
             //-----
-            shopping_side_card = $('.checkout-summary-main');
-            //-----
-            addressRadioChange();
-            shippingRadioChange();
+            discountBtnClick();
+            discountDeleteBtnClick();
         }
 
         //------------------------------

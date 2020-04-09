@@ -1,8 +1,6 @@
 <?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
-<?php $this->view('templates/fe/main-menu', $data); ?>
-<?php $this->view('templates/fe/main-nav', $data); ?>
-<?php $this->view('templates/fe/main-nav-mobile', $data); ?>
+<?php $this->view('templates/fe/main-menu-minimal', $data); ?>
 
 <main class="main-container page-payment">
     <div class="container">
@@ -36,6 +34,8 @@
 
         <div class="row">
             <div class="col-lg-8 order-2 order-lg-1">
+                <?php $this->view('templates/fe/alert/error', ['errors' => $errors ?? null]); ?>
+
                 <div class="box-header-info">
                     نحوه پرداخت
                 </div>
@@ -88,57 +88,14 @@
             </div>
 
             <div class="col-lg-4 col-md-6 order-1 order-lg-2 mx-auto">
-                <div class="box">
-                    <div class="box-body">
-                        <div class="shopping-cart-container">
-                            <div class="shopping-cart-info">
-                                <div class="shopping-cart-info-item">
-                                    <div>
-                                        مبلغ کل (۱ کالا) :
-                                    </div>
-                                    <div class="text-dark">
-                                        ۸۵۰،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                                <div class="shopping-cart-info-item">
-                                    <div class="text-primary">
-                                        مبلغ تخفیف :
-                                    </div>
-                                    <div class="text-primary">
-                                        ۲۰۰،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                                <div class="shopping-cart-info-item">
-                                    <div>
-                                        هزینه ارسال :
-                                    </div>
-                                    <div class="text-dark">
-                                        ۶،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="shopping-cart-continue">
-                                <div class="text-secondary mb-2">
-                                    مبلغ کل‌ :
-                                </div>
-                                <div class="text-danger font-size-21px mb-4">
-                                    ۶۵۶،۰۰۰
-                                    تومان
-                                </div>
-                                <a href="#" class="btn btn-success btn-block">
-                                    ادامه ثبت سفارش
-                                    <i class="la la-angle-left font-size-21px mr-3 float-left" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?= $sideCard; ?>
             </div>
         </div>
     </div>
 </main>
+
+<!-- Removed/Updated products modal -->
+<?php $this->view('templates/fe/modal/modified-items', $data); ?>
+<!-- Removed/Updated products modal -->
 
 <?php $this->view('templates/fe/footer', $data); ?>

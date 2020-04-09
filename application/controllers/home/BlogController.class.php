@@ -18,6 +18,10 @@ class BlogController extends AbstractController
         //-----
         $this->data['page_image'] = $this->setting['pages']['blog']['topImage'] ?? '';
         $this->data['page_title'] = 'اخبار و اطلاعیه‌ها';
+        $this->data['page_has_search'] = [
+            'action' => base_url('blog/all'),
+            'placeholder' => 'جستجو در بلاگ',
+        ];
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اخبار و اطلاعیه‌ها');
 
@@ -62,116 +66,6 @@ class BlogController extends AbstractController
 
     //-----
 
-    public function searchAction($param)
-    {
-        $query = isset($param[1]) ? urldecode($param[1]) : (isset($param[0]) ? urldecode($param[0]) : '');
-        if (empty($query)) {
-            if (isset($_GET['blog-query'])) {
-                $param = [$_GET['blog-query']];
-                $query = urldecode($param[0]);
-            } else {
-                $param = ['all'];
-                $query = 'نمایش همه';
-            }
-        }
-        //-----
-        $this->data['param'] = $param;
-        $this->data['searchText'] = $query;
-        $this->data['searchTitle'] = '';
-        //-----
-        $where = '';
-        $bindValues = [];
-
-        $model = new Model();
-        $blog = new BlogModel();
-        if (isset($param[1])) {
-            $this->data['searchTitle'] .= $query;
-            switch (strtolower($param[0])) {
-                case 'category':
-                    $this->data['searchTitle'] = 'دسته‌بندی - ';
-                    //-----
-                    $where .= '(c.id=:cat';
-                    $bindValues['cat'] = $query;
-                    //+++++
-                    $where .= ') AND ';
-                    break;
-                case 'writer':
-                    $this->data['searchTitle'] = 'نویسنده - ';
-                    //-----
-                    $where .= '(b.writer LIKE :writer';
-                    $bindValues['writer'] = '%' . $query . '%';
-                    //+++++
-                    $where .= ') AND ';
-                    break;
-                case 'tag':
-                    $this->data['searchTitle'] = 'کلمات کلیدی - ';
-                    //-----
-                    $where .= '(b.keywords LIKE :kw';
-                    $bindValues['kw'] = '%' . $query . '%';
-                    //+++++
-                    $where .= ') AND ';
-                    break;
-            }
-            //-----
-            $this->data['pagination']['total'] = $model->it_count(null, $where . ' b.publish=:pub',
-                array_merge($bindValues, ['pub' => 1]));
-            $this->data['pagination']['page'] = isset($param[3]) && strtolower($param[2]) == 'page' ? (int)$param[3] : 1;
-            $this->data['pagination']['limit'] = 12;
-            $this->data['pagination']['offset'] = ($this->data['pagination']['page'] - 1) * $this->data['pagination']['limit'];
-            $this->data['pagination']['firstPage'] = 1;
-            $this->data['pagination']['lastPage'] = ceil($this->data['pagination']['total'] / $this->data['pagination']['limit']);
-            //-----
-            $this->data['result'] = $blog->getAllBlog($where . ' b.publish=:pub', array_merge($bindValues, ['pub' => 1]),
-                $this->data['pagination']['limit'], $this->data['pagination']['offset']);
-            //-----
-            if (strtolower($param[0]) == 'category') {
-                $category = $model->select_it(null, 'categories', 'category_name', 'id=:id', ['id' => $query]);
-                $this->data['searchTitle'] .= count($category) ? $category[0]['category_name'] : 'ناشناخته';
-            }
-        } else {
-            $this->data['searchTitle'] = 'همه - ';
-            $this->data['searchTitle'] .= $query;
-            if (!empty($query)) {
-                $where .= '(b.title LIKE :title OR ';
-                $bindValues['title'] = '%' . $query . '%';
-                //+++++
-                $where .= 'b.abstract LIKE :abs OR ';
-                $bindValues['abs'] = '%' . $query . '%';
-                //+++++
-                $where .= 'b.writer LIKE :writer OR ';
-                $bindValues['writer'] = '%' . $query . '%';
-                //+++++
-                $where .= 'b.keywords LIKE :kw OR ';
-                $bindValues['kw'] = '%' . $query . '%';
-                //+++++
-                $where .= 'c.category_name LIKE :cat';
-                $bindValues['cat'] = '%' . $query . '%';
-                //+++++
-                $where .= ') AND ';
-            }
-            //-----
-            $this->data['pagination']['total'] = $model->it_count(null, $where . ' b.publish=:pub',
-                array_merge($bindValues, ['pub' => 1]));
-            $this->data['pagination']['page'] = isset($param[2]) && strtolower($param[1]) == 'page' ? (int)$param[2] : 1;
-            $this->data['pagination']['limit'] = 12;
-            $this->data['pagination']['offset'] = ($this->data['pagination']['page'] - 1) * $this->data['pagination']['limit'];
-            $this->data['pagination']['firstPage'] = 1;
-            $this->data['pagination']['lastPage'] = ceil($this->data['pagination']['total'] / $this->data['pagination']['limit']);
-            //-----
-            $this->data['result'] = $blog->getAllBlog($where . ' b.publish=:pub', array_merge($bindValues, ['pub' => 1]),
-                $this->data['pagination']['limit'], $this->data['pagination']['offset']);
-        }
-        //-----
-
-        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جستجو', $query);
-
-        $this->_render_page([
-            'pages/fe/blog-search',
-        ]);
-    }
-
-    //-----
-
     private $_order_types = [
         'newest' => ['b.id DESC'],
         'most_view' => ['b.view_count DESC', 'b.id DESC'],
@@ -197,13 +91,81 @@ class BlogController extends AbstractController
         $this->data['orderParam'] = 'newest';
         $this->data['orderText'] = $this->_order_type_globalization['newest'];
 
+        $this->data['tagParam'] = '';
+
         $this->data['pagination']['page'] = 1;
 
+        if (isset($_GET['q']) && !empty($_GET['q'])) {
+            $extraWhere .= ' AND (b.title LIKE :q1 OR';
+            $extraWhere .= ' b.abstract LIKE :q2 OR';
+            $extraWhere .= ' b.abstract LIKE :q3 OR';
+            $extraWhere .= ' b.keywords LIKE :q4 OR';
+            $extraWhere .= ' c.name LIKE :q5)';
+            $extraParams[':q1'] = '%' . $_GET['q'] . '%';
+            $extraParams[':q2'] = '%' . $_GET['q'] . '%';
+            $extraParams[':q3'] = '%' . $_GET['q'] . '%';
+            $extraParams[':q4'] = '%' . $_GET['q'] . '%';
+            $extraParams[':q5'] = '%' . $_GET['q'] . '%';
+        }
         if (isset($param[0])) {
-            $param = array_map('strtolower', $param);
+            $param = array_map('mb_strtolower', $param);
             if ($param[0] == 'category') {
                 if (isset($param[1])) {
-                    if ($param[1] == 'order') {
+                    if ($param[1] == 'tag') {
+                        if (isset($param[2])) {
+                            if ($param[2] == 'order') {
+                                if (isset($param[3])) {
+                                    if (in_array($param[3], $orderTypeKeys)) {
+                                        $orderParams = $this->_order_types[$param[3]];
+                                        $this->data['orderText'] = $this->_order_type_globalization[$param[3]];
+                                        $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[3]])[0];
+                                    }
+                                    if (isset($param[4])) {
+                                        if ($param[4] == 'page') {
+                                            if (isset($param[5])) {
+                                                if (is_numeric($param[5])) {
+                                                    $this->data['pagination']['page'] = $param[5];
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                $extraWhere .= ' AND b.keywords LIKE :tag';
+                                $extraParams['tag'] = '%' . $param[2] . '%';
+                                $this->data['tagParam'] = $param[2];
+                            }
+                            if (isset($param[3])) {
+                                if ($param[3] == 'order') {
+                                    if (isset($param[4])) {
+                                        if (in_array($param[4], $orderTypeKeys)) {
+                                            $orderParams = $this->_order_types[$param[4]];
+                                            $this->data['orderText'] = $this->_order_type_globalization[$param[4]];
+                                            $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[4]])[0];
+                                        }
+                                        if (isset($param[5])) {
+                                            if ($param[5] == 'page') {
+                                                if (isset($param[6])) {
+                                                    if (is_numeric($param[6])) {
+                                                        $this->data['pagination']['page'] = $param[6];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (isset($param[4])) {
+                                            if ($param[4] == 'page') {
+                                                if (isset($param[5])) {
+                                                    if (is_numeric($param[5])) {
+                                                        $this->data['pagination']['page'] = $param[5];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } elseif ($param[1] == 'order') {
                         if (isset($param[2])) {
                             if (in_array($param[2], $orderTypeKeys)) {
                                 $orderParams = $this->_order_types[$param[2]];
@@ -238,6 +200,114 @@ class BlogController extends AbstractController
                         $this->data['categoryText'] = $model->select_it(null, self::TBL_BLOG_CATEGORY, ['name'],
                             'id=:id', ['id' => $param[1]]);
                         $this->data['categoryText'] = count($this->data['categoryText']) ? $this->data['categoryText'][0]['name'] : '';
+                    }
+                    if (isset($param[2])) {
+                        if ($param[2] == 'tag') {
+                            if (isset($param[3])) {
+                                if ($param[3] == 'order') {
+                                    if (isset($param[4])) {
+                                        if (in_array($param[4], $orderTypeKeys)) {
+                                            $orderParams = $this->_order_types[$param[4]];
+                                            $this->data['orderText'] = $this->_order_type_globalization[$param[4]];
+                                            $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[4]])[0];
+                                        }
+                                        if (isset($param[5])) {
+                                            if ($param[5] == 'page') {
+                                                if (isset($param[6])) {
+                                                    if (is_numeric($param[6])) {
+                                                        $this->data['pagination']['page'] = $param[6];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $extraWhere .= ' AND b.keywords LIKE :tag';
+                                    $extraParams['tag'] = '%' . $param[3] . '%';
+                                    $this->data['tagParam'] = $param[3];
+                                }
+                                if (isset($param[4])) {
+                                    if ($param[4] == 'order') {
+                                        if (isset($param[5])) {
+                                            if (in_array($param[5], $orderTypeKeys)) {
+                                                $orderParams = $this->_order_types[$param[5]];
+                                                $this->data['orderText'] = $this->_order_type_globalization[$param[5]];
+                                                $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[5]])[0];
+                                            }
+                                            if (isset($param[6])) {
+                                                if ($param[6] == 'page') {
+                                                    if (isset($param[7])) {
+                                                        if (is_numeric($param[7])) {
+                                                            $this->data['pagination']['page'] = $param[7];
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if (isset($param[5])) {
+                                                if ($param[5] == 'page') {
+                                                    if (isset($param[6])) {
+                                                        if (is_numeric($param[6])) {
+                                                            $this->data['pagination']['page'] = $param[6];
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } elseif ($param[2] == 'order') {
+                            if (isset($param[3])) {
+                                if (in_array($param[3], $orderTypeKeys)) {
+                                    $orderParams = $this->_order_types[$param[3]];
+                                    $this->data['orderText'] = $this->_order_type_globalization[$param[3]];
+                                    $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[3]])[0];
+                                }
+                                if (isset($param[4])) {
+                                    if ($param[4] == 'page') {
+                                        if (isset($param[5])) {
+                                            if (is_numeric($param[5])) {
+                                                $this->data['pagination']['page'] = $param[5];
+                                            }
+                                        }
+                                    }
+                                }
+                                if (isset($param[3])) {
+                                    if ($param[3] == 'page') {
+                                        if (isset($param[4])) {
+                                            if (is_numeric($param[4])) {
+                                                $this->data['pagination']['page'] = $param[4];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } elseif ($param[0] == 'tag') {
+                if (isset($param[1])) {
+                    if ($param[1] == 'order') {
+                        if (isset($param[2])) {
+                            if (in_array($param[2], $orderTypeKeys)) {
+                                $orderParams = $this->_order_types[$param[2]];
+                                $this->data['orderText'] = $this->_order_type_globalization[$param[2]];
+                                $this->data['orderParam'] = array_keys($this->_order_type_globalization, $this->_order_type_globalization[$param[2]])[0];
+                            }
+                            if (isset($param[3])) {
+                                if ($param[3] == 'page') {
+                                    if (isset($param[4])) {
+                                        if (is_numeric($param[4])) {
+                                            $this->data['pagination']['page'] = $param[4];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $extraWhere .= ' AND b.keywords LIKE :tag';
+                        $extraParams['tag'] = '%' . $param[1] . '%';
+                        $this->data['tagParam'] = $param[1];
                     }
                     if (isset($param[2])) {
                         if ($param[2] == 'order') {
@@ -296,7 +366,7 @@ class BlogController extends AbstractController
         }
 
         //-----
-        $this->data['pagination']['total'] = $model->it_count(self::TBL_BLOG, 'publish=:pub' . $extraWhere,
+        $this->data['pagination']['total'] = $blogModel->getBlogCount('b.publish=:pub' . $extraWhere,
             array_merge(['pub' => 1], $extraParams));
         $this->data['pagination']['limit'] = isset($this->setting['pages']['product']['itemsEachPage']) && is_numeric($this->setting['pages']['product']['itemsEachPage']) && $this->setting['pages']['product']['itemsEachPage'] > 0 ? $this->setting['pages']['product']['itemsEachPage'] : ITEMS_EACH_PAGE_DEFAULT;
         $this->data['pagination']['offset'] = ($this->data['pagination']['page'] - 1) * $this->data['pagination']['limit'];

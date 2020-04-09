@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/js-offcanvas.css?<?= app_version(); ?>">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/owl.carousel.min.css?<?= app_version(); ?>">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/select2.css?<?= app_version(); ?>">
+    <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/iziToast.min.css?<?= app_version(); ?>">
     <link rel="stylesheet" href="<?= asset_url(); ?>fe/css/main.css?<?= app_version(); ?>">
     <!-- endinject -->
 

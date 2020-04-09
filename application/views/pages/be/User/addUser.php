@@ -42,7 +42,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/addUser" method="post">
+                        <form action="<?= base_url(); ?>admin/user/addUser" method="post">
                             <?= $form_token; ?>
 
                             <div class="panel panel-white">

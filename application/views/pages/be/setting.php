@@ -505,7 +505,7 @@
                                                            for="showOurTeam">
                                                         <span class="pull-left h5 no-margin">
                                                             <i class="icon-switch2 position-left text-info"></i>
-                                                            نمایش آیکون دسته‌بندی‌ها
+                                                            نمایش تیم ما
                                                         </span>
                                                         <input type="checkbox" name="showOurTeam" id="showOurTeam"
                                                                class="switchery" <?= set_value($values_main['showOurTeam'] ?? $setting['pages']['index']['showOurTeam'] ?? '', 1, 'checked', '', '=='); ?> />
@@ -1007,19 +1007,19 @@
                                         <div class="row pl-20 pr-20 pb-20">
                                             <div class="form-group col-md-12">
                                                 <label>کد نماد الکترونیکی:</label>
-                                                <textarea class="form-control col-md-12 p-10"
+                                                <textarea class="form-control col-md-12 p-10 ltr"
                                                           style="min-height: 100px; resize: vertical;"
                                                           name="namad1"
                                                           rows="4"
-                                                          cols="10"><?= $values_footer['namad1'] ?? $setting['footer']['namad']['namad1'] ?? ''; ?></textarea>
+                                                          cols="10"><?= $values_footer['namad1'] ?? html_entity_decode($setting['footer']['namad']['namad1'] ?? ''); ?></textarea>
                                             </div>
                                             <div class="form-group col-md-12">
                                                 <label>کد نشان ملی ثبت:</label>
-                                                <textarea class="form-control col-md-12 p-10"
+                                                <textarea class="form-control col-md-12 p-10 ltr"
                                                           style="min-height: 100px; resize: vertical;"
                                                           name="namad2"
                                                           rows="4"
-                                                          cols="10"><?= $values_footer['namad2'] ?? $setting['footer']['namad']['namad2'] ?? ''; ?></textarea>
+                                                          cols="10"><?= $values_footer['namad2'] ?? html_entity_decode($setting['footer']['namad']['namad2'] ?? ''); ?></textarea>
                                             </div>
                                         </div>
 
@@ -1045,11 +1045,11 @@
                                             </div>
                                             <div class="col-lg-6 mt-10">
                                                 <div class="form-group">
-                                                    <label>آدرس فیسبوک:</label>
-                                                    <input name="facebook" type="text"
+                                                    <label>آدرس واتس اَپ:</label>
+                                                    <input name="whatsapp" type="text"
                                                            class="form-control" placeholder="Press Enter"
                                                            data-role="tagsinput"
-                                                           value="<?= set_value($values_footer['facebook'] ?? $setting['footer']['socials']['facebook'] ?? ''); ?>">
+                                                           value="<?= set_value($values_footer['whatsapp'] ?? $setting['footer']['socials']['whatsapp'] ?? ''); ?>">
                                                 </div>
                                             </div>
                                         </div>

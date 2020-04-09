@@ -47,8 +47,9 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url(); ?>admin/addFAQ" method="post">
+                        <form action="<?= base_url('admin/addFAQ'); ?>" method="post">
                             <?= $form_token; ?>
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="panel panel-white">

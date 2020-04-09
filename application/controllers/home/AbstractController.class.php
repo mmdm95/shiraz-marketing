@@ -11,7 +11,9 @@ use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use HPayment\Payment;
 use HPayment\PaymentException;
+use HPayment\PaymentFactory;
 use HSMS\rohamSMS;
 use HSMS\SMSException;
 use Model;
@@ -25,6 +27,7 @@ abstract class AbstractController extends AbstractPaymentController
     protected $couponPastDays = 365 * 24 * 60 * 60; // 1 year
     //-----
     protected $haveCartAccess = false;
+    protected $haveShoppingSideCardAccess = false;
     protected $cartCookieName = 'cart__products_items_roham';
     //-----
     protected $messageSession = 'message_redirect_session';
@@ -55,11 +58,12 @@ abstract class AbstractController extends AbstractPaymentController
         // Load file helper .e.g: read_json, etc.
         $this->load->helper('file');
 
-        if (!is_ajax()) {
-            // Read settings once
-            $this->setting = read_json(CORE_PATH . 'config.json');
-            $this->data['setting'] = $this->setting;
+        // Read settings once
+        $this->setting = read_json(CORE_PATH . 'config.json');
+        if (empty($this->setting)) {
+            $this->setting = [];
         }
+        $this->data['setting'] = $this->setting;
 
         // Read identity and store in data to pass in views
         $this->data['auth'] = $this->auth;
@@ -67,14 +71,13 @@ abstract class AbstractController extends AbstractPaymentController
 
         if (!is_ajax()) {
             // Config(s)
-            $this->data['favIcon'] = $this->setting['main']['favIcon'] ? base_url($this->setting['main']['favIcon']) : '';
+            $this->data['favIcon'] = !empty($this->setting['main']['favIcon']) ? base_url($this->setting['main']['favIcon']) : '';
             $this->data['logo'] = $this->setting['main']['logo'] ?? '';
         }
 
         if (!is_ajax()) {
-            $model = new Model();
-            $this->data['menuNavigation'] = $model->select_it(null, self::TBL_CATEGORY, ['name', 'slug', 'icon'],
-                'publish=:pub', ['pub' => 1]);
+            $categoryModel = new \CategoryModel();
+            $this->data['menuNavigation'] = $categoryModel->getCategories('c.publish=:pub', ['pub' => 1]);
 
             // Cart items
             $this->data['cart_items'] = $this->fetchCardItemsAction();
@@ -157,7 +160,11 @@ abstract class AbstractController extends AbstractPaymentController
                     ->setMethod('post');
                 try {
                     $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                        $values = array_map('trim', $values);
+                        foreach ($values as &$value) {
+                            if (is_string($value)) {
+                                $value = trim($value);
+                            }
+                        }
 
                         $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
@@ -233,7 +240,11 @@ abstract class AbstractController extends AbstractPaymentController
                     ->setMethod('post');
                 try {
                     $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
-                        $values = array_map('trim', $values);
+                        foreach ($values as &$value) {
+                            if (is_string($value)) {
+                                $value = trim($value);
+                            }
+                        }
 
                         $form->isRequired(['code'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $username, 'active' => 0])) {
@@ -303,7 +314,11 @@ abstract class AbstractController extends AbstractPaymentController
                     ->setMethod('post');
                 try {
                     $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
-                        $values = array_map('trim', $values);
+                        foreach ($values as &$value) {
+                            if (is_string($value)) {
+                                $value = trim($value);
+                            }
+                        }
 
                         $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.');
                         $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
@@ -385,7 +400,11 @@ abstract class AbstractController extends AbstractPaymentController
                     ->setMethod('post');
                 try {
                     $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                        $values = array_map('trim', $values);
+                        foreach ($values as &$value) {
+                            if (is_string($value)) {
+                                $value = trim($value);
+                            }
+                        }
                         $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
                             $form->setError('کاربری با این نام شماره موبایل وجود ندارد!');
@@ -464,7 +483,11 @@ abstract class AbstractController extends AbstractPaymentController
                     ->setMethod('post');
                 try {
                     $form->beforeCheckCallback(function (&$values) use ($model, $form, $username) {
-                        $values = array_map('trim', $values);
+                        foreach ($values as &$value) {
+                            if (is_string($value)) {
+                                $value = trim($value);
+                            }
+                        }
 
                         $form->isRequired(['code'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $username, 'active' => 0])) {
@@ -606,8 +629,12 @@ abstract class AbstractController extends AbstractPaymentController
                     'user_id' => $res,
                     'role_id' => AUTH_ROLE_USER,
                 ]);
+                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT, [
+                    'user_id' => $res,
+                    'account_balance' => 0,
+                ]);
 
-                if ($res && $res3) {
+                if ($res && $res2 && $res3) {
                     $model->transactionComplete();
                 } else {
                     $model->transactionRollback();
@@ -720,12 +747,9 @@ abstract class AbstractController extends AbstractPaymentController
         $this->data['updated_items_in_cart'] = $cartItems['deleted'];
         $this->data['items'] = $cartItems['items'];
         //-----
-        $this->data['totalAmount'] = 0;
-        $this->data['totalDiscountedAmount'] = 0;
-        foreach ($this->data['items'] as $item) {
-            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
-            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
-        }
+        $totals = $this->_get_total_amounts($this->data['items']);
+        $this->data['totalAmount'] = $totals['total_amount'];
+        $this->data['totalDiscountedAmount'] = $totals['total_discount'];
 
         $this->data['cart_content'] = $this->load->view('templates/fe/cart/main-cart', $this->data, true);
 
@@ -961,13 +985,11 @@ abstract class AbstractController extends AbstractPaymentController
         $cartItems = $this->_fetch_cart_items();
         $data['items'] = $cartItems['items'];
         //-----
-        $data['totalAmount'] = 0;
-        $data['totalDiscountedAmount'] = 0;
-        foreach ($data['items'] as $item) {
-            $data['totalAmount'] += $item['price'] * $item['quantity'];
-            $data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
-        }
+        $totals = $this->_get_total_amounts($data['items']);
+        $data['totalAmount'] = $totals['total_amount'];
+        $data['totalDiscountedAmount'] = $totals['total_discount'];
         $data['auth'] = $this->auth;
+        $data['setting'] = $this->setting;
 
         message(self::AJAX_TYPE_SUCCESS, 200, $this->load->view('templates/fe/cart/main-cart', $data, true));
     }
@@ -980,17 +1002,15 @@ abstract class AbstractController extends AbstractPaymentController
         $cartItems = $this->_fetch_cart_items();
         $data['items'] = $cartItems['items'];
         //-----
-        $data['totalAmount'] = 0;
-        foreach ($data['items'] as $item) {
-            $data['totalAmount'] += $item['discount_price'] * $item['quantity'];
-        }
+        $totals = $this->_get_total_amounts($data['items']);
+        $data['totalAmount'] = $totals['total_discount'];
 
         $cart_items_count = count($saved_cart_items);
 
         if (!is_ajax()) {
-            return [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count];
+            return [$this->load->view('templates/fe/cart/cart-items', $data, true), convertNumbersToPersian($cart_items_count)];
         } else {
-            message(self::AJAX_TYPE_SUCCESS, 200, [$this->load->view('templates/fe/cart/cart-items', $data, true), $cart_items_count]);
+            message(self::AJAX_TYPE_SUCCESS, 200, [$this->load->view('templates/fe/cart/cart-items', $data, true), convertNumbersToPersian($cart_items_count)]);
             exit;
         }
     }
@@ -1004,9 +1024,7 @@ abstract class AbstractController extends AbstractPaymentController
     public function shoppingAction()
     {
         // reset shopping session
-        unset($_SESSION['shopping_page_session']);
-
-        $model = new Model();
+        $this->session->remove('shopping_page_session');
 
         if (!$this->auth->isLoggedIn()) {
             $this->session->setFlash($this->messageSession, [
@@ -1029,6 +1047,7 @@ abstract class AbstractController extends AbstractPaymentController
         $cartItems = $this->_fetch_cart_items();
         $this->data['updated_items_in_cart'] = $cartItems['deleted'];
         $this->data['items'] = $cartItems['items'];
+        $this->data['has_product_type'] = $cartItems['has_product_type'];
         //-----
         if (!count($this->data['items'])) {
             $this->redirect(base_url('cart'));
@@ -1041,30 +1060,30 @@ abstract class AbstractController extends AbstractPaymentController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('shopping');
-        $form->setFieldsName(['addrRadio', 'shipping-radio', 'send-factor'])
-            ->setDefaults('send-factor', 'off')->setMethod('post');
+        $form->setFieldsName(['receiver_name', 'receiver_mobile', 'coupon_code'])
+            ->setMethod('post');
         try {
-            $form->afterCheckCallback(function ($values) use ($model, $form) {
+            $form->beforeCheckCallback(function (&$values) use ($form) {
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
+                //-----
                 $this->data['_shopping_arr'] = [];
-                // Check for address's id
-                $addrId = array_column($this->data['addresses'], 'id');
-                if (!in_array($values['addrRadio'], $addrId)) {
-                    $form->setError('آدرس انتخاب شده نامعتبر است.');
+                //-----
+                $form->validatePersianName('receiver_name', 'نام گیرنده باید از حروف فارسی باشد.');
+                $form->validatePersianMobile('receiver_mobile', 'شماره تماس گیرنده نامعتبر است.');
+                $isValidCoupon = $this->_validate_coupon($values['coupon_code']);
+                if (!empty($values['coupon_code']) && $isValidCoupon['status']) {
+                    $this->data['_shopping_arr']['coupon_code']['code'] = $values['coupon_code'];
+                    $this->data['_shopping_arr']['coupon_code']['price'] = $isValidCoupon['price'];
                 } else {
-                    $this->data['_shopping_arr'][$this->sessionStr['address_id']] = $values['addrRadio'];
+                    $this->data['_shopping_arr']['coupon_code'] = null;
                 }
-                // Check for shipping's code
-                $shippingCode = array_column($this->data['shippings'], 'shipping_code');
-                if (!in_array($values['shipping-radio'], $shippingCode)) {
-                    $form->setError('نحوه ارسال انتخاب شده نامعتبر است.');
-                } else {
-                    $this->data['_shopping_arr'][$this->sessionStr['shipping_code']] = $values['shipping-radio'];
-                }
-                if ($form->isChecked('send-factor')) {
-                    $this->data['_shopping_arr'][$this->sessionStr['want_factor']] = true;
-                } else {
-                    $this->data['_shopping_arr'][$this->sessionStr['want_factor']] = false;
-                }
+            })->afterCheckCallback(function (&$values) use ($form) {
+                $this->data['_shopping_arr']['receiver_name'] = $values['receiver_name'];
+                $this->data['_shopping_arr']['receiver_mobile'] = $values['receiver_mobile'];
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -1073,56 +1092,353 @@ abstract class AbstractController extends AbstractPaymentController
         $res = $form->checkForm()->isSuccess();
         if ($form->isSubmit()) {
             if ($res) {
-                $_SESSION['shopping_page_session'] = encryption_decryption(ED_ENCRYPT, json_encode($this->data['_shopping_arr']));
+                $this->session->set('shopping_page_session', $this->data['_shopping_arr']);
                 $this->redirect(base_url('prepareToPay'));
             } else {
                 $this->data['errors'] = $form->getError();
+                $this->data['values'] = $form->getValues();
             }
         }
 
-        // Check error that is come from prepareToPay page
-        if (!count($this->data['errors']) && isset($_SESSION['error_from_prepareToPay_page_session']) &&
-            count($_SESSION['error_from_prepareToPay_page_session'])) {
-            $this->data['errors'] = $_SESSION['error_from_prepareToPay_page_session'];
-            unset($_SESSION['error_from_prepareToPay_page_session']);
-        }
         //-----
-        $this->data['totalAmount'] = 0;
-        $this->data['totalDiscountedAmount'] = 0;
-        foreach ($this->data['items'] as $item) {
-            $this->data['totalAmount'] += $item['price'] * $item['quantity'];
-            $this->data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
-        }
+        $totals = $this->_get_total_amounts($this->data['items']);
+        $this->data['totalAmount'] = $totals['total_amount'];
+        $this->data['totalDiscountedAmount'] = $totals['total_discount'];
+        $this->data['sideCard'] = $this->load->view('templates/fe/cart/side-shopping-card', $this->data, true);
 
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'اطلاعات ارسال');
 
         // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/shoppingJs.js');
+        $this->data['js'][] = $this->asset->script('fe/js/shoppingJs.js');
 
         $this->_render_page(['pages/fe/shopping']);
     }
 
     public function prepareToPayAction()
     {
+        // check information
+        if (!$this->session->has('shopping_page_session')) {
+            $this->redirect(base_url('shopping'));
+        }
+
+        if (!$this->auth->isLoggedIn()) {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'لطفا ابتدا به حساب کابری خود وارد شوید.',
+            ]);
+            $this->redirect(base_url('login?back_url=' . base_url('prepareToPay')));
+        }
+        if ($this->data['identity']->flag_buy != 1) {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'لطفا اطلاعات حساب خود را تکمیل کنید.',
+            ]);
+            $this->redirect(base_url('user/editUser?back_url=' . base_url('prepareToPay')));
+        }
+
+        // Get previous stored data from session
+        $prevData = $this->session->get('shopping_page_session');
+        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile'])) {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'پارمترهای ارسال شده دستکاری شده‌اند! لطفا مراحل را دوباره طی کنید.',
+            ]);
+            $this->redirect(base_url('shopping'));
+        }
+
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
+        $this->data['items'] = $cartItems['items'];
+        $this->data['has_product_type'] = $cartItems['has_product_type'];
+        //-----
+        if (!count($this->data['items'])) {
+            $this->redirect(base_url('cart'));
+        }
+        //-----
+        $totals = $this->_get_total_amounts($this->data['items']);
+        $this->data['totalAmount'] = $totals['total_amount'];
+        $this->data['totalDiscountedAmount'] = $totals['total_discount'];
+        $this->data['sideCard'] = $this->load->view('templates/fe/cart/side-shopping-card', $this->data, true);
+        //-----
+
+        // Submit form for next step
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('prepareToPay');
+        $form->setFieldsName(['payment_radio'])
+            ->setMethod('post');
+        try {
+            $form->afterCheckCallback(function ($values) use ($form) {
+                // Check for payment method's code
+                $arr = array_merge($this->gatewayTables[self::PAYMENT_TABLE_IDPAY],
+                    $this->gatewayTables[self::PAYMENT_TABLE_MABNA],
+                    $this->gatewayTables[self::PAYMENT_TABLE_ZARINPAL],
+                    [PAYMENT_METHOD_WALLET, PAYMENT_METHOD_IN_PLACE, PAYMENT_METHOD_RECEIPT]);
+                if (!in_array($values['payment_radio'], $arr)) {
+                    $form->setError('شیوه پرداخت انتخاب شده، نامعتبر است.');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $formValues = $form->getValues();
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                if ($formValues['payment_radio'] == PAYMENT_METHOD_RECEIPT) {
+                    $this->session->set('payment_page_session', 'receipt_value');
+                    $this->redirect(base_url('paymentReceipt'));
+                }
+                $status = $this->_gateway_processor($prevData, $formValues['payment_radio']);
+                if (!$status) {
+                    $this->data['errors'][] = 'خطا در انجام عملیات پرداخت! لطفا مجددا تلاش نمایید.';
+                }
+            } else {
+                $this->data['errors'] = $form->getError();
+            }
+        }
+
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'آماده پرداخت');
-
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
 
         $this->_render_page(['pages/fe/payment']);
     }
 
+    public function paymentReceiptAction()
+    {
+        // check information
+        if (!$this->session->has('shopping_page_session')) {
+            $this->redirect(base_url('shopping'));
+        }
+        if (!$this->session->has('payment_page_session')) {
+            $this->redirect(base_url('prepareToPay'));
+        }
+
+        // Get previous stored data from session
+        $prevData = $this->session->get('shopping_page_session');
+        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile'])) {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'پارمترهای ارسال شده دستکاری شده‌اند! لطفا مراحل را دوباره طی کنید.',
+            ]);
+            $this->redirect(base_url('shopping'));
+        }
+        $sure = $this->session->get('payment_page_session');
+        if ($sure != 'receipt_value') {
+            $this->session->setFlash($this->messageSession, [
+                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
+                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
+                'message' => 'پارمترهای ارسال شده دستکاری شده‌اند! لطفا مراحل را دوباره طی کنید.',
+            ]);
+            $this->redirect(base_url('prepareToPay'));
+        }
+
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $this->data['updated_items_in_cart'] = $cartItems['deleted'];
+        $this->data['items'] = $cartItems['items'];
+        $this->data['has_product_type'] = $cartItems['has_product_type'];
+        //-----
+        if (!count($this->data['items'])) {
+            $this->redirect(base_url('cart'));
+        }
+        //-----
+        $totals = $this->_get_total_amounts($this->data['items']);
+        $this->data['totalAmount'] = $totals['total_amount'];
+        $this->data['totalDiscountedAmount'] = $totals['total_discount'];
+        $this->data['sideCard'] = $this->load->view('templates/fe/cart/side-shopping-card', $this->data, true);
+        //-----
+
+        // Submit form for next step
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('paymentReceipt');
+        $form->setFieldsName(['receipt_code', 'receipt_date'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($form) {
+                $form->validateDate('receipt_date', 'Y-m-d H:i:s', 'تاریخ رسید نامعتبر است.');
+            })->afterCheckCallback(function () use ($form, &$prevData) {
+                $prevData['receipt_code'] = ['receipt_code'];
+                $prevData['receipt_date'] = ['receipt_date'];
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->session->set('shopping_page_session', $prevData);
+                $status = $this->_gateway_processor($prevData, PAYMENT_METHOD_RECEIPT);
+                if (!$status) {
+                    $this->data['errors'][] = 'خطا در انجام عملیات ثبت رسید! لطفا مجددا تلاش نمایید.';
+                    $this->data['values'] = $form->getValues();
+                }
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['values'] = $form->getValues();
+            }
+        }
+
+        // Other information
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'پرداخت از طریق رسید بانکی');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+
+        $this->_render_page(['pages/fe/payment-receipt']);
+    }
+
     public function payResultAction($param)
     {
+        if (!$this->auth->isLoggedIn() || !isset($param[0]) || !in_array($param[0], array_keys($this->paymentResultParam))) {
+            $this->error->show_404();
+        }
+        //-----
+        $model = new Model();
+        call_user_func_array($this->paymentResultParam[$param[0]], []);
+        //-----
+        if (!isset($this->data['order_code'])) $this->error->show_404();
+        //-----
+        // Select current factor
+        $this->data['cur_factor'] = $model->select_it(null, self::TBL_ORDER, '*',
+            'order_code=:oc AND user_id=:uId', ['oc' => $this->data['order_code'], 'uId' => $this->data['identity']->id])[0];
+        // Select current factor status label
+        $this->data['order_status'] = $model->select_it(null, 'send_status', ['name', 'badge'],
+            'id=:id', ['id' => $this->data['cur_factor']['send_status']])[0];
+        // Set if gateway method is one of the known method codes for bank gateway
+        $this->data['is_gateway_method'] = false;
+        foreach ($this->gatewayTables as $table => $codeArr) {
+            if (in_array($this->data['cur_factor']['method_code'], $codeArr) !== false) {
+                $this->data['is_gateway_method'] = true;
+                break;
+            }
+        }
+        // Get count of items
+        $this->data['order_items_count'] = $model->it_count(self::TBL_ORDER_ITEM,
+            'order_code=:oc', ['oc' => $this->data['order_code']]);
+        // Get count of sum of each item
+        $this->data['order_all_items_count'] = $model->select_it(null, self::TBL_ORDER_ITEM, 'SUM(product_count) AS count',
+            'order_code=:oc', ['oc' => $this->data['order_code']])[0]['count'];
+
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
 
-        // Extra js
-//        $this->data['js'][] = $this->asset->script('fe/js/checkoutJs.js');
-
         $this->_render_page(['pages/fe/pay-result']);
+    }
+
+    //-----
+
+    public function shoppingSideCardAction()
+    {
+        if (is_ajax() && ($this->haveShoppingSideCardAccess !== true) || !$this->auth->isLoggedIn()) {
+            message('error', 403, 'دسترسی غیر مجاز');
+        }
+        if (!is_ajax() && ($this->haveShoppingSideCardAccess !== true) || !$this->auth->isLoggedIn()) {
+            $this->error->access_denied();
+        }
+
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $data['items'] = $cartItems['items'];
+        $data['has_product_type'] = $cartItems['has_product_type'];
+        //-----
+        //-----
+        if (!count($data['items'])) {
+            message('error', 200, 'در سبد خرید شما محصولی وجود ندارد!');
+        }
+        //-----
+        $totals = $this->_get_total_amounts($data['items']);
+        $data['totalAmount'] = $totals['total_amount'];
+        $data['totalDiscountedAmount'] = $totals['total_discount'];
+
+        if ($this->haveShoppingSideCardAccess) {
+            $this->haveShoppingSideCardAccess = false;
+            return $this->load->view('templates/fe/cart/side-shopping-card', $data, true);
+        } else {
+            message('success', 200, ['', $this->load->view('templates/fe/cart/side-shopping-card', $data, true)]);
+        }
+    }
+
+    public function checkCouponCodeAction()
+    {
+        if (is_ajax() && !$this->auth->isLoggedIn()) {
+            message('error', 403, 'دسترسی غیر مجاز');
+        }
+        if (!is_ajax() && !$this->auth->isLoggedIn()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $code = $_POST['postedCode'] ?? null;
+        if (!isset($code)) {
+            message('error', 200, 'ورودی نامعتبر است.');
+        }
+        // If coupon is not exists
+        if (!$model->is_exist(self::TBL_COUPON, 'coupon_code=:code AND expire_time>=:expire', ['code' => $code, 'expire' => time()])) {
+            message('error', 200, 'کد تخفیف وارد شده نامعتبر می‌باشد. دوباره امتحان نمایید.');
+        }
+        // If coupon is used before
+        if ($model->is_exist(self::TBL_ORDER, 'user_id=:uId AND coupon_code=:cc AND payment_date<:pd AND payment_status IN(:ps, :ps2)',
+            ['uId' => $this->data['identity']->id, 'cc' => $code, 'pd' => time() - $this->couponPastDays,
+                'ps' => OWN_PAYMENT_STATUS_SUCCESSFUL, 'ps2' => OWN_PAYMENT_STATUS_WAIT])) {
+            message('warning', 200, 'شما از این کد تخفیف قبلا استفاده نموده‌اید! کد تخفیف دیگری را امتحان نمایید.');
+        }
+
+        // Get previous stored data from session
+        $prevData = $this->session->get('shopping_page_session');
+        if (!isset($prevData['receiver_name'])) {
+            message('error', 200, 'برخی داده‌های این صفحه دستکاری شده است! لطفا مراحل را مجددا طی نمایید.');
+        }
+
+        // Select current coupon
+        $coupon = $model->select_it(null, 'coupons', '*', 'coupon_code=:cc', ['cc' => $code])[0];
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $data['items'] = $cartItems['items'];
+        $data['has_product_type'] = $cartItems['has_product_type'];
+        //-----
+        //-----
+        if (!count($data['items'])) {
+            message('error', 200, 'در سبد خرید شما محصولی وجود ندارد!');
+        }
+        //-----
+        $totals = $this->_get_total_amounts($data['items']);
+        $data['totalAmount'] = $totals['total_amount'];
+        $data['totalDiscountedAmount'] = $totals['total_discount'];
+
+        if ($coupon['min_price'] != '' && $data['totalDiscountedAmount'] >= $coupon['min_price']) {
+            if ($data['totalDiscountedAmount'] - $coupon['price'] > 0) {
+                $data['totalDiscountedAmount'] = $data['totalDiscountedAmount'] - $coupon['price'];
+            } else {
+                message('error', 200, 'این کد تخفیف دچار نقص فنی شده است!');
+            }
+
+            if ($coupon['max_price'] == '' || ($coupon['max_price'] != '' && $data['totalDiscountedAmount'] <= $coupon['max_price'])) {
+                message('success', 200, ['کد تخفیف اعمال شد.', $this->load->view('templates/fe/cart/side-shopping-card', $data, true)]);
+            } else {
+                message('error', 200, 'قیمت کالا‌ها از حداکثر قیمت برای اعمال این کد تخفیف، بیشتر است!');
+            }
+        } else {
+            message('error', 200, 'قیمت کالا‌ها از حداقل قیمت برای اعمال این کد تخفیف، کمتر است!');
+        }
     }
 
     //----->
@@ -1153,6 +1469,7 @@ abstract class AbstractController extends AbstractPaymentController
         $saved_cart_items = $this->_read_cart_cookie();
         //-----
         $items = [];
+        $hasProductType = false;
         //-----
         foreach ($tmpItems as $info) {
             $res = $info;
@@ -1167,7 +1484,8 @@ abstract class AbstractController extends AbstractPaymentController
 
         return [
             'deleted' => $cartItems['deleted'],
-            'items' => $items
+            'items' => $items,
+            'has_product_type' => $hasProductType,
         ];
     }
 
@@ -1201,9 +1519,9 @@ abstract class AbstractController extends AbstractPaymentController
                 //-----
                 unset($_POST['postedId']);
             }
-            if (count($mainItem) && $mainItem[0]['stock_count'] < $eachItem['quantity']) {
+            if (count($mainItem) && ($mainItem[0]['stock_count'] < $eachItem['quantity'] || $eachItem['quantity'] > $mainItem[0]['max_cart_count'])) {
                 $_POST['postedId'] = $id;
-                $_POST['quantity'] = $mainItem[0]['stock_count'];
+                $_POST['quantity'] = $eachItem['quantity'] < $mainItem[0]['max_cart_count'] ? $mainItem[0]['stock_count'] : $mainItem[0]['max_cart_count'];
                 if ($this->updateCartAction() === true) {
                     $delete_items_array[] = $mainItem[0];
                 }
@@ -1222,127 +1540,214 @@ abstract class AbstractController extends AbstractPaymentController
         ];
     }
 
+    //-----
+
+    private function _validate_coupon($code)
+    {
+        if (empty($code)) return ['status' => false, 'price' => 0];
+
+        $model = new Model();
+
+        // If coupon is not exists
+        if ($model->is_exist(self::TBL_COUPON, 'coupon_code=:code AND expire_time>=:expire', ['code' => $code, 'expire' => time()])) {
+            // If coupon is used before
+            if ($model->is_exist(self::TBL_ORDER, 'user_id=:uId AND coupon_code=:cc AND payment_date<:pd AND payment_status IN(:ps, :ps2)',
+                ['uId' => $this->data['identity']->id, 'cc' => $code, 'pd' => time() - $this->couponPastDays,
+                    'ps' => OWN_PAYMENT_STATUS_SUCCESSFUL, 'ps2' => OWN_PAYMENT_STATUS_WAIT])) {
+                return ['status' => false, 'price' => 0];
+            }
+            // Select current coupon
+            $coupon = $model->select_it(null, self::TBL_COUPON, '*', 'coupon_code=:cc', ['cc' => $code])[0];
+            // Check cart and cart items
+            $cartItems = $this->_fetch_cart_items();
+            $data['items'] = $cartItems['items'];
+            //-----
+            //-----
+            if (!count($data['items'])) {
+                return ['status' => false, 'price' => 0];
+            }
+            //-----
+            $data['totalAmount'] = 0;
+            $data['totalDiscountedAmount'] = 0;
+            foreach ($data['items'] as $item) {
+                $data['totalAmount'] += $item['price'] * $item['quantity'];
+                $data['totalDiscountedAmount'] += $item['discount_price'] * $item['quantity'];
+            }
+
+            if ($coupon['min_price'] != '' && $data['totalDiscountedAmount'] >= $coupon['min_price']) {
+                if ($data['totalDiscountedAmount'] - $coupon['price'] > 0) {
+                    $data['totalDiscountedAmount'] = $data['totalDiscountedAmount'] - $coupon['price'];
+                } else {
+                    return ['status' => false, 'price' => 0];
+                }
+
+                if ($coupon['max_price'] != '' && $data['totalDiscountedAmount'] <= $coupon['max_price']) {
+                    return ['status' => true, 'price' => $coupon['price']];
+                } else if ($coupon['max_price'] == '') {
+                    return ['status' => true, 'price' => $coupon['price']];
+                } else {
+                    return ['status' => false, 'price' => 0];
+                }
+            } else {
+                return ['status' => false, 'price' => 0];
+            }
+        }
+        return ['status' => false, 'price' => 0];
+    }
+
+    //-----
+
+    private function _get_total_amounts($items)
+    {
+        $totalAmount = 0;
+        $totalDiscountedAmount = 0;
+        foreach ($items as $item) {
+            $totalAmount += $item['price'] * $item['quantity'];
+            $totalDiscountedAmount += $item['discount_price'] * $item['quantity'];
+        }
+
+        return [
+            'total_amount' => $totalAmount,
+            'total_discount' => $totalDiscountedAmount,
+        ];
+    }
+
     //------------------------
     //---- Gateway actions ---
     //------------------------
 
-    private function _gateway_processor($payment, $address, $shipping, $wantFactor, $offCode)
+    private function _gateway_processor($prev, $paymentMethod)
     {
-        $gatewayCode = $payment['method_code'];
         $model = new Model();
+
+        $gatewayCode = '';
         // Select gateway table if gateway code is one of the bank payment gateway's code
         foreach ($this->gatewayTables as $table => $codeArr) {
-            if (array_search($gatewayCode, $codeArr) !== false) {
+            if (array_search($paymentMethod, $codeArr) !== false) {
+                $gatewayCode = $paymentMethod;
+                $paymentMethod = PAYMENT_METHOD_GATEWAY;
                 $gatewayTable = $table;
                 break;
             }
         }
+
         // Create transaction
         $model->transactionBegin();
         // Create factor code
         $common = new CommonModel();
-        $factorCode = $common->generate_random_unique_code('factors', 'factor_code', 'BTK_', 6, 15, 10, CommonModel::DIGITS);
-        $factorCode = 'BTK_' . $factorCode;
+        $orderCode = $common->generate_random_unique_code(self::TBL_ORDER, 'order_code', ORDER_CODE_PREFIX, 6,
+            15, 10, CommonModel::DIGITS);
+        $orderCode = ORDER_CODE_PREFIX . $orderCode;
         // Check cart and cart items
         $cartItems = $this->_fetch_cart_items();
         $items = $cartItems['items'];
         // Insert factor information to factors table
-        $res1 = $model->insert_it('factors', [
-            'factor_code' => $factorCode,
+        $res1 = $model->insert_it(self::TBL_ORDER, [
+            'order_code' => $orderCode,
             'user_id' => $this->data['identity']->id,
             'first_name' => $this->data['identity']->first_name,
             'last_name' => $this->data['identity']->last_name,
-            'mobile' => $this->data['identity']->username,
+            'mobile' => $this->data['identity']->mobile,
+            'receipt_code' => $prev['receipt_code'] ?? '',
+            'receipt_date' => $prev['receipt_date'] ?? '',
             'method_code' => $gatewayCode,
-            'payment_title' => $payment['method_title'],
+            'payment_method' => $paymentMethod,
+            'payment_title' => PAYMENT_METHODS[$paymentMethod],
             'payment_status' => OWN_PAYMENT_STATUS_NOT_PAYED,
-            'send_status' => 1,
-            'shipping_address' => $address['address'],
-            'shipping_receiver' => $address['receiver'],
-            'shipping_province' => $address['province'],
-            'shipping_city' => $address['city'],
-            'shipping_postal_code' => $address['postal_code'],
-            'shipping_phone' => $address['phone'],
-            'want_factor' => $wantFactor ? 1 : 0,
+            'send_status' => SEND_STATUS_IN_QUEUE,
+            'receiver_name' => $prev['receiver_name'],
+            'receiver_phone' => $prev['receiver_mobile'],
+            'province' => $this->data['identity']->province,
+            'city' => $this->data['identity']->city,
+            'postal_code' => $this->data['identity']->postal_code,
+            'address' => $this->data['identity']->address,
             'order_date' => time()
         ]);
         // Calculate price of product(s) and store in factors_item
         $totalAmount = 0;
         $totalDiscountedAmount = 0;
-        $discountPrice = 0;
+        $hasProductType = false;
         foreach ($items as $item) {
             try {
                 $productTotalPrice = $item['price'] * $item['quantity'];
                 // Add to total amount and total discounted amount variable
                 $totalAmount += $productTotalPrice;
                 $totalDiscountedAmount += $item['discount_price'] * $item['quantity'];
-                $discountPrice = $totalAmount - $totalDiscountedAmount;
                 // Insert each product information to factors_item table
-                $model->insert_it('factors_item', [
-                    'factor_code' => $factorCode,
-                    'product_code' => $item['product_code'],
+                $model->insert_it(self::TBL_ORDER_ITEM, [
+                    'order_code' => $orderCode,
+                    'product_id' => $item['id'],
                     'product_count' => $item['quantity'],
-                    'product_color' => $item['color_name'],
-                    'product_color_hex' => $item['color_hex'],
-                    'product_unit_price' => $item['base_price'],
+                    'product_unit_price' => $item['price'],
                     'product_price' => $productTotalPrice,
                 ]);
-                $model->update_it('products', [], 'product_code=:pc', ['pc' => $item['product_code']], [
+                $model->update_it(self::TBL_PRODUCT, [], 'id=:id', ['id' => $item['id']], [
                     'stock_count' => 'stock_count-' . (int)$item['quantity'],
                     'sold_count' => 'sold_count+' . (int)$item['quantity'],
                 ]);
+                if (!$hasProductType && $item['product_type'] == PRODUCT_TYPE_ITEM) {
+                    $hasProductType = true;
+                }
             } catch (Exception $e) {
                 continue;
             }
         }
+        $discountPrice = $totalAmount - $totalDiscountedAmount;
 
         // Coupon check
         $couponCode = '';
         $couponTitle = '';
         $couponAmount = '';
-        $couponUnit = null;
-        if ($this->_validate_coupon($offCode)) {
-            $theCoupon = $model->select_it(null, 'coupons', ['coupon_code', 'coupon_title', 'amount', 'unit'],
-                'coupon_code=:code AND coupon_expire_time>=:expire', ['code' => $offCode, 'expire' => time()])[0];
-            $couponCode = $offCode;
-            $couponTitle = $theCoupon['coupon_title'];
-            $couponAmount = $theCoupon['amount'];
-            $couponUnit = $theCoupon['unit'];
+        if (!empty($prev['coupon_code']) && $this->_validate_coupon($prev['coupon_code'])) {
+            $theCoupon = $model->select_it(null, 'coupons', ['coupon_code', 'title', 'price'],
+                'coupon_code=:code AND expire_time>=:expire', ['code' => $prev['coupon_code'], 'expire' => time()])[0];
+            $couponCode = $theCoupon['coupon_code'];
+            $couponTitle = $theCoupon['title'];
+            $couponAmount = $theCoupon['price'];
 
             // Discount coupon price
-            if ($theCoupon['unit'] == 2) { // Percentage unit
-                $totalDiscountedAmount -= ($totalDiscountedAmount * convertNumbersToPersian($theCoupon['amount'], true) / 100);
-            } else { // Otherwise it is toman unit
-                $totalDiscountedAmount -= convertNumbersToPersian($theCoupon['amount'], true);
-            }
+            $totalDiscountedAmount -= convertNumbersToPersian($theCoupon['price'], true);
         }
 
         // Add shipping price to total amounts
-        $totalAmount += $totalDiscountedAmount < convertNumbersToPersian($shipping['max_price'], true) ?
-            convertNumbersToPersian($shipping['shipping_price'], true) : 0;
-        $totalDiscountedAmount += $totalDiscountedAmount < convertNumbersToPersian($shipping['max_price'], true) ?
-            convertNumbersToPersian($shipping['shipping_price'], true) : 0;
+        $shippingPrice = 0;
+        if ($hasProductType) {
+            if (!isset($this->data['setting']['cart']['shipping_free_price']) ||
+                empty($this->data['setting']['cart']['shipping_free_price']) ||
+                $totalDiscountedAmount < (int)$this->data['setting']['cart']['shipping_free_price']) {
+                if ($this->data['identity']->city == SHIRAZ_CITY) {
+                    if (isset($this->data['setting']['cart']['shipping_price']['area1']) &&
+                        !empty($this->data['setting']['cart']['shipping_price']['area1'])) {
+                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area1'];
+                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area1'];
+                    }
+                } else {
+                    if (isset($this->data['setting']['cart']['shipping_price']['area2']) &&
+                        !empty($this->data['setting']['cart']['shipping_price']['area2'])) {
+                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area2'];
+                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area2'];
+                    }
+                }
+            }
+        }
+        $totalAmount += $shippingPrice;
+        $totalDiscountedAmount += $shippingPrice;
 
         // Update factor information in factors table
-        $res2 = $model->update_it('factors', [
+        $res2 = $model->update_it(self::TBL_ORDER, [
             'amount' => $totalAmount,
-            'shipping_title' => $shipping['shipping_title'],
-            'shipping_price' => $totalDiscountedAmount < convertNumbersToPersian($shipping['max_price'], true) ?
-                convertNumbersToPersian($shipping['shipping_price'], true) : 0,
-            'shipping_min_days' => $shipping['min_days'],
-            'shipping_max_days' => $shipping['max_days'],
-            'final_amount' => $totalDiscountedAmount,
+            'shipping_price' => $shippingPrice,
+            'final_price' => $totalDiscountedAmount,
             'coupon_code' => $couponCode,
             'coupon_title' => $couponTitle,
             'coupon_amount' => $couponAmount,
-            'coupon_unit' => $couponUnit,
             'discount_price' => $discountPrice,
-        ], 'factor_code=:fc', ['fc' => $factorCode]);
+        ], 'order_code=:oc', ['oc' => $orderCode]);
 
         // Insert factor code to reserved factors codes
-        $reserved = $model->insert_it('factors_reserved', [
-            'factor_code' => $factorCode,
-            'factor_time' => time(),
+        $reserved = $model->insert_it(self::TBL_ORDER_RESERVED, [
+            'order_code' => $orderCode,
+            'expire_time' => time(),
         ]);
         //-----
 
@@ -1353,25 +1758,40 @@ abstract class AbstractController extends AbstractPaymentController
             // Make transaction complete
             $model->transactionComplete();
 
-            // Delete cart items
-            $this->removeAllFromCartAction();
-
             // If any gateway exists (if method code is one of the bank payment gateways)
             if (isset($gatewayTable)) {
+                // Delete cart items
+                $this->removeAllFromCartAction();
+
                 // Fill parameters variable to pass between gateway connection functions
                 $parameters = [
                     'price' => $discountPrice,
-                    'factor_code' => $factorCode,
+                    'order_code' => $orderCode,
+                    'backUrl' => base_url('payResult/' . array_search($gatewayTable, $this->paymentParamTable)),
+                    'exportation' => FACTOR_EXPORTATION_TYPE_BUY,
                 ];
+
                 // Call one of the [_*_connection] functions
                 $res = call_user_func_array($this->gatewayFunctions[$gatewayTable], $parameters);
                 if (!$res) {
-                    $model->delete_it('factors', 'factor_code=:fc', ['fc' => $factorCode]);
+                    $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode]);
                     return false;
                 }
             } else {
-                $_SESSION[$this->otherParamSessionName] = encryption_decryption(ED_ENCRYPT, $factorCode);
-                $this->redirect(base_url('paymentResult/' . self::PAYMENT_RESULT_PARAM_OTHER), 'لطفا صبر کنید...در حال نهایی‌سازی ثبت سفارش', 1);
+                $param = '';
+                if ($paymentMethod == PAYMENT_METHOD_WALLET) {
+                    $param = self::PAYMENT_RESULT_PARAM_WALLET;
+                } elseif ($paymentMethod == PAYMENT_METHOD_IN_PLACE) {
+                    $param = self::PAYMENT_RESULT_PARAM_IN_PLACE;
+                } elseif ($paymentMethod == PAYMENT_METHOD_RECEIPT) {
+                    $param = self::PAYMENT_RESULT_PARAM_RECEIPT;
+                }
+
+                if (empty($param)) return false;
+
+                $sessName = $param . '_session';
+                $this->session->set($sessName, $orderCode);
+                $this->redirect(base_url('payResult/' . $param), 'لطفا صبر کنید...در حال نهایی‌سازی ثبت سفارش', 1);
             }
             return true;
         }
@@ -1381,6 +1801,8 @@ abstract class AbstractController extends AbstractPaymentController
 
     protected function _idpay_connection($parameters)
     {
+        if (!$this->auth->isLoggedIn()) return false;
+        //-----
         $this->load->library('HPayment/vendor/autoload');
         try {
             $model = new Model();
@@ -1390,16 +1812,19 @@ abstract class AbstractController extends AbstractPaymentController
             $wait = 1;
             //-----
             $payRes = $idpay->create_request([
-                'order_id' => $parameters['factor_code'],
+                'order_id' => $parameters['order_code'],
                 'amount' => $parameters['price'] * 10,
-                'callback' => base_url('paymentResult/' . self::PAYMENT_RESULT_PARAM_IDPAY)])->get_result();
+                'callback' => $parameters['backUrl']])->get_result();
             // Handle result of payment gateway
             if ((!isset($payRes['error_code']) || $idpay->get_message($payRes['error_code'], Payment::PAYMENT_STATUS_REQUEST_IDPAY) === false) && isset($payRes['id']) && isset($payRes['link'])) {
                 // Insert new payment in DB
                 $res = $model->insert_it(self::PAYMENT_TABLE_IDPAY, [
-                    'factor_code' => $parameters['factor_code'],
+                    'order_code' => $parameters['order_code'],
+                    'user_id' => $this->data['identity']->id,
+                    'price' => $parameters['price'],
                     'payment_id' => $payRes['id'],
                     'payment_link' => $payRes['link'],
+                    'exportation_type' => $parameters['exportation'],
                 ]);
 
                 if ($res) {
@@ -1407,14 +1832,12 @@ abstract class AbstractController extends AbstractPaymentController
                     $this->redirect($payRes['link'], $redirectMessage, $wait);
                     return true;
                 } else {
-//                    $error = 'عملیات انجام تراکنش با خطا روبرو شد! لطفا مجددا تلاش نمایید.';
                     return false;
                 }
             } else {
                 return false;
             }
         } catch (PaymentException $e) {
-//            $error = $e->__toString();
             return false;
         }
     }
@@ -1426,6 +1849,8 @@ abstract class AbstractController extends AbstractPaymentController
 
     protected function _zarinpal_connection($parameters)
     {
+        if (!$this->auth->isLoggedIn()) return false;
+        //-----
         $this->load->library('HPayment/vendor/autoload');
         try {
             $model = new Model();
@@ -1442,7 +1867,10 @@ abstract class AbstractController extends AbstractPaymentController
                 // Insert new payment in DB
                 $res = $model->insert_it(self::PAYMENT_TABLE_ZARINPAL, [
                     'authority' => 'zarinpal-' . $payRes->Authority,
-                    'factor_code' => $parameters['factor_code'],
+                    'order_code' => $parameters['order_code'],
+                    'user_id' => $this->data['identity']->id,
+                    'price' => $parameters['price'],
+                    'exportation_type' => FACTOR_EXPORTATION_TYPE_BUY,
                 ]);
 
                 if ($res) {
@@ -1454,11 +1882,9 @@ abstract class AbstractController extends AbstractPaymentController
                     return false;
                 }
             } else {
-//                $error = $zarinpal->get_message($payRes->Status);
                 return false;
             }
         } catch (PaymentException $e) {
-//            $error = $e->__toString();
             return false;
         }
     }
@@ -1476,27 +1902,27 @@ abstract class AbstractController extends AbstractPaymentController
 
             // Check for factor first and If factor exists
             if (isset($postVars['order_id']) && isset($postVars['status']) &&
-                $model->is_exist('factors', 'factor_code=:fc', ['fc' => $postVars['order_id']])) {
+                $model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $postVars['order_id']])) {
                 // Set factor_code to global data
-                $this->data['factor_code'] = $postVars['order_id'];
+                $this->data['order_code'] = $postVars['order_id'];
                 // Select factor
-                $factor = $model->select_it(null, 'factors', [
-                    'factor_code', 'final_amount', 'payment_status'
+                $order = $model->select_it(null, self::TBL_ORDER, [
+                    'order_code', 'final_price', 'payment_status'
                 ], 'factor_code=:fc', ['fc' => $postVars['order_id']])[0];
                 // Select factor payment according to gateway id result
-                $factorPayment = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, [
+                $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, [
                     'payment_id', 'status'
-                ], 'factor_code=:fc AND payment_id=:pId', ['fc' => $postVars['order_id'], 'pId' => $postVars['id']]);
+                ], 'order_code=:oc AND payment_id=:pId', ['fc' => $postVars['order_id'], 'pId' => $postVars['id']]);
                 // If there is a record in gateway table(only one record is acceptable)
-                if (count($factorPayment) == 1) {
+                if (count($orderPayment) == 1) {
                     // Select factor payment
-                    $factorPayment = $factorPayment[0];
+                    $orderPayment = $orderPayment[0];
                     // Check if factor was advice before
-                    if ($factor['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED &&
-                        !in_array($factorPayment['status'], [Payment::PAYMENT_STATUS_OK_IDPAY, Payment::PAYMENT_STATUS_DUPLICATE_IDPAY]) &&
+                    if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED &&
+                        !in_array($orderPayment['status'], [Payment::PAYMENT_STATUS_OK_IDPAY, Payment::PAYMENT_STATUS_DUPLICATE_IDPAY]) &&
                         $postVars['status'] == Payment::PAYMENT_STATUS_WAIT_IDPAY) {
                         // Check for returned amount
-                        if ((intval($factor['final_amount']) * 10) == $postVars['amount']) {
+                        if ((intval($order['final_price']) * 10) == $postVars['amount']) {
                             // If all are ok send advice to bank gateway
                             // This means ready to transfer money to our bank account
                             $advice = $idpay->send_advice([
@@ -1511,13 +1937,13 @@ abstract class AbstractController extends AbstractPaymentController
                                 // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
                                 if ($status == Payment::PAYMENT_STATUS_OK_IDPAY) {
                                     // Store extra info from bank's gateway result
-                                    $model->update_it('factors', [
+                                    $model->update_it(self::TBL_ORDER, [
                                         'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
-                                    ], 'factor_code=:fc', ['fc' => $factor['factor_code']]);
+                                    ], 'order_code=:oc', ['oc' => $order['order_code']]);
                                     $model->update_it(self::PAYMENT_TABLE_IDPAY, [
                                         'payment_code' => $advice['payment']['track_id'],
                                         'status' => $status,
-                                    ], 'factor_code=:fc', ['fc' => $factor['factor_code']]);
+                                    ], 'order_code=:oc', ['oc' => $order['order_code']]);
                                     $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
                                     $traceNumber = $advice['payment']['track_id'];
 
@@ -1528,16 +1954,19 @@ abstract class AbstractController extends AbstractPaymentController
                                     $this->data['have_ref_id'] = true;
 
                                     // Send sms to user if is login
-//                                    if ($this->auth->isLoggedIn()) {
-//                                        $this->load->library('HSMS/rohamSMS');
-//                                        $sms = new rohamSMS();
-//                                        try {
-//                                            $is_sent = $sms->set_numbers($this->data['identity']->username)->body('خرید با موفقیت برای فاکتور ' . $factor['factor_code'] . ' انجام شد.')->send();
-//                                        } catch (SMSException $e) {
-//                                            die($e->getMessage());
-//                                        }
-//                                    }
-                                    // Store sms operation to database
+                                    if ($this->auth->isLoggedIn()) {
+                                        // Send SMS code goes here
+                                        $this->load->library('HSMS/rohamSMS');
+                                        $sms = new rohamSMS();
+                                        try {
+                                            $body = $this->setting['sms']['activationCodeMsg'];
+                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
+                                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                        } catch (SMSException $e) {
+                                            die($e->getMessage());
+                                        }
+                                    }
                                 }
                             } else {
                                 $this->data['error'] = $idpay->get_message($advice['error_code'], Payment::PAYMENT_STATUS_VERIFY_IDPAY);
@@ -1565,20 +1994,20 @@ abstract class AbstractController extends AbstractPaymentController
                 }
 
                 // Store current result from bank gateway
-                $model->update_it('factors', [
+                $model->update_it(self::TBL_ORDER, [
                     'payment_date' => $postVars['date']
-                ], 'factor_code=:fc', ['fc' => $factor['factor_code']]);
+                ], 'order_code=:oc', ['oc' => $order['order_code']]);
                 $model->update_it(self::PAYMENT_TABLE_IDPAY, [
                     'status' => isset($status) ? $status : $postVars['status'],
                     'track_id' => $postVars['track_id'],
                     'msg' => isset($status) ? $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY) : $idpay->get_message($postVars['status'], Payment::PAYMENT_STATUS_VERIFY_IDPAY),
                     'mask_card_number' => $postVars['card_no'],
                     'payment_date' => time(),
-                ], 'factor_code=:fc', ['fc' => $factor['factor_code']]);
+                ], 'order_code=:oc', ['oc' => $order['order_code']]);
 
                 // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
                 if (isset($success)) {
-                    $model->delete_it('factors_reserved', 'factor_code=:fc', ['fc' => $factor['factor_code']]);
+                    $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $order['order_code']]);
                 }
             } else {
                 $this->data['error'] = 'تراکنش نامعتبر است!';
@@ -1617,61 +2046,69 @@ abstract class AbstractController extends AbstractPaymentController
 
             if (count($curPay)) {
                 $curPay = $curPay[0];
-                // Set factor_code to global data
-                $this->data['factor_code'] = $curPay['factor_code'];
-                if ($curPay['status'] != Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
-                    $res = $zarinpal->verify_request($curPay['amount']);
-                    if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL || // Successful transaction
-                        intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_DUPLICATE_ZARINPAL) { // Duplicated transaction
-                        $this->data['is_success'] = true;
-                        $this->data['have_ref_id'] = true;
+                $curFactor = $model->select_it(null, self::TBL_ORDER, '*',
+                    'user_id=:uId AND order_code=:oc', ['uId' => $curPay['user_id'], 'oc' => $curPay['order_code']]);
+                if (count($curFactor)) {
+                    $curFactor = $curFactor[0];
+                    // Set factor_code to global data
+                    $this->data['order_code'] = $curPay['order_code'];
+                    if ($curPay['status'] != Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
+                        $res = $zarinpal->verify_request($curPay['amount']);
+                        if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL || // Successful transaction
+                            intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_DUPLICATE_ZARINPAL) { // Duplicated transaction
+                            $this->data['is_success'] = true;
+                            $this->data['have_ref_id'] = true;
 
-                        if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
+                            if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
+                                $this->data['ref_id'] = $res->RefID;
+
+                                // Update payment status and refID for success
+                                $model->update_it(self::PAYMENT_TABLE_ZARINPAL, [
+                                    'payment_code' => $this->data['ref_id'],
+                                    'status' => $zarinpal->status,
+                                    'payment_date' => time(),
+                                ], 'authority=:auth', ['auth' => 'zarinpal-' . $authority]);
+                                $model->update_it(self::TBL_ORDER, [
+                                    'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL,
+                                    'payment_date' => time(),
+                                ], 'order_code=:oc', ['oc' => $curPay['order_code']]);
+                            }
+                        } else if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_CANCELED_ZARINPAL) { // Transaction was canceled
+                            $this->data['is_success'] = false;
+                            $this->data['have_ref_id'] = false;
+                            $this->data['error'] = $res;
+                        } else { // Failed transaction
+                            $this->data['is_success'] = false;
+                            $this->data['have_ref_id'] = true;
                             $this->data['ref_id'] = $res->RefID;
 
-                            // Update payment status and refID for success
+                            // Update payment status and refID for fail
                             $model->update_it(self::PAYMENT_TABLE_ZARINPAL, [
                                 'payment_code' => $this->data['ref_id'],
                                 'status' => $zarinpal->status,
                                 'payment_date' => time(),
                             ], 'authority=:auth', ['auth' => 'zarinpal-' . $authority]);
-                            $model->update_it('factors', [
-                                'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL,
+                            $model->update_it(self::TBL_ORDER, [
+                                'payment_status' => OWN_PAYMENT_STATUS_FAILED,
                                 'payment_date' => time(),
                             ],
-                                'factor_code=:fc', ['fc' => $curPay['factor_code']]);
+                                'order_code=:oc', ['oc' => $curPay['order_code']]);
+                            $this->data['error'] = $zarinpal->get_message($zarinpal->status);
                         }
-                    } else if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_CANCELED_ZARINPAL) { // Transaction was canceled
-                        $this->data['is_success'] = false;
-                        $this->data['have_ref_id'] = false;
-                        $this->data['error'] = $res;
-                    } else { // Failed transaction
-                        $this->data['is_success'] = false;
+
+                        // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
+                        if ($this->data['is_success']) {
+                            $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $curPay['order_code']]);
+                        }
+                    } else {
+                        $this->data['is_success'] = true;
                         $this->data['have_ref_id'] = true;
-                        $this->data['ref_id'] = $res->RefID;
-
-                        // Update payment status and refID for fail
-                        $model->update_it(self::PAYMENT_TABLE_ZARINPAL, [
-                            'payment_code' => $this->data['ref_id'],
-                            'status' => $zarinpal->status,
-                            'payment_date' => time(),
-                        ], 'authority=:auth', ['auth' => 'zarinpal-' . $authority]);
-                        $model->update_it('factors', [
-                            'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                            'payment_date' => time(),
-                        ],
-                            'factor_code=:fc', ['fc' => $curPay['factor_code']]);
-                        $this->data['error'] = $zarinpal->get_message($zarinpal->status);
-                    }
-
-                    // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
-                    if ($this->data['is_success']) {
-                        $model->delete_it('factors_reserved', 'factor_code=:fc', ['fc' => $curPay['factor_code']]);
+                        $this->data['ref_id'] = $curPay['payment_code'];
                     }
                 } else {
-                    $this->data['is_success'] = true;
-                    $this->data['have_ref_id'] = true;
-                    $this->data['ref_id'] = $curPay['payment_code'];
+                    $this->data['error'] = 'تراکنش نامعتبر است!';
+                    $this->data['is_success'] = false;
+                    $this->data['have_ref_id'] = false;
                 }
             } else {
                 $this->data['error'] = 'تراکنش نامعتبر است!';
@@ -1683,34 +2120,209 @@ abstract class AbstractController extends AbstractPaymentController
         }
     }
 
-    protected function _other_result()
+    protected function _wallet_result()
     {
+        $sessName = self::PAYMENT_RESULT_PARAM_WALLET . '_session';
+        $theSess = $this->session->get($sessName);
         $model = new Model();
-        if (isset($_SESSION[$this->otherParamSessionName])) {
-            $factorCode = encryption_decryption(ED_DECRYPT, $_SESSION[$this->otherParamSessionName]);
+        $this->data['have_ref_id'] = false;
+        if (!empty($theSess)) {
+            $orderCode = $theSess;
 
-            if ($model->is_exist('factors', 'factor_code=:fc', ['fc' => $factorCode])) {
-                $model->update_it('factors', [
-                    'payment_status' => OWN_PAYMENT_STATUS_WAIT,
-                    'payment_date' => time(),
-                ], 'factor_code=:fc', ['fc' => $factorCode]);
+            if ($model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode])) {
+                $account = $model->select_it(null, self::TBL_USER_ACCOUNT, ['account_balance'],
+                    'user_id=:uId', ['uId' => $this->data['identity']->id]);
+                if (count($account)) {
+                    $account = $account[0];
+                    $orderPrice = $model->select_it(null, self::TBL_ORDER, ['final_price'],
+                        'order_code=:oc', ['oc' => $orderCode])[0];
+                    if ((int)$orderPrice['final_price'] <= (int)$account['account_balance']) {
+                        $model->transactionBegin();
+                        //-----
+                        $res = $model->update_it(self::TBL_ORDER, [
+                            'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL,
+                            'payment_date' => time(),
+                        ], 'order_code=:oc', ['oc' => $orderCode]);
+                        $res2 = $model->update_it(self::TBL_USER_ACCOUNT, [],
+                            'user_id=:uId', ['uId' => $this->data['identity']->id], [
+                                'account_balance' => 'account_balance-' . (int)$orderPrice['final_price'],
+                            ]);
+                        $res3 = $model->insert_it(self::TBL_USER_ACCOUNT_BUY, [
+                            'order_code' => $orderCode,
+                            'user_id' => $this->data['identity']->id,
+                            'price' => (int)$orderPrice['final_price'],
+                            'payment_date' => time(),
+                        ]);
+                        // Calculate reward
+                        $productModel = new \ProductModel();
+                        $commonModel = new CommonModel();
+                        $reward = $productModel->getProductsReward($orderCode);
+                        $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
+                            'DEP-', 6, 15, 10, CommonModel::DIGITS);
+                        // Store reward to wallet
+                        $res4 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                            'deposit_code' => 'DEP-' . $code,
+                            'user_id' => $this->data['identity']->id,
+                            'deposit_price' => $reward,
+                            'description' => 'پاداش خرید',
+                            'deposit_type' => DEPOSIT_TYPE_REWARD,
+                            'deposit_date' => time(),
+                        ]);
+                        //-----
+                        if ($res && $res2 && $res3 && $res4) {
+                            $model->transactionComplete();
+                            //-----
+                            $this->data['order_code'] = $orderCode;
+                            $this->data['is_success'] = true;
 
-                $this->data['factor_code'] = $factorCode;
-                $this->data['is_success'] = true;
-                $this->data['have_ref_id'] = false;
-
-                // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
-                $model->delete_it('factors_reserved', 'factor_code=:fc', ['fc' => $factorCode]);
+                            // Delete cart items
+                            $this->removeAllFromCartAction();
+                            // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
+                            $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+                        } else {
+                            $model->transactionRollback();
+                            //-----
+                            $this->data['error'] = 'عملیات با خطا مواجه شد! لطفا مجددا تلاش نمایید.';
+                            $this->data['is_success'] = false;
+                        }
+                    } else {
+                        $this->data['error'] = 'موجودی کیف پول شما کافی نیست.';
+                        $this->data['is_success'] = false;
+                    }
+                } else {
+                    $this->data['error'] = 'کیف پول برای این حساب کاربری فعال نمی‌باشد.';
+                    $this->data['is_success'] = false;
+                }
             } else {
                 $this->data['error'] = 'فاکتور نامعتبر است!';
                 $this->data['is_success'] = false;
-                $this->data['have_ref_id'] = false;
             }
         } else {
             $this->data['error'] = 'ورودی نامعتبر است!';
             $this->data['is_success'] = false;
-            $this->data['have_ref_id'] = false;
         }
+        //-----
+        $this->session->remove($sessName);
+    }
+
+    protected function _in_place_result()
+    {
+        $sessName = self::PAYMENT_RESULT_PARAM_IN_PLACE . '_session';
+        $theSess = $this->session->get($sessName);
+        $model = new Model();
+        $this->data['have_ref_id'] = false;
+        if (!empty($theSess)) {
+            $orderCode = $theSess;
+
+            if ($model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode])) {
+                $model->transactionBegin();
+                //-----
+                $res = $model->update_it(self::TBL_ORDER, [
+                    'payment_status' => OWN_PAYMENT_STATUS_WAIT,
+                    'payment_date' => time(),
+                ], 'order_code=:oc', ['oc' => $orderCode]);
+                // Calculate reward
+                $productModel = new \ProductModel();
+                $commonModel = new CommonModel();
+                $reward = $productModel->getProductsReward($orderCode);
+                $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
+                    'DEP-', 6, 15, 10, CommonModel::DIGITS);
+                // Store reward to wallet
+                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                    'deposit_code' => 'DEP-' . $code,
+                    'user_id' => $this->data['identity']->id,
+                    'deposit_price' => $reward,
+                    'description' => 'پاداش خرید',
+                    'deposit_type' => DEPOSIT_TYPE_REWARD,
+                    'deposit_date' => time(),
+                ]);
+
+                if ($res && $res2) {
+                    $model->transactionComplete();
+                    //-----
+                    $this->data['order_code'] = $orderCode;
+                    $this->data['is_success'] = true;
+
+                    // Delete cart items
+                    $this->removeAllFromCartAction();
+                    // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
+                    $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+                } else {
+                    $model->transactionRollback();
+                    //-----
+                    $this->data['error'] = 'عملیات با خطا مواجه شد! لطفا مجددا تلاش نمایید.';
+                    $this->data['is_success'] = false;
+                }
+            } else {
+                $this->data['error'] = 'فاکتور نامعتبر است!';
+                $this->data['is_success'] = false;
+            }
+        } else {
+            $this->data['error'] = 'ورودی نامعتبر است!';
+            $this->data['is_success'] = false;
+        }
+        //-----
+        $this->session->remove($sessName);
+    }
+
+    protected function _receipt_result()
+    {
+        $sessName = self::PAYMENT_RESULT_PARAM_RECEIPT . '_session';
+        $theSess = $this->session->get($sessName);
+        $model = new Model();
+        $this->data['have_ref_id'] = false;
+        if (!empty($theSess)) {
+            $orderCode = $theSess;
+
+            if ($model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode])) {
+                $model->transactionBegin();
+                //-----
+                $res = $model->update_it(self::TBL_ORDER, [
+                    'payment_status' => OWN_PAYMENT_STATUS_WAIT_VERIFY,
+                    'payment_date' => time(),
+                ], 'order_code=:oc', ['oc' => $orderCode]);
+                // Calculate reward
+                $productModel = new \ProductModel();
+                $commonModel = new CommonModel();
+                $reward = $productModel->getProductsReward($orderCode);
+                $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
+                    'DEP-', 6, 15, 10, CommonModel::DIGITS);
+                // Store reward to wallet
+                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                    'deposit_code' => 'DEP-' . $code,
+                    'user_id' => $this->data['identity']->id,
+                    'deposit_price' => $reward,
+                    'description' => 'پاداش خرید',
+                    'deposit_type' => DEPOSIT_TYPE_REWARD,
+                    'deposit_date' => time(),
+                ]);
+
+                if ($res && $res2) {
+                    $model->transactionComplete();
+                    //-----
+                    $this->data['order_code'] = $orderCode;
+                    $this->data['is_success'] = true;
+
+                    // Delete cart items
+                    $this->removeAllFromCartAction();
+                    // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
+                    $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+                } else {
+                    $model->transactionRollback();
+                    //-----
+                    $this->data['error'] = 'عملیات با خطا مواجه شد! لطفا مجددا تلاش نمایید.';
+                    $this->data['is_success'] = false;
+                }
+            } else {
+                $this->data['error'] = 'فاکتور نامعتبر است!';
+                $this->data['is_success'] = false;
+            }
+        } else {
+            $this->data['error'] = 'ورودی نامعتبر است!';
+            $this->data['is_success'] = false;
+        }
+        //-----
+        $this->session->remove($sessName);
     }
 
     //-----
@@ -1727,7 +2339,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $items = $model->select_it(null, self::TBL_ORDER_ITEM, ['product_id', 'product_count'], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 foreach ($items as $k => $item) {
                     try {
-                        $res = $model->update_it('products', [], 'id=:id', ['id' => $item['product_id']], [
+                        $res = $model->update_it(self::TBL_PRODUCT, [], 'id=:id', ['id' => $item['product_id']], [
                             'stock_count' => 'stock_count+' . (int)$item['product_count'],
                             'sold_count' => 'sold_count-' . (int)$item['product_count'],
                         ]);

@@ -31,12 +31,12 @@
                                    class="text-white p-10 label bg-orange-600">
                                     <h6 class="no-margin">
                                         <i class="icon-envelop5 position-left" aria-hidden="true"></i>
-                                        <!--                                        --><?php //if ($unreadContacts != 0): ?>
-                                        <!--                                            --><? //= convertNumbersToPersian($unreadContacts); ?>
-                                        <!--                                            عدد-->
-                                        <!--                                        --><?php //else: ?>
-                                        <!--                                            ندارید-->
-                                        <!--                                        --><?php //endif; ?>
+                                        <?php if ($unreadContacts != 0): ?>
+                                            <?= convertNumbersToPersian($unreadContacts); ?>
+                                            عدد
+                                        <?php else: ?>
+                                            ندارید
+                                        <?php endif; ?>
                                     </h6>
                                 </a>
                             </label>
@@ -143,12 +143,13 @@
                                 </h5>
                             </div>
                             <div class="col-lg-12">
-                                <?php if ($identity->role_id <= AUTH_ROLE_ADMIN): ?>
+                                <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
+                                    in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
                                     <div class="col-sm-6 col-md-3 col-lg-2">
                                         <div class="panel text-pink-400 border-top-lg border-top-pink-400">
                                             <div class="panel-body">
                                                 <h3 class="no-margin">
-
+                                                    <?= convertNumbersToPersian($userAllCount); ?>
                                                 </h3>
                                                 کاربر
                                             </div>
@@ -159,7 +160,7 @@
                                         <div class="panel text-pink-400 border-top-lg border-top-pink-400">
                                             <div class="panel-body">
                                                 <h3 class="no-margin">
-
+                                                    <?= convertNumbersToPersian($userCount); ?>
                                                 </h3>
                                                 کاربر عادی
                                             </div>
@@ -170,7 +171,7 @@
                                         <div class="panel text-pink-400 border-top-lg border-top-pink-400">
                                             <div class="panel-body">
                                                 <h3 class="no-margin">
-
+                                                    <?= convertNumbersToPersian($marketerCount); ?>
                                                 </h3>
                                                 کاربر بازاریاب
                                             </div>
@@ -181,7 +182,7 @@
                                         <div class="panel text-pink-400 border-top-lg border-top-pink-400">
                                             <div class="panel-body">
                                                 <h3 class="no-margin">
-
+                                                    <?= convertNumbersToPersian($userAllDeactiveCount); ?>
                                                 </h3>
                                                 کاربر غیرفعال
                                             </div>
@@ -194,18 +195,9 @@
                                     <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian($staticPageCount); ?>
                                             </h3>
                                             نوشته‌ ثابت
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6 col-md-3 col-lg-2">
-                                    <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                            </h3>
-                                            فاکتور‌های امروز
                                         </div>
                                     </div>
                                 </div>
@@ -214,18 +206,9 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian($categoryCount); ?>
                                             </h3>
                                             دسته‌بندی
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6 col-md-3 col-lg-2">
-                                    <div class="panel text-purple-600 border-top-lg border-top-purple-600">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                            </h3>
-                                            نظر
                                         </div>
                                     </div>
                                 </div>
@@ -235,6 +218,7 @@
                                     <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
                                             کل سفارش‌ها
                                         </div>
@@ -245,8 +229,9 @@
                                     <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
-                                            سفارش‌های امروز امروز
+                                            سفارش‌های امروز
                                         </div>
                                     </div>
                                 </div>
@@ -255,6 +240,7 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
                                             سفارش‌های انجام ‌نشده
                                         </div>
@@ -265,6 +251,7 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
                                             سفارش‌های انجام شده
                                         </div>
@@ -275,6 +262,7 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
                                             سفارش‌های مرجوع شده
                                         </div>
@@ -285,6 +273,7 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
+                                                <?= convertNumbersToPersian(''); ?>
                                             </h3>
                                             پرداختی‌ها تا کنون
                                         </div>

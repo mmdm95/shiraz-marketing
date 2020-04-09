@@ -1,8 +1,6 @@
 <?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
-<?php $this->view('templates/fe/main-menu', $data); ?>
-<?php $this->view('templates/fe/main-nav', $data); ?>
-<?php $this->view('templates/fe/main-nav-mobile', $data); ?>
+<?php $this->view('templates/fe/main-menu-minimal', $data); ?>
 
 <main class="main-container page-shopping">
     <div class="container">
@@ -32,104 +30,139 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-8 order-2 order-lg-1">
-                <div class="box-header-info">
-                    آدرس تحویل سفارش
-                </div>
-                <div class="box box-info">
-                    <div class="box-body text-secondary">
-                        <div>
-                            گیرنده :
-                            <span>
-                                محمد مهدی دهقان منشادی
-                            </span>
-                            <a href="#" class="btn btn-light mr-2">
-                                اصلاح آدرس
-                            </a>
-                        </div>
-                        <div class="mt-4">
-                            شماره تماس :
-                            <span>
-                                ۰۹۱۷۹۵۱۶۲۷۱
-                            </span>
-                            <span class="mx-2">
-                                |
-                            </span>
-                            کد پستی :
-                            <span>
-                                ۹۹۹۹۹۹۹۹۹۹
-                            </span>
-                        </div>
-                        <div class="mt-4">
-                            استان
-                            <span>
-                                فارس،
-                            </span>
-                            شهر
-                            <span>
-                                آباده،
-                            </span>
-                            <span>
-                                بلوار جام جم کوچه دهم پلاک ۱۴
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <form action="<?= base_url('shopping'); ?>" method="post">
+            <?= $form_token; ?>
 
-            <div class="col-lg-4 col-md-6 order-1 order-lg-2 mx-auto">
-                <div class="box">
-                    <div class="box-body">
-                        <div class="shopping-cart-container">
-                            <div class="shopping-cart-info">
-                                <div class="shopping-cart-info-item">
-                                    <div>
-                                        مبلغ کل (۱ کالا) :
-                                    </div>
-                                    <div class="text-dark">
-                                        ۸۵۰،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                                <div class="shopping-cart-info-item">
-                                    <div class="text-primary">
-                                        مبلغ تخفیف :
-                                    </div>
-                                    <div class="text-primary">
-                                        ۲۰۰،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                                <div class="shopping-cart-info-item">
-                                    <div>
-                                        هزینه ارسال :
-                                    </div>
-                                    <div class="text-dark">
-                                        ۶،۰۰۰
-                                        تومان
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="shopping-cart-continue">
-                                <div class="text-secondary mb-2">
-                                    مبلغ کل‌ :
-                                </div>
-                                <div class="text-danger font-size-21px mb-4">
-                                    ۶۵۶،۰۰۰
-                                    تومان
-                                </div>
-                                <a href="#" class="btn btn-success btn-block">
-                                    ادامه ثبت سفارش
-                                    <i class="la la-angle-left font-size-21px mr-3 float-left" aria-hidden="true"></i>
+            <div class="row">
+                <div class="col-lg-8 order-2 order-lg-1">
+                    <?php $this->view('templates/fe/alert/error', ['errors' => $errors ?? null]); ?>
+
+                    <div class="box-header-info">
+                        آدرس تحویل سفارش
+                    </div>
+                    <div class="box box-info">
+                        <div class="box-body text-secondary">
+                            <div class="mb-4">
+                                <span class="text-primary">
+                                    به صورت پیش فرض از اطلاعات شما برای گیرنده استفاده می‌شود.
+                                </span>
+                                <a href="<?= base_url('user/editUser?back_url=' . base_url('shopping')); ?>"
+                                   class="btn btn-light mr-2">
+                                    اصلاح اطلاعات
                                 </a>
                             </div>
+                            <div class="form-group">
+                                <label for="sh-rn" class="d-inline-block">
+                                    نام گیرنده
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-rn" class="form-control"
+                                           name="receiver_name" placeholder="حروف فارسی"
+                                           value="<?= $values['receiver_name'] ?? trim(($identity->first_name ?? '') . ' ' . ($identity->last_name ?? '')); ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-user-circle"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sh-rm" class="d-inline-block">
+                                    شماره تماس گیرنده
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-rm" class="form-control"
+                                           name="receiver_mobile" placeholder="۰۹۱۷xxxxxxx"
+                                           value="<?= $values['receiver_mobile'] ?? $identity->mobile ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-mobile"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                کد پستی :
+                                <span>
+                                <?= $identity->postal_code ?? 'نامشخص'; ?>
+                            </span>
+                                <span class="mx-2">
+                                |
+                            </span>
+                                استان
+                                <span>
+                                <?= $identity->province ?? 'نامشخص'; ?>
+                                ،
+                            </span>
+                                شهر
+                                <span>
+                                <?= $identity->city ?? 'نامشخص'; ?>
+                                ،
+                            </span>
+                                <span>
+                                <?= $identity->address ?? 'نامشخص'; ?>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-header-info">
+                        اعمال کد تخفیف
+                    </div>
+                    <div class="box border-top border-info">
+                        <div class="box-body text-secondary">
+                            <div class="form-group">
+                                <label for="sh-cc" class="d-inline-block">
+                                    کد تخفیف خود را استفاده کنید :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-cc" class="form-control"
+                                           name="coupon_code" placeholder="کد تخفیف"
+                                           value="<?= $values['coupon_code'] ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-dollar-sign"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <button type="button" class="btn btn-light" id="couponDelete">
+                                    <i class="la la-trash-alt float-right ml-3 font-size-21px"
+                                       aria-hidden="true"></i>
+                                    حذف کد اعمال شده
+                                </button>
+                                <button type="button" class="btn btn-info" id="couponChecker">
+                                    <i class="la la-undo la-rotate-180 float-right ml-3 font-size-21px"
+                                       aria-hidden="true"></i>
+                                    بررسی کد تخفیف
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-lg-4 col-md-6 order-1 order-lg-2 mx-auto" id="main_sidebar__wrapper">
+                    <?= $sideCard; ?>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </main>
+
+<!-- Removed/Updated products modal -->
+<?php $this->view('templates/fe/modal/modified-items', $data); ?>
+<!-- Removed/Updated products modal -->
 
 <?php $this->view('templates/fe/footer', $data); ?>

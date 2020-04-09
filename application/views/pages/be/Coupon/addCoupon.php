@@ -109,7 +109,7 @@
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly
                                                        data-alt-field="#altDateField" data-time="true"
-                                                       value="<?= $coValues['expire'] ?? ''; ?>">
+                                                       value="<?= date('Y/m/d H:i', $coValues['expire'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="coStatus">وضعیت فعالسازی:</label>

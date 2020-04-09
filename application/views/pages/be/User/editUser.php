@@ -174,7 +174,7 @@
                                                 <input type="hidden" name="birth_date" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ تولد" readonly data-alt-field="#altDateField"
-                                                       value="<?= $uValues['birth_date'] ?? $uTrueValues['birth_date'] ?? '' ?>">
+                                                       value="<?= date('Y/m/d H:i', $uValues['birth_date'] ?? $uTrueValues['birth_date'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>استان:</label>

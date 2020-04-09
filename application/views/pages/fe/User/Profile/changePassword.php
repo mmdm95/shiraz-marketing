@@ -41,7 +41,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url('user/changePassword/' . $param[0]); ?>" method="post">
+                        <form action="<?= base_url('user/changePassword'); ?>" method="post">
                             <?= $form_token; ?>
 
                             <div class="row">

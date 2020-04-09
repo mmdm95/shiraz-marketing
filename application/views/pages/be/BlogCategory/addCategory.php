@@ -52,7 +52,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <form action="<?= base_url(); ?>admin/blog/addCategory" method="post">
-                            <!--                            --><? //= $data['form_token']; ?>
+                            <?= $form_token; ?>
 
                             <div class="row">
                                 <div class="col-md-9">

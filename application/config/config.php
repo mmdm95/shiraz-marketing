@@ -19,7 +19,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
  *     1.2.5.0 instead of 1.2.5-a
  *     1.2.5.0.1 instead of 1.2.5-a1 (I'm not sure)
  */
-defined('APP_VERSION') OR define('APP_VERSION', '1.0.0');
+defined('APP_VERSION') OR define('APP_VERSION', '1.0.1');
 
 //===============================================
 
@@ -57,13 +57,18 @@ defined('OWN_PAYMENT_STATUS_SUCCESSFUL') OR define('OWN_PAYMENT_STATUS_SUCCESSFU
 defined('OWN_PAYMENT_STATUS_FAILED') OR define('OWN_PAYMENT_STATUS_FAILED', 0);
 defined('OWN_PAYMENT_STATUS_NOT_PAYED') OR define('OWN_PAYMENT_STATUS_NOT_PAYED', -9);
 defined('OWN_PAYMENT_STATUS_WAIT') OR define('OWN_PAYMENT_STATUS_WAIT', -8);
+defined('OWN_PAYMENT_STATUS_WAIT_VERIFY') OR define('OWN_PAYMENT_STATUS_WAIT_VERIFY', -7);
 // My custom payment status array
 defined('OWN_PAYMENT_STATUSES') OR define('OWN_PAYMENT_STATUSES', [
     OWN_PAYMENT_STATUS_SUCCESSFUL => 'پرداخت شده',
     OWN_PAYMENT_STATUS_FAILED => 'پرداخت ناموفق',
     OWN_PAYMENT_STATUS_NOT_PAYED => 'پرداخت نشده',
-    OWN_PAYMENT_STATUS_WAIT => 'در انتظار پرداخت'
+    OWN_PAYMENT_STATUS_WAIT => 'در انتظار پرداخت',
+    OWN_PAYMENT_STATUS_WAIT_VERIFY => 'در انتظار تایید',
 ]);
+
+// Shiraz city
+defined('SHIRAZ_CITY') OR define('SHIRAZ_CITY', 232);
 
 // My custom order code prefix
 defined('ITEMS_EACH_PAGE_DEFAULT') OR define('ITEMS_EACH_PAGE_DEFAULT', 24);

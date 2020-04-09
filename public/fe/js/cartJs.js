@@ -36,8 +36,8 @@
 
             cart_wrapper = $('.basket-container').first();
             cart_item_wrapper = cart_wrapper.find('#basketDropdown');
-            cart_btn = cart_wrapper.find('shoppingCart');
-            cart_count_wrapper = cart_btn.find('basket-number');
+            cart_btn = cart_wrapper.find('#shoppingCart');
+            cart_count_wrapper = cart_btn.find('.basket-number');
 
             //------------------------------
             //---------- Functions ---------
@@ -179,6 +179,9 @@
                     if (quantity) {
                         ajax_obj['add']['quantity'] = quantity;
                     }
+
+                    shop.log(ajax_obj);
+
                     doAddAjax();
                 }
             };
@@ -223,8 +226,11 @@
             dist = dist && $(dist) && $(dist).length ? $(dist) : false;
             qnt = $this.find(':selected');
             qnt = qnt ? qnt.val() : $this.find('option').first().val();
+
+            console.log(qnt);
+
             if (qnt && dist) {
-                dist.data('item-quantity', qnt);
+                dist.attr('data-item-quantity', qnt);
             }
         });
     });

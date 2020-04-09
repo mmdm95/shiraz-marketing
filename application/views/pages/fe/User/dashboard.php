@@ -72,7 +72,7 @@
                                         border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
                                                 <i class="icon-wallet" aria-hidden="true"></i>
                                                 <span>
-کیف پول
+                                                    کیف پول
                                                 </span>
                                             </a>
                                         </li>

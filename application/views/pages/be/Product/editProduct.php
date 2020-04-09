@@ -189,7 +189,7 @@
                                                 <input type="hidden" name="discount_expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
-                                                       value="<?= $pValues['discount_expire'] ?? $pTrueValues['discount_until'] ?? ''; ?>">
+                                                       value="<?= date('Y/m/d H:i', $pValues['discount_expire'] ?? $pTrueValues['discount_until'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <label>پاداش خرید:</label>
@@ -227,14 +227,14 @@
                                                     وضعیت انتشار:
                                                 </label>
                                                 <input type="checkbox" name="publish" id="pStatus"
-                                                       class="switchery" <?= set_value($pValues['publish'] ?? $pTrueValues['publish'] ?? '', 'off', '', 'checked', '=='); ?>>
+                                                       class="switchery" <?= set_value($pValues['publish'] ?? $pTrueValues['publish'] ?? '', 1, 'checked', '', '=='); ?>>
                                             </div>
                                             <div class="col-lg-12 text-right">
                                                 <label for="pSpecial" class="pull-left">
                                                     ویژه:
                                                 </label>
                                                 <input type="checkbox" name="is_special" id="pSpecial"
-                                                       class="switchery" <?= set_value($pValues['is_special'] ?? $pTrueValues['is_special'] ?? '', 'off', '', 'checked', '=='); ?>>
+                                                       class="switchery" <?= set_value($pValues['is_special'] ?? $pTrueValues['is_special'] ?? '', 1, 'checked', '', '=='); ?>>
                                             </div>
                                         </div>
                                     </div>

@@ -68,7 +68,8 @@
                             </div>
 
                             <?php
-                            $discountPercentage = floor(((convertNumbersToPersian($offer['price'], true) - convertNumbersToPersian($offer['discount_price'], true)) / convertNumbersToPersian($offer['price'], true)) * 100);
+                            $discount = $offer['discount_until'] > time() ? convertNumbersToPersian($offer['discount_price'], true) : convertNumbersToPersian($offer['price'], true);
+                            $discountPercentage = floor(((convertNumbersToPersian($offer['price'], true) - $discount) / convertNumbersToPersian($offer['price'], true)) * 100);
                             ?>
                             <div class="card-info">
                                 <div>
@@ -105,6 +106,27 @@
                                             <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="card-timer">
+                                <div countdown
+                                     data-date="<?= date('Y-m-d H:i:s', $offer['discount_until']); ?>">
+                                    <div class="col">
+                                        <span data-days>0</span>
+                                        روز
+                                    </div>
+                                    <div class="col">
+                                        <span data-hours>0</span>
+                                        ساعت
+                                    </div>
+                                    <div class="col">
+                                        <span data-minutes>0</span>
+                                        دقیقه
+                                    </div>
+                                    <div class="col">
+                                        <span data-seconds>0</span>
+                                        ثانیه
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -157,7 +179,8 @@
                             </div>
 
                             <?php
-                            $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - convertNumbersToPersian($item['discount_price'], true)) / convertNumbersToPersian($item['price'], true)) * 100);
+                            $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
+                            $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
                             ?>
                             <div class="card-info">
                                 <div>
@@ -268,6 +291,41 @@
                         </div>
                     </div>
                 <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (count($ourTeam)): ?>
+        <div class="container">
+            <div class="section-header justify-content-center align-items-center">
+                <h1 class="section-title">
+                    با تیم ما آشنا شوید
+                </h1>
+                <div class="separator solid primary my-0 mr-4 col"></div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="our-team owl-carousel">
+                        <?php foreach ($ourTeam as $team): ?>
+                            <div>
+                                <div class="box">
+                                    <div class="box-body">
+                                        <img src="<?= base_url($team['image']); ?>"
+                                             alt="" class="our-team-img">
+                                        <h1 class="our-team-name">
+                                            <?= $team['first_name'] . ' ' . $team['last_name']; ?>
+                                        </h1>
+                                        <span class="our-team-geo">
+                                            <?= $team['city']; ?>
+                                            ،
+                                            <?= $team['province']; ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
         </div>
     <?php endif; ?>

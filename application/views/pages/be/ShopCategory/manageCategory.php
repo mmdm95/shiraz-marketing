@@ -81,7 +81,7 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <i class="la-3x <?= $category['icon']; ?>" aria-hidden="true"></i>
+                                                    <i class="la-3x <?= $category['icon_name']; ?>" aria-hidden="true"></i>
                                                 </td>
                                                 <td>
                                                     <?= $category['name']; ?>
@@ -98,7 +98,7 @@
                                                 <td style="width: 115px;" class="text-center">
                                                     <ul class="icons-list">
                                                         <li class="text-primary-600">
-                                                            <a href="<?= base_url('admin/shop/editCategory' . $category['id']); ?>"
+                                                            <a href="<?= base_url('admin/shop/editCategory/' . $category['id']); ?>"
                                                                title="ویرایش" data-popup="tooltip">
                                                                 <i class="icon-pencil7"></i>
                                                             </a>

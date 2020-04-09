@@ -44,23 +44,21 @@
                         <?php endif; ?>
                     </div>
                     <div class="owl-thumb owl-carousel" data-owl-carousel-thumb-id="thumbnailSliderCarousel">
-                        <div>
-                            <?php if (count($product['gallery'])): ?>
-                                <?php foreach ($product['gallery'] as $img): ?>
-                                    <div>
-                                        <a href="javascript:void(0);">
-                                            <img src="<?= base_url($img['image']); ?>" alt="" class="owl-thumb-image">
-                                        </a>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                        <?php if (count($product['gallery'])): ?>
+                            <?php foreach ($product['gallery'] as $img): ?>
                                 <div>
                                     <a href="javascript:void(0);">
-                                        <img src="<?= base_url($product['image']); ?>" alt="" class="owl-thumb-image">
+                                        <img src="<?= base_url($img['image']); ?>" alt="" class="owl-thumb-image">
                                     </a>
                                 </div>
-                            <?php endif; ?>
-                        </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div>
+                                <a href="javascript:void(0);">
+                                    <img src="<?= base_url($product['image']); ?>" alt="" class="owl-thumb-image">
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -81,7 +79,7 @@
                         </div>
                     </div>
                     <?php
-                    $discount = $product['discount_until'] > time() ? convertNumbersToPersian($product['discount_price'], true) : 0;
+                    $discount = $product['discount_until'] > time() ? convertNumbersToPersian($product['discount_price'], true) : convertNumbersToPersian($product['price'], true);
                     $discountPercentage = floor(((convertNumbersToPersian($product['price'], true) - $discount) / convertNumbersToPersian($product['price'], true)) * 100);
                     ?>
                     <div class="box-body pt-0">
@@ -129,7 +127,7 @@
                                             data-cart-quantity-for="#addToCartBtn">
                                         <?php for ($i = 0; $i < $product['max_cart_count'] && $i < $product['stock_count']; ++$i): ?>
                                             <option value="<?= ($i + 1); ?>"
-                                                <?= count($curCartItem) ? ($curCartItem[0]['quantity'] == $i ? 'selected' : '') : ($i == 0 ? 'selected' : ''); ?>>
+                                                <?= count($curCartItem) ? ($curCartItem[0]['quantity'] == ($i + 1) ? 'selected' : '') : ($i == 0 ? 'selected' : ''); ?>>
                                                 <?= convertNumbersToPersian(($i + 1)); ?>
                                             </option>
                                         <?php endfor; ?>
@@ -235,7 +233,7 @@
                             $keywords = explode(',', $product['keywords']);
                             ?>
                             <?php foreach ($keywords as $keyword): ?>
-                                <a href="<?= base_url('search/tag/' . trim($keyword)); ?>"
+                                <a href="<?= base_url('product/all/tag/' . trim($keyword)); ?>"
                                    class="btn btn-outline-secondary m-2">
                                     <?= trim($keyword); ?>
                                 </a>
@@ -276,13 +274,15 @@
                                         </span>
                                     </div>
                                     <div class="card-title">
-                                        <a href="<?= base_url('product/detail/' . $related['id'] . '/' . $related['slug']); ?>" title="<?= $related['title']; ?>">
+                                        <a href="<?= base_url('product/detail/' . $related['id'] . '/' . $related['slug']); ?>"
+                                           title="<?= $related['title']; ?>">
                                             <?= $related['title']; ?>
                                         </a>
                                     </div>
 
                                     <?php
-                                    $discountPercentage = floor(((convertNumbersToPersian($related['price'], true) - convertNumbersToPersian($related['discount_price'], true)) / convertNumbersToPersian($related['price'], true)) * 100);
+                                    $discount = $related['discount_until'] > time() ? convertNumbersToPersian($related['discount_price'], true) : convertNumbersToPersian($related['price'], true);
+                                    $discountPercentage = floor(((convertNumbersToPersian($related['price'], true) - $discount) / convertNumbersToPersian($related['price'], true)) * 100);
                                     ?>
                                     <div class="card-info">
                                         <div>

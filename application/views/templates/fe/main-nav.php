@@ -7,8 +7,8 @@
                 <nav class="nav nav-items">
                     <?php foreach ($menuNavigation as $item): ?>
                         <a class="nav-item" href="<?= base_url('product/all/category/' . $item['slug']); ?>">
-                            <?php if ($setting['main']['showMenuIcon']): ?>
-                                <i class="<?= $item['icon']; ?> nav-item-icon"></i>
+                            <?php if ($setting['main']['showMenuIcon'] == 1): ?>
+                                <i class="<?= $item['icon_name']; ?> nav-item-icon"></i>
                             <?php endif; ?>
                             <span class="nav-item-text"><?= $item['name']; ?></span>
                         </a>

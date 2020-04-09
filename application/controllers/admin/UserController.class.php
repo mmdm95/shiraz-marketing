@@ -51,7 +51,11 @@ class UserController extends AbstractController
             ]);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['mobile', 'subset_of', 'password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validatePersianMobile('mobile')
                     ->validatePersianName(['first_name', 'last_name'], 'نام و نام خانوادگی باید از حروف فارسی باشند.')
@@ -71,7 +75,7 @@ class UserController extends AbstractController
                     $values['image'] = PROFILE_DEFAULT_IMAGE;
                 }
 
-                $marketers = $this->data['marketers'];
+                $marketers = array_column($this->data['marketers'], 'id');
                 $marketers[] = -1;
                 if (!in_array($values['subset_of'], $marketers)) {
                     $form->setError('معرف انتخاب شده نامعتبر است.');
@@ -186,7 +190,11 @@ class UserController extends AbstractController
         ])->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['mobile', 'subset_of'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validatePersianMobile('mobile')
                     ->validatePersianName(['first_name', 'last_name'], 'نام و نام خانوادگی باید از حروف فارسی باشند.');
@@ -201,7 +209,7 @@ class UserController extends AbstractController
                     $values['image'] = PROFILE_DEFAULT_IMAGE;
                 }
 
-                $marketers = $this->data['marketers'];
+                $marketers = array_column($this->data['marketers'], 'id');
                 $marketers[] = -1;
                 if (!in_array($values['icon'], $marketers)) {
                     $form->setError('معرف انتخاب شده نامعتبر است.');
@@ -649,6 +657,7 @@ class UserController extends AbstractController
     public function userDepositAction($param)
     {
         $model = new Model();
+        $orderModel = new OrderModel();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_USER, 'id=:id', ['id' => $param[0]])) {
             $this->redirect(base_url('admin/user/manageUser'));
@@ -664,8 +673,13 @@ class UserController extends AbstractController
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
-                $form->isInRange('price', 0, PHP_INT_MAX, 'قیمت باید عددی بیشتر از صفر باشد.');
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
+                $form->validate('numeric', 'price', 'قیمت افزایش حساب باید از نوع عدد باشد.')
+                    ->isInRange('price', 1000, PHP_INT_MAX, 'قیمت باید عددی بیشتر از ۱۰۰۰ تومان باشد.');
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $commonModel = new CommonModel();
                 $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
@@ -678,10 +692,11 @@ class UserController extends AbstractController
                         'account_balance' => 'account_balance+' . (int)$values['price']
                     ]);
                 $res = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                    'deposit_code' => $code,
+                    'deposit_code' => 'DEP-' . $code,
                     'user_id' => $this->data['param'][0],
                     'payer_id' => $this->data['identity']->id,
-                    'deposit_price' => $values['price'],
+                    'deposit_price' => (int)$values['price'],
+                    'description' => 'افزایش موجودی حساب',
                     'deposit_type' => DEPOSIT_TYPE_OTHER,
                     'deposit_date' => time(),
                 ]);
@@ -707,10 +722,28 @@ class UserController extends AbstractController
             }
         }
 
+        $this->data['user'] = $model->select_it(null, self::TBL_USER, ['first_name', 'last_name', 'mobile'], 'id=:id', ['id' => $param[0]])[0];
+        $this->data['user']['balance'] = $model->select_it(null, self::TBL_USER_ACCOUNT, 'account_balance',
+            'user_id=:id', ['id' => $param[0]]);
+        $this->data['user']['balance'] = count($this->data['user']['balance']) ? $this->data['user']['balance'][0]['account_balance'] : 0;
+        // Calculate account income
+        $idPaySum = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, ['SUM(price) AS sum'],
+            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+        $mabnaSum = $model->select_it(null, self::PAYMENT_TABLE_MABNA, ['SUM(price) AS sum'],
+            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+        $zarinpalSum = $model->select_it(null, self::PAYMENT_TABLE_ZARINPAL, ['SUM(price) AS sum'],
+            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+        $this->data['user']['total_income'] = $idPaySum + $mabnaSum + $zarinpalSum;
+        // Calculate account outcome
+        $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],
+            'user_id=:uId', ['uId' => $param[0]])[0]['sum'];
+        // Deposit transactions
+        $this->data['user']['transactions'] = $orderModel->getUserDeposit('ud.user_id=:uId', ['uId' => $param[0]]);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کیف پول کاربر');
 
+        // Extra js
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
@@ -737,7 +770,11 @@ class UserController extends AbstractController
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
-                $values = array_map('trim', $values);
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
                 $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');

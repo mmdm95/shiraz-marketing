@@ -9,14 +9,14 @@
             </button>
             <div class="logo-container">
                 <a href="<?= base_url('index'); ?>" class="logo-wrapper">
-                    <img src="<?= asset_url('fe/images/logo.png'); ?>" alt="لوگو">
+                    <img src="<?= base_url($logo); ?>" alt="<?= $setting['main']['title']; ?>">
                     <h1 class="irentezar">
                         شیراز مارکتینگ
                     </h1>
                 </a>
             </div>
             <div class="search-container col">
-                <form class="search-form" id="mobileSearchForm" method="get" action="<?= base_url('search'); ?>">
+                <form class="search-form" id="mobileSearchForm" method="get" action="<?= base_url('product/all'); ?>">
                     <button type="submit" class="btn btn-primary-main search-button">
                         جستجو
                     </button>
