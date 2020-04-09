@@ -95,6 +95,10 @@
     font-family: 'IREntezar', Arial, sans-serif !important;
 }
 
+.en-font {
+    font-family: Arial, sans-serif;
+}
+
 :root {
     /* Main bg color */
     --darker-bg: #e1e2e5;

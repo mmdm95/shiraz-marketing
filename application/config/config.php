@@ -79,6 +79,7 @@ defined('SMS_REPLACEMENT_CHARS') OR define('SMS_REPLACEMENT_CHARS', [
     'code' => '@code@',
     'orderCode' => '@orderCode@',
     'status' => '@status@',
+    'balance' => '@balance@',
 ]);
 
 // My custom order code prefix

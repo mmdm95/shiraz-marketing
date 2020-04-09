@@ -808,7 +808,7 @@ class HomeController extends AbstractController
         $this->data['errors_sms'] = [];
         $this->data['form_token_sms'] = $form->csrfToken('settingSMS');
         $form->setFieldsName([
-            'smsActivation', 'smsForgetPassword', 'smsProductReg', 'smsStatus'
+            'smsActivation', 'smsForgetPassword', 'smsProductReg', 'smsStatus', 'smsChargeAccount'
         ])->setMethod('post');
         try {
             $form->beforeCheckCallback(function () use ($form) {
@@ -818,6 +818,7 @@ class HomeController extends AbstractController
                 $this->data['setting']['sms']['forgetPasswordCodeMsg'] = trim($values['smsForgetPassword']);
                 $this->data['setting']['sms']['productRegistrationMsg'] = trim($values['smsProductReg']);
                 $this->data['setting']['sms']['changeStatusMsg'] = trim($values['smsStatus']);
+                $this->data['setting']['sms']['chargeAccountBalanceMsg'] = trim($values['smsChargeAccount']);
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);
@@ -918,9 +919,9 @@ class HomeController extends AbstractController
         $this->data['form_token_footer'] = $form->csrfToken('settingFooter');
         $form->setFieldsName([
             'footer_1_title', 'footer_1_text', 'footer_1_link',
-            'namad1', 'namad2',
+            'namad1', 'namad2', 'namad3',
             'telegram', 'instagram', 'whatsapp',
-        ])->xssExcludeVariables(['namad1', 'namd2'])
+        ])->xssExcludeVariables(['namad1', 'namad2', 'namad3'])
             ->setMethod('post');
         try {
             $form->afterCheckCallback(function ($values) use ($form) {
@@ -939,6 +940,7 @@ class HomeController extends AbstractController
 
                 $this->data['setting']['footer']['namad']['namad1'] = htmlentities(trim($values['namad1']));
                 $this->data['setting']['footer']['namad']['namad2'] = htmlentities(trim($values['namad2']));
+                $this->data['setting']['footer']['namad']['namad3'] = htmlentities(trim($values['namad3']));
 
                 $this->data['setting']['footer']['socials']['telegram'] = $values['telegram'];
                 $this->data['setting']['footer']['socials']['instagram'] = $values['instagram'];

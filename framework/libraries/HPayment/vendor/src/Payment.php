@@ -44,6 +44,7 @@ abstract class Payment
     const PAYMENT_TRANSACTION_CANCELED_MABNA = -1;
     const PAYMENT_TRANSACTION_TIMEOUT_MABNA = -2;
     // url constant(s)
+    const PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA = 10;
     const PAYMENT_URL_PAYMENT_MABNA = 1;
     const PAYMENT_URL_BILL_MABNA = 2;
     const PAYMENT_URL_BATCH_BILL_MABNA = 3;
@@ -60,6 +61,10 @@ abstract class Payment
     const PAYMENT_STATUS_OK_MABNA = 100;
     const PAYMENT_STATUS_FAILED_MABNA = -1;
     const PAYMENT_STATUS_DUPLICATE_MABNA = 101;
+    //-----
+    const PAYMENT_ADVICE_OK_MABNA = 'OK';
+    const PAYMENT_ADVICE_NOK_MABNA = 'NOK';
+    const PAYMENT_ADVICE_DUPLICATE_MABNA = 'Duplicate';
 
     //********************************
     //****** ZarinPal constants ******

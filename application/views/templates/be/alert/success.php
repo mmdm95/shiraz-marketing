@@ -2,7 +2,10 @@
 
 <?php if (isset($success)): ?>
     <div class="alert alert-success alert-dismissible fade in alert-styled-left alert-bordered no-border-top no-border-right no-border-bottom">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close" style="top: 4px; left: -15px;">&times;</a>
+        <button type="button" class="close" data-dismiss="alert">
+            <span>×</span>
+            <span class="sr-only">Close</span>
+        </button>
         <p class="no-margin-bottom">
             <?= $success; ?>
         </p>

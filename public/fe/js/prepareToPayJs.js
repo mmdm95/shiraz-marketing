@@ -7,13 +7,10 @@
         //---------- Variables ---------
         //------------------------------
         var
-            shopping_side_card,
+            theForm,
+            payment_radio,
             //-----
-            off_inp,
-            off_btn,
-            //-----
-            check_off_code_url,
-            price_calculate_url;
+            get_token_url;
 
         var
             namespace = 'shoppingActions',
@@ -22,68 +19,63 @@
             //-----
             ajax_obj = {};
 
-        check_off_code_url = baseUrl + 'checkOffCode';
-        price_calculate_url = baseUrl + 'prepareShoppingSideCard';
+        get_token_url = baseUrl + '';
 
         //------------------------------
         //---------- Functions ---------
         //------------------------------
-        function offBtnClick() {
-            var $this, code;
-            off_btn.on('click.' + namespace, function () {
+        function formSubmission(url, terminal, token) {
+            var $this, terminal_field, token_field;
+            theForm.submit(function () {
                 $this = $(this);
-                if(!$this.is(':disabled')) {
-                    code = off_inp.val();
-                    if ($.trim(code) !== '') {
-                        shop.ajaxRequest({
-                            url: check_off_code_url,
-                            method: 'POST',
-                            data: {
-                                postedCode: code
-                            }
-                        }, function (response) {
-                            var res = JSON.parse(response);
+                $this.attr('action', url).attr('method', 'post');
+                terminal_field = _hiddenField('terminalID', terminal);
+                token_field = _hiddenField('token', token);
+                $this.prepend(terminal_field);
+                $this.prepend(token_field);
+                return true;
+            });
+        }
 
-                            shop.processAjaxData(res, function (content) {
-                                if (res.success) {
-                                    shopping_side_card.html(content);
-                                    // Disable edit/click the/on input/button
-                                    off_inp.attr('readonly', 'readonly');
-                                    $this.attr('disabled', 'disabled');
-                                    // Call repeater function
-                                    repeaterCaller();
-                                }
-                            });
+        function paymentRadioChange() {
+            var $this, code;
+            payment_radio.on('change.' + namespace, function () {
+                $this = $(this);
+                code = $this.val();
+                if ($.trim(code) !== '' && code == 'PAY_342515312') {
+                    shop.ajaxRequest({
+                        url: get_token_url,
+                        method: 'POST',
+                        data: {
+                            paymentCode: code,
+                        }
+                    }, function (response) {
+                        var res = JSON.parse(response);
+
+                        shop.processAjaxData(res, function (content) {
+                            if (res.success) {
+                                formSubmission(content[0], content[1], content[2]);
+                            }
                         });
-                    }
+                    });
                 }
             });
         }
 
-        function repeaterCaller() {
-            var wiki = $('.wiki');
-            wiki.each(function () {
-                var $this = $(this);
-                $this.popover({
-                    content: $($this.data('content-el')).html(),
-                    html: true
-                });
-            });
+        function _hiddenField(name, value) {
+            return $('<input type="hidden" name="' + name + '" value="' + value + '"/>');
         }
 
         function functionsCaller() {
-            off_inp = $('input[name="code"]');
-            off_btn = $('#offBtn');
+            theForm = $('#paymentForm');
+            payment_radio = $('input[name="payment-radio"]');
             //-----
-            offBtnClick();
-            //-----
-            shopping_side_card = $('.checkout-summary-main');
+            paymentRadioChange();
         }
 
         //------------------------------
         //------- Call Functions -------
         //------------------------------
         functionsCaller();
-        repeaterCaller();
     });
 })(jQuery);

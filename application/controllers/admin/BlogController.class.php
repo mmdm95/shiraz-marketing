@@ -180,18 +180,18 @@ class BlogController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_BLOG_CATEGORY;
         if (!isset($id)) {
-            message('error', 200, 'شناسه دسته‌بندی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه دسته‌بندی نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'دسته‌بندی وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'دسته‌بندی وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'دسته‌بندی با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'دسته‌بندی با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     public function showInSideAction()
@@ -206,23 +206,23 @@ class BlogController extends AbstractController
         $stat = $_POST['stat'];
         $table = self::TBL_BLOG_CATEGORY;
         if (!isset($id) || !isset($stat) || !in_array($stat, [0, 1])) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'دسته‌بندی وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'دسته‌بندی وجود ندارد.');
         }
 
         $res = $model->update_it($table, ['show_in_side' => $stat], 'id=:id', ['id' => $id]);
         if ($res) {
             if ($stat == 1) {
-                message('success', 200, 'نمایش دسته‌بندی در کنار صفحه فعال شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'نمایش دسته‌بندی در کنار صفحه فعال شد.');
             } else {
-                message('warning', 200, 'نمایش دسته‌بندی در کنار صفحه غیر فعال شد.');
+                message(self::AJAX_TYPE_WARNING, 200, 'نمایش دسته‌بندی در کنار صفحه غیر فعال شد.');
             }
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -450,17 +450,17 @@ class BlogController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_BLOG;
         if (!isset($id)) {
-            message('error', 200, 'شناسه مطلب نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه مطلب نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'مطلب وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'مطلب وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'مطلب با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'مطلب با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 }

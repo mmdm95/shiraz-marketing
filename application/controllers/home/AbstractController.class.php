@@ -12,6 +12,7 @@ use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
 use HPayment\Payment;
+use HPayment\PaymentClasses\PaymentMabna;
 use HPayment\PaymentException;
 use HPayment\PaymentFactory;
 use HSMS\rohamSMS;
@@ -1184,6 +1185,9 @@ abstract class AbstractController extends AbstractPaymentController
                 if (!in_array($values['payment_radio'], $arr)) {
                     $form->setError('شیوه پرداخت انتخاب شده، نامعتبر است.');
                 }
+                if (in_array($values['payment_radio'], $this->gatewayTables[self::PAYMENT_TABLE_MABNA])) {
+                    $form->setError('اتصال به درگاه پرداخت با مشکل روبرو شده است.');
+                }
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -1208,6 +1212,9 @@ abstract class AbstractController extends AbstractPaymentController
 
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'آماده پرداخت');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('fe/js/prepareToPayJs.js');
 
         $this->_render_page(['pages/fe/payment']);
     }
@@ -1311,31 +1318,9 @@ abstract class AbstractController extends AbstractPaymentController
             $this->error->show_404();
         }
         //-----
-        $model = new Model();
         call_user_func_array($this->paymentResultParam[$param[0]], []);
         //-----
         if (!isset($this->data['order_code'])) $this->error->show_404();
-        //-----
-        // Select current factor
-        $this->data['cur_factor'] = $model->select_it(null, self::TBL_ORDER, '*',
-            'order_code=:oc AND user_id=:uId', ['oc' => $this->data['order_code'], 'uId' => $this->data['identity']->id])[0];
-        // Select current factor status label
-        $this->data['order_status'] = $model->select_it(null, 'send_status', ['name', 'badge'],
-            'id=:id', ['id' => $this->data['cur_factor']['send_status']])[0];
-        // Set if gateway method is one of the known method codes for bank gateway
-        $this->data['is_gateway_method'] = false;
-        foreach ($this->gatewayTables as $table => $codeArr) {
-            if (in_array($this->data['cur_factor']['method_code'], $codeArr) !== false) {
-                $this->data['is_gateway_method'] = true;
-                break;
-            }
-        }
-        // Get count of items
-        $this->data['order_items_count'] = $model->it_count(self::TBL_ORDER_ITEM,
-            'order_code=:oc', ['oc' => $this->data['order_code']]);
-        // Get count of sum of each item
-        $this->data['order_all_items_count'] = $model->select_it(null, self::TBL_ORDER_ITEM, 'SUM(product_count) AS count',
-            'order_code=:oc', ['oc' => $this->data['order_code']])[0]['count'];
 
         // Other information
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'نتیجه تراکنش');
@@ -1616,7 +1601,7 @@ abstract class AbstractController extends AbstractPaymentController
     //---- Gateway actions ---
     //------------------------
 
-    private function _gateway_processor($prev, $paymentMethod)
+    private function _gateway_processor($prev, $paymentMethod, $hasLimited = false)
     {
         $model = new Model();
 
@@ -1771,6 +1756,10 @@ abstract class AbstractController extends AbstractPaymentController
                     'exportation' => FACTOR_EXPORTATION_TYPE_BUY,
                 ];
 
+                if ($hasLimited === true) {
+                    return true;
+                }
+
                 // Call one of the [_*_connection] functions
                 $res = call_user_func_array($this->gatewayFunctions[$gatewayTable], $parameters);
                 if (!$res) {
@@ -1806,7 +1795,7 @@ abstract class AbstractController extends AbstractPaymentController
         $this->load->library('HPayment/vendor/autoload');
         try {
             $model = new Model();
-            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY);
+            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY, '2b4846e8-5fc3-4ef9-b7e8-905ccbb8c46f');
             //-----
             $redirectMessage = 'انتقال به درگاه پرداخت ...';
             $wait = 1;
@@ -1842,9 +1831,62 @@ abstract class AbstractController extends AbstractPaymentController
         }
     }
 
-    protected function _mabna_connection()
+    protected function _mabna_connection($parameters)
     {
+        if (is_ajax() && !$this->auth->isLoggedIn()) {
+            message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
+        }
+        if (!is_ajax() && !$this->auth->isLoggedIn()) {
+            $this->error->access_denied();
+        }
+        //-----
+        $code = $_POST['paymentCode'] ?? '';
+        if (empty($code) || !in_array($code, $this->gatewayTables[self::PAYMENT_TABLE_MABNA])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'پارامتر ارسال شده نامعتبر است!');
+        }
+        //-----
+        $prevData = $this->session->get('shopping_page_session');
+        $status = $this->_gateway_processor($prevData, $code, true);
+        if (!$status) {
+            message(self::AJAX_TYPE_ERROR, 200, 'خطا در ثبت سفارش! لطفا مجددا تلاش نمایید.');
+        }
+        //-----
+        $this->load->library('HPayment/vendor/autoload');
+        try {
+            $model = new Model();
+            $mabna = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_MABNA);
+            //-----
+            $payRes = $mabna->get_token([
+                'invoiceID' => $parameters['order_code'],
+                'Amount' => $parameters['price'] * 10,
+                'callbackURL' => $parameters['backUrl'],
+                'terminalID' => '69005147'])->get_result();
+            // Handle result of payment gateway
+            if (isset($payRes['Status']) && isset($payRes['AccessToken']) && $payRes['Status'] == 0) {
+                // Insert new payment in DB
+                $res = $model->insert_it(self::PAYMENT_TABLE_MABNA, [
+                    'order_code' => $parameters['order_code'],
+                    'user_id' => $this->data['identity']->id,
+                    'price' => $parameters['price'],
+                    'exportation_type' => $parameters['exportation'],
+                ]);
+                // Required information
+                $token = $payRes['AccessToken'];
+                $terminal = '69005147';
+                $url = $mabna->urls[PaymentMabna::PAYMENT_URL_PAYMENT_MABNA];
 
+                if ($res) {
+                    // Send user to mabna for transaction
+                    message(self::AJAX_TYPE_SUCCESS, 200, ['', $url, $terminal, $token]);
+                } else {
+                    message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
+                }
+            } else {
+                message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
+            }
+        } catch (PaymentException $e) {
+            message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
+        }
     }
 
     protected function _zarinpal_connection($parameters)
@@ -1897,25 +1939,25 @@ abstract class AbstractController extends AbstractPaymentController
 
         try {
             $model = new Model();
-            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY);
+            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY, '2b4846e8-5fc3-4ef9-b7e8-905ccbb8c46f');
             $postVars = $idpay->handle_request()->get_result();
 
             // Check for factor first and If factor exists
             if (isset($postVars['order_id']) && isset($postVars['status']) &&
                 $model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $postVars['order_id']])) {
-                // Set factor_code to global data
+                // Set order_code to global data
                 $this->data['order_code'] = $postVars['order_id'];
-                // Select factor
+                // Select order
                 $order = $model->select_it(null, self::TBL_ORDER, [
                     'order_code', 'final_price', 'payment_status'
-                ], 'factor_code=:fc', ['fc' => $postVars['order_id']])[0];
-                // Select factor payment according to gateway id result
+                ], 'order_code=:oc', ['oc' => $postVars['order_id']])[0];
+                // Select order payment according to gateway id result
                 $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, [
                     'payment_id', 'status'
-                ], 'order_code=:oc AND payment_id=:pId', ['fc' => $postVars['order_id'], 'pId' => $postVars['id']]);
+                ], 'order_code=:oc AND payment_id=:pId', ['oc' => $postVars['order_id'], 'pId' => $postVars['id']]);
                 // If there is a record in gateway table(only one record is acceptable)
                 if (count($orderPayment) == 1) {
-                    // Select factor payment
+                    // Select order payment
                     $orderPayment = $orderPayment[0];
                     // Check if factor was advice before
                     if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED &&
@@ -1936,36 +1978,45 @@ abstract class AbstractController extends AbstractPaymentController
 
                                 // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
                                 if ($status == Payment::PAYMENT_STATUS_OK_IDPAY) {
+                                    // Transaction
+                                    $model->transactionBegin();
                                     // Store extra info from bank's gateway result
-                                    $model->update_it(self::TBL_ORDER, [
+                                    $res1 = $model->update_it(self::TBL_ORDER, [
                                         'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
                                     ], 'order_code=:oc', ['oc' => $order['order_code']]);
-                                    $model->update_it(self::PAYMENT_TABLE_IDPAY, [
+                                    $res2 = $model->update_it(self::PAYMENT_TABLE_IDPAY, [
                                         'payment_code' => $advice['payment']['track_id'],
                                         'status' => $status,
                                     ], 'order_code=:oc', ['oc' => $order['order_code']]);
                                     $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
                                     $traceNumber = $advice['payment']['track_id'];
 
-                                    // Set success parameters
-                                    $this->data['success'] = $success;
-                                    $this->data['is_success'] = true;
                                     $this->data['ref_id'] = $traceNumber;
                                     $this->data['have_ref_id'] = true;
+                                    if ($res1 && $res2) {
+                                        $model->transactionComplete();
+                                        // Set success parameters
+                                        $this->data['success'] = $success;
+                                        $this->data['is_success'] = true;
 
-                                    // Send sms to user if is login
-                                    if ($this->auth->isLoggedIn()) {
-                                        // Send SMS code goes here
-                                        $this->load->library('HSMS/rohamSMS');
-                                        $sms = new rohamSMS();
-                                        try {
-                                            $body = $this->setting['sms']['activationCodeMsg'];
-                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
-                                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
-                                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
-                                        } catch (SMSException $e) {
-                                            die($e->getMessage());
+                                        // Send sms to user if is login
+                                        if ($this->auth->isLoggedIn()) {
+                                            // Send SMS code goes here
+                                            $this->load->library('HSMS/rohamSMS');
+                                            $sms = new rohamSMS();
+                                            try {
+                                                $body = $this->setting['sms']['activationCodeMsg'];
+                                                $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                                $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
+                                                $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                            } catch (SMSException $e) {
+                                                die($e->getMessage());
+                                            }
                                         }
+                                    } else {
+                                        $model->transactionRollback();
+                                        $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                        $this->data['is_success'] = false;
                                     }
                                 }
                             } else {
@@ -1994,9 +2045,17 @@ abstract class AbstractController extends AbstractPaymentController
                 }
 
                 // Store current result from bank gateway
-                $model->update_it(self::TBL_ORDER, [
-                    'payment_date' => $postVars['date']
-                ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                if (!isset($status)) {
+                    $updateColumns = [
+                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                        'payment_date' => $postVars['date'],
+                    ];
+                } else {
+                    $updateColumns = [
+                        'payment_date' => $postVars['date'],
+                    ];
+                }
+                $model->update_it(self::TBL_ORDER, $updateColumns, 'order_code=:oc', ['oc' => $order['order_code']]);
                 $model->update_it(self::PAYMENT_TABLE_IDPAY, [
                     'status' => isset($status) ? $status : $postVars['status'],
                     'track_id' => $postVars['track_id'],
@@ -2021,7 +2080,164 @@ abstract class AbstractController extends AbstractPaymentController
 
     protected function _mabna_result()
     {
+        $this->load->library('HPayment/vendor/autoload');
 
+        try {
+            $model = new Model();
+            $mabna = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_MABNA);
+            $postVars = $mabna->handle_request()->get_result();
+            $terminal = '69005147';
+
+            // Check for factor first and If factor exists
+            if (isset($postVars['respcode']) && isset($postVars['respmsg']) && isset($postVars['amount']) &&
+                isset($postVars['payload']) && isset($postVars['terminalid']) && isset($postVars['tracenumber']) &&
+                isset($postVars['rrn']) && isset($postVars['datePaid']) && isset($postVars['digitalreceipt']) &&
+                isset($postVars['datePaid']) && isset($postVars['issuerbank']) && isset($postVars['payid']) &&
+                isset($postVars['cardnumber']) && isset($postVars['invoiceid']) &&
+                $postVars['respcode'] == 0 && $postVars['terminalid'] == $terminal &&
+                $model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $postVars['invoiceid']]) &&
+                !$model->is_exist(self::PAYMENT_TABLE_MABNA, 'digitalreceipt=:dr', ['dr' => $postVars['digitalreceipt']])) {
+                // Set order_code to global data
+                $this->data['order_code'] = $postVars['invoiceid'];
+                // Select order
+                $order = $model->select_it(null, self::TBL_ORDER, [
+                    'order_code', 'final_price', 'payment_status'
+                ], 'order_code=:oc', ['oc' => $postVars['invoiceid']])[0];
+                // Select order payment according to gateway id result
+                $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_MABNA, [
+                    'status'
+                ], 'order_code=:oc', ['oc' => $postVars['order_id']]);
+                // If there is a record in gateway table(only one record is acceptable)
+                if (count($orderPayment) == 1) {
+                    // Select order payment
+                    $orderPayment = $orderPayment[0];
+                    // Check if factor was advice before
+                    if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED &&
+                        !in_array($orderPayment['status'], [Payment::PAYMENT_STATUS_OK_MABNA, Payment::PAYMENT_STATUS_DUPLICATE_MABNA])) {
+                        // Check for returned amount
+                        if ((intval($order['final_price']) * 10) == $postVars['amount']) {
+                            // If all are ok send advice to bank gateway
+                            // This means ready to transfer money to our bank account
+                            $advice = $mabna->send_advice([
+                                'digitalreceipt' => $postVars['digitalreceipt'],
+                                'Tid' => $terminal,
+                            ]);
+
+                            // Check for error
+                            if (isset($advice['Status']) &&
+                                ($advice['Status'] == Payment::PAYMENT_ADVICE_OK_MABNA || $advice['Status'] == Payment::PAYMENT_ADVICE_DUPLICATE_MABNA)) {
+                                $status = $advice['Status'];
+
+                                // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
+                                if ($status == Payment::PAYMENT_ADVICE_OK_MABNA) {
+                                    if ($advice['ReturnId'] == (intval($order['final_price']) * 10)) {
+                                        // Transaction
+                                        $model->transactionBegin();
+                                        // Store extra info from bank's gateway result
+                                        $res1 = $model->update_it(self::TBL_ORDER, [
+                                            'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
+                                        ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                        $res2 = $model->update_it(self::PAYMENT_TABLE_MABNA, [
+                                            'payment_code' => $postVars['tracenumber'] ?: '',
+                                            'status' => $status,
+                                        ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                        $success = $advice['Message'];
+                                        $traceNumber = $postVars['tracenumber'];
+
+                                        $this->data['ref_id'] = $traceNumber;
+                                        $this->data['have_ref_id'] = true;
+                                        if ($res1 && $res2) {
+                                            $model->transactionComplete();
+                                            // Set success parameters
+                                            $this->data['success'] = $success;
+                                            $this->data['is_success'] = true;
+
+                                            // Send sms to user if is login
+                                            if ($this->auth->isLoggedIn()) {
+                                                // Send SMS code goes here
+                                                $this->load->library('HSMS/rohamSMS');
+                                                $sms = new rohamSMS();
+                                                try {
+                                                    $body = $this->setting['sms']['activationCodeMsg'];
+                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
+                                                    $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                                } catch (SMSException $e) {
+                                                    die($e->getMessage());
+                                                }
+                                            }
+                                        } else {
+                                            $model->transactionRollback();
+                                            $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                            $this->data['is_success'] = false;
+                                        }
+                                    } else {
+                                        $this->data['error'] = $mabna->get_message($advice['ReturnId'], Payment::PAYMENT_STATUS_VERIFY_MABNA);
+                                        $this->data['is_success'] = false;
+                                        $this->data['ref_id'] = $postVars['tracenumber'] ?: $postVars['payid'];
+                                        $this->data['have_ref_id'] = true;
+                                    }
+                                }
+                            } else {
+                                $this->data['error'] = $mabna->get_message($advice['ReturnId'], Payment::PAYMENT_STATUS_VERIFY_MABNA);
+                                $this->data['is_success'] = false;
+                                $this->data['ref_id'] = $postVars['tracenumber'] ?: $postVars['payid'];
+                                $this->data['have_ref_id'] = true;
+                            }
+                        } else {
+                            $this->data['error'] = 'فاکتور نامعتبر است!';
+                            $this->data['is_success'] = false;
+                            $this->data['ref_id'] = $postVars['tracenumber'] ?: $postVars['payid'];
+                            $this->data['have_ref_id'] = true;
+                        }
+                    } else {
+                        $this->data['error'] = 'فاکتور نامعتبر است!';
+                        $this->data['is_success'] = false;
+                        $this->data['ref_id'] = $postVars['tracenumber'] ?: $postVars['payid'];
+                        $this->data['have_ref_id'] = true;
+                    }
+                } else {
+                    $this->data['error'] = 'فاکتور نامعتبر است!';
+                    $this->data['is_success'] = false;
+                    $this->data['ref_id'] = $postVars['tracenumber'] ?: $postVars['payid'];
+                    $this->data['have_ref_id'] = true;
+                }
+
+                // Store current result from bank gateway
+                if (!isset($status)) {
+                    $updateColumns = [
+                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                        'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
+                    ];
+                } else {
+                    $updateColumns = [
+                        'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
+                    ];
+                }
+                $model->update_it(self::TBL_ORDER, $updateColumns, 'order_code=:oc', ['oc' => $order['order_code']]);
+                $model->update_it(self::PAYMENT_TABLE_MABNA, [
+                    'status' => isset($status) ? $status : $postVars['respcode'],
+                    'payment_id' => $postVars['payid'],
+                    'digitalreceipt' => $postVars['digitalreceipt'],
+                    'rrn' => $postVars['rrn'] ?: '',
+                    'msg' => isset($status) ? $advice['Message'] : $postVars['respmsg'],
+                    'bank_name' => $postVars['issuerbank'],
+                    'mask_card_number' => $postVars['cardnumber'],
+                    'payment_date' => time(),
+                ], 'order_code=:oc', ['oc' => $order['order_code']]);
+
+                // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
+                if (isset($success)) {
+                    $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $order['order_code']]);
+                }
+            } else {
+                $this->data['error'] = 'تراکنش نامعتبر است!';
+                $this->data['is_success'] = false;
+                $this->data['have_ref_id'] = false;
+            }
+        } catch (PaymentException $e) {
+            die($e);
+        }
     }
 
     protected function _zarinpal_result()
@@ -2050,7 +2266,7 @@ abstract class AbstractController extends AbstractPaymentController
                     'user_id=:uId AND order_code=:oc', ['uId' => $curPay['user_id'], 'oc' => $curPay['order_code']]);
                 if (count($curFactor)) {
                     $curFactor = $curFactor[0];
-                    // Set factor_code to global data
+                    // Set order_code to global data
                     $this->data['order_code'] = $curPay['order_code'];
                     if ($curPay['status'] != Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
                         $res = $zarinpal->verify_request($curPay['amount']);
@@ -2062,16 +2278,24 @@ abstract class AbstractController extends AbstractPaymentController
                             if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL) {
                                 $this->data['ref_id'] = $res->RefID;
 
+                                $model->transactionBegin();
                                 // Update payment status and refID for success
-                                $model->update_it(self::PAYMENT_TABLE_ZARINPAL, [
+                                $res1 = $model->update_it(self::PAYMENT_TABLE_ZARINPAL, [
                                     'payment_code' => $this->data['ref_id'],
                                     'status' => $zarinpal->status,
                                     'payment_date' => time(),
                                 ], 'authority=:auth', ['auth' => 'zarinpal-' . $authority]);
-                                $model->update_it(self::TBL_ORDER, [
+                                $res2 = $model->update_it(self::TBL_ORDER, [
                                     'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL,
                                     'payment_date' => time(),
                                 ], 'order_code=:oc', ['oc' => $curPay['order_code']]);
+                                if ($res1 && $res2) {
+                                    $model->transactionComplete();
+                                } else {
+                                    $model->transactionRollback();
+                                    $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                    $this->data['is_success'] = false;
+                                }
                             }
                         } else if (intval($zarinpal->status) == Payment::PAYMENT_TRANSACTION_CANCELED_ZARINPAL) { // Transaction was canceled
                             $this->data['is_success'] = false;

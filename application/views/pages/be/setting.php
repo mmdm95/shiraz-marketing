@@ -637,6 +637,29 @@
                                             </div>
                                         </div>
 
+                                        <?php $this->view('templates/be/title', ['header_title' => 'پیامک شارژ حساب کاربری']) ?>
+                                        <div class="row pl-20 pr-20 pb-20">
+                                            <div class="form-group col-md-12">
+                                                <textarea class="form-control col-md-12 p-10"
+                                                          style="min-height: 100px; resize: vertical;"
+                                                          name="smsChargeAccount"
+                                                          placeholder="متن پیامک"
+                                                          rows="4"
+                                                          cols="10"><?= $values_sms['smsChargeAccount'] ?? $setting['sms']['chargeAccountBalanceMsg'] ?? ''; ?></textarea>
+                                                <span class="help-block col-md-12">
+                                                    می‌توانید از
+                                                    <code>
+                                                        @mobile@
+                                                    </code>
+                                                    برای قرار دادن محل شماره موبایل و از
+                                                    <code>
+                                                        @balance@
+                                                    </code>
+                                                    برای قرار دادن اعتبار فعلی استفاده کنید.
+                                                </span>
+                                            </div>
+                                        </div>
+
                                         <div class="text-center">
                                             <hr style="margin-bottom: 0;">
                                             <button type="submit"
@@ -1014,12 +1037,20 @@
                                                           cols="10"><?= $values_footer['namad1'] ?? html_entity_decode($setting['footer']['namad']['namad1'] ?? ''); ?></textarea>
                                             </div>
                                             <div class="form-group col-md-12">
-                                                <label>کد نشان ملی ثبت:</label>
+                                                <label>کد عضویت کسب و کارهای مجازی:</label>
                                                 <textarea class="form-control col-md-12 p-10 ltr"
                                                           style="min-height: 100px; resize: vertical;"
                                                           name="namad2"
                                                           rows="4"
                                                           cols="10"><?= $values_footer['namad2'] ?? html_entity_decode($setting['footer']['namad']['namad2'] ?? ''); ?></textarea>
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>کد نشان ملی ثبت:</label>
+                                                <textarea class="form-control col-md-12 p-10 ltr"
+                                                          style="min-height: 100px; resize: vertical;"
+                                                          name="namad3"
+                                                          rows="4"
+                                                          cols="10"><?= $values_footer['namad3'] ?? html_entity_decode($setting['footer']['namad']['namad3'] ?? ''); ?></textarea>
                                             </div>
                                         </div>
 

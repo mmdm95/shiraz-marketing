@@ -21,14 +21,14 @@ abstract class AbstractPaymentController extends HController
     protected $gatewayTables = [
         self::PAYMENT_TABLE_IDPAY => [
             'PAY_798447359',
+        ],
+        self::PAYMENT_TABLE_MABNA => [
             'PAY_342515312',
         ],
-        self::PAYMENT_TABLE_MABNA => [],
         self::PAYMENT_TABLE_ZARINPAL => [],
     ];
     protected $gatewayFunctions = [
         self::PAYMENT_TABLE_IDPAY => [__CLASS__, '_idpay_connection'],
-        self::PAYMENT_TABLE_MABNA => [__CLASS__, '_mabna_connection'],
         self::PAYMENT_TABLE_ZARINPAL => [__CLASS__, '_zarinpal_connection'],
     ];
     //-----

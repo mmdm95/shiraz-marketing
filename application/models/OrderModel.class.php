@@ -17,8 +17,7 @@ class OrderModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'o.id', 'o.order_code', 'o.first_name', 'o.last_name', 'o.payment_date', 'o.order_date',
-            'o.final_price', 'o.payment_status', 'ss.name AS send_status_name', 'ss.badge',
+            'o.*', 'ss.name AS send_status_name', 'ss.badge',
         ])->from($this->table . ' AS o');
 
         try {

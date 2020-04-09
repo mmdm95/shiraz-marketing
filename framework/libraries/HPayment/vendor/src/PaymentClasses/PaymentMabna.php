@@ -64,6 +64,7 @@ class PaymentMabna extends Payment
      * @var array
      */
     public $urls = [
+        self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
         self::PAYMENT_URL_PAYMENT_MABNA => 'https://mabna.shaparak.ir:8080/Pay',
         self::PAYMENT_URL_BILL_MABNA => 'https://mabna.shaparak.ir:8080/Bill',
         self::PAYMENT_URL_BATCH_BILL_MABNA => 'https://mabna.shaparak.ir:8080/BatchBill',
@@ -72,7 +73,7 @@ class PaymentMabna extends Payment
         self::PAYMENT_URL_MOBILE_BILL_MABNA => 'https://mabna.shaparak.ir:8080/MBill',
         self::PAYMENT_URL_MOBILE_BATCH_BILL_MABNA => 'https://mabna.shaparak.ir:8080/MBatchBill',
         self::PAYMENT_URL_MOBILE_CHARGE_MABNA => 'https://mabna.shaparak.ir:8080/MCharge',
-        self::PAYMENT_URL_VERIFY_MABNA => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice'
+        self::PAYMENT_URL_VERIFY_MABNA => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice',
     ];
 
     /**
@@ -112,8 +113,28 @@ class PaymentMabna extends Payment
     public function create_request($data)
     {
         if (is_array($data) && count($data)) {
-            // Set advice url
+            // Set request url
             $this->_parameters[$this->urlStr] = self::PAYMENT_URL_PAYMENT_MABNA;
+            // Check request
+            $this->_request_check($data);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Get token from
+     *
+     * @param $data
+     * @return mixed
+     * @throws PaymentException
+     */
+    public function get_token($data)
+    {
+        if (is_array($data) && count($data)) {
+            // Set token url
+            $this->_parameters[$this->urlStr] = self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA;
             // Check request
             $this->_request_check($data);
         }
@@ -158,7 +179,8 @@ class PaymentMabna extends Payment
      * @param $kind - a <i>PAYMENT_STATUS_*_MABNA</i> constant
      * @return string|bool - return <b>string</b> if there is message otherwise return <b>false</b>
      */
-    public function get_message($code, $kind) {
+    public function get_message($code, $kind)
+    {
         if (isset($code) && isset($this->_statusArr[$kind]) && key_exists($code, $this->_statusArr[$kind])) {
             return $this->_statusArr[$kind][$code];
         }

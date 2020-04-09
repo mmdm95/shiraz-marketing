@@ -228,18 +228,18 @@ class ShopController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_CATEGORY;
         if (!isset($id)) {
-            message('error', 200, 'شناسه دسته‌بندی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه دسته‌بندی نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'دسته‌بندی وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'دسته‌بندی وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'دسته‌بندی با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'دسته‌بندی با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -446,18 +446,18 @@ class ShopController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_COUPON;
         if (!isset($id)) {
-            message('error', 200, 'شناسه کوپن نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه کوپن نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'کوپن وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کوپن وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'کوپن با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'کوپن با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -813,10 +813,10 @@ class ShopController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_PRODUCT;
         if (!isset($id)) {
-            message('error', 200, 'شناسه محصول نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه محصول نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'محصول وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'محصول وجود ندارد.');
         }
 
         try {
@@ -828,12 +828,12 @@ class ShopController extends AbstractController
                 ], 'id=:id', ['id' => $id]);
             }
             if ($res) {
-                message('success', 200, 'محصول با موفقیت حذف شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'محصول با موفقیت حذف شد.');
             }
 
-            message('error', 200, 'عملیات با خطا مواجه شد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
         } catch (HAException $e) {
-            message('error', 200, 'امکان حذف محصول وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'امکان حذف محصول وجود ندارد.');
         }
     }
 
@@ -849,23 +849,23 @@ class ShopController extends AbstractController
         $stat = $_POST['stat'];
         $table = self::TBL_PRODUCT;
         if (!isset($id) || !isset($stat) || !in_array($stat, [0, 1])) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'محصول وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'محصول وجود ندارد.');
         }
 
         $res = $model->update_it($table, ['available' => $stat], 'id=:id', ['id' => $id]);
         if ($res) {
             if ($stat == 1) {
-                message('success', 200, 'محصول به حالت موجود تبدیل شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'محصول به حالت موجود تبدیل شد.');
             } else {
-                message('warning', 200, 'محصول از حالت موجود خارج شد.');
+                message(self::AJAX_TYPE_WARNING, 200, 'محصول از حالت موجود خارج شد.');
             }
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -876,7 +876,9 @@ class ShopController extends AbstractController
         $userModel = new UserModel();
         $orderModel = new OrderModel();
 
-        $this->data['orders'] = $orderModel->getOrders();
+        $this->data['_where'] = '';
+        $this->data['_params'] = [];
+
         $this->data['users'] = $userModel->getUsers();
         $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name'],
@@ -924,10 +926,11 @@ class ShopController extends AbstractController
                         }
                     }
                 }
-
+                //-----
                 $where = trim(trim($where), 'AND');
-
-                $this->data['orders'] = $orderModel->getOrders($where, $params);
+                //-----
+                $this->data['_where'] = $where;
+                $this->data['_params'] = $params;
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -940,6 +943,10 @@ class ShopController extends AbstractController
                 $this->data['filters'] = $form->getValues();
             }
         }
+
+        $this->data['orders'] = $orderModel->getOrders($this->data['_where'], $this->data['_params']);
+        unset($this->data['_where']);
+        unset($this->data['_params']);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مدیرت سفارشات‌');
@@ -1187,18 +1194,18 @@ class ShopController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_RETURN_ORDER;
         if (!isset($id)) {
-            message('error', 200, 'شناسه سفارش مرجوعی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه سفارش مرجوعی نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'سفارش مرجوعی وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'سفارش مرجوعی وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'سفارش مرجوعی با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'سفارش مرجوعی با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     public function closeReturnOrderAction()
@@ -1212,18 +1219,18 @@ class ShopController extends AbstractController
         $id = $_POST['postedId'];
         $table = self::TBL_RETURN_ORDER;
         if (!isset($id)) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'درخواست مرجوعی وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'درخواست مرجوعی وجود ندارد.');
         }
 
         $res = $model->update_it($table, ['status' => 4], 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'درخواست مرجوعی بسته شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'درخواست مرجوعی بسته شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 }

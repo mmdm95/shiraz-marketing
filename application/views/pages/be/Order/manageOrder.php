@@ -152,107 +152,103 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">سفارشات</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
-                                                <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>کد سفارش</th>
-                                                    <th>خریدار</th>
-                                                    <th>تاریخ ثبت سفارش</th>
-                                                    <th>نحوه پرداخت</th>
-                                                    <th>تاریخ پرداخت</th>
-                                                    <th>مبلغ قابل پرداخت</th>
-                                                    <th>وضعیت پرداخت</th>
-                                                    <th>عملیات</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <?php foreach ($orders as $key => $order): ?>
-                                                    <tr>
-                                                        <td width="50px">
-                                                            <?= convertNumbersToPersian($key + 1); ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= $order['order_code']; ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= $order['first_name'] . ' ' . $order['last_name']; ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
-                                                        </td>
-                                                        <td>
-                                                            <?php if (in_array($order['payment_method'], array_keys(PAYMENT_METHODS))): ?>
-                                                                <?= PAYMENT_METHODS[$order['payment_method']]; ?>
-                                                            <?php else: ?>
-                                                                <i class="icon-minus2 text-danger"
-                                                                   aria-hidden="true"></i>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= !empty($order['payment_date']) ? jDateTime::date('j F Y در ساعت H:i', $order['payment_date']) : '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
-                                                        </td>
-                                                        <td>
-                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['final_price'], true))); ?>
-                                                            تومان
-                                                        </td>
-                                                        <td align="center">
-                                                            <?php if ($order['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                        <div class="panel panel-white">
+                            <div class="panel-heading">
+                                <h6 class="panel-title">سفارشات</h6>
+                                <div class="heading-elements">
+                                    <ul class="icons-list">
+                                        <li><a data-action="collapse"></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered datatable-highlight">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>کد سفارش</th>
+                                            <th>خریدار</th>
+                                            <th>تاریخ ثبت سفارش</th>
+                                            <th>نحوه پرداخت</th>
+                                            <th>تاریخ پرداخت</th>
+                                            <th>مبلغ قابل پرداخت</th>
+                                            <th>وضعیت پرداخت</th>
+                                            <th>عملیات</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($orders as $key => $order): ?>
+                                            <tr>
+                                                <td width="50px">
+                                                    <?= convertNumbersToPersian($key + 1); ?>
+                                                </td>
+                                                <td>
+                                                    <?= $order['order_code']; ?>
+                                                </td>
+                                                <td>
+                                                    <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                </td>
+                                                <td>
+                                                    <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
+                                                </td>
+                                                <td>
+                                                    <?php if (in_array($order['payment_method'], array_keys(PAYMENT_METHODS))): ?>
+                                                        <?= PAYMENT_METHODS[$order['payment_method']]; ?>
+                                                    <?php else: ?>
+                                                        <i class="icon-minus2 text-danger"
+                                                           aria-hidden="true"></i>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <?= !empty($order['payment_date']) ? jDateTime::date('j F Y در ساعت H:i', $order['payment_date']) : '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                </td>
+                                                <td>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['final_price'], true))); ?>
+                                                    تومان
+                                                </td>
+                                                <td align="center">
+                                                    <?php if ($order['payment_status'] == OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                 border-left-lg border-left-success">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_SUCCESSFUL]; ?>
                                                                 </span>
-                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                    <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_FAILED): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-danger">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_FAILED]; ?>
                                                                 </span>
-                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                    <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-danger">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_NOT_PAYED]; ?>
                                                                 </span>
-                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                    <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_WAIT): ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-orange-400">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT]; ?>
                                                                 </span>
-                                                            <?php else: ?>
-                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                    <?php else: ?>
+                                                        <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-grey-800">
                                                                     نامشخص
                                                                 </span>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                        <td style="width: 115px;" class="text-center">
-                                                            <ul class="icons-list">
-                                                                <li class="text-black">
-                                                                    <a href="<?= base_url('admin/shop/viewOrder/' . $order['id']); ?>"
-                                                                       title="مشاهده" data-popup="tooltip">
-                                                                        <i class="icon-eye"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td style="width: 115px;" class="text-center">
+                                                    <ul class="icons-list">
+                                                        <li class="text-black">
+                                                            <a href="<?= base_url('admin/shop/viewOrder/' . $order['id']); ?>"
+                                                               title="مشاهده" data-popup="tooltip">
+                                                                <i class="icon-eye"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

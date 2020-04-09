@@ -2,7 +2,10 @@
 
 <?php if (isset($errors) && count($errors)): ?>
     <div class="alert alert-danger alert-dismissible alert-styled-left alert-bordered no-border-top no-border-right no-border-bottom">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close" style="top: 4px; left: -15px;">&times;</a>
+        <button type="button" class="close" data-dismiss="alert">
+            <span>×</span>
+            <span class="sr-only">Close</span>
+        </button>
         <ul class="list-unstyled">
             <?php foreach ($errors as $err): ?>
                 <li>
