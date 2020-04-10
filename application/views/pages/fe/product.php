@@ -86,6 +86,10 @@
                                 </a>
                                 <span class="card-location">
                                     <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                    <?= $item['province_name']; ?>
+                                    ،
+                                    <?= $item['city_name']; ?>
+                                    ،
                                     <?= $item['place']; ?>
                                 </span>
                             </div>

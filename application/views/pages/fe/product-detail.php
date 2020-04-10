@@ -153,6 +153,10 @@
                             <div class="product-detail-side-item product-detail-side-location">
                                 <i class="la la-map-marker" aria-hidden="true"></i>
                                 <div>
+                                    <?= $product['province_name']; ?>
+                                    ،
+                                    <?= $product['city_name']; ?>
+                                    ،
                                     <?= $product['place']; ?>
                                 </div>
                             </div>
@@ -270,6 +274,10 @@
                                         </a>
                                         <span class="card-location">
                                             <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                            <?= $related['province_name']; ?>
+                                            ،
+                                            <?= $related['city_name']; ?>
+                                            ،
                                             <?= $related['place']; ?>
                                         </span>
                                     </div>

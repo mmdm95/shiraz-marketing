@@ -57,6 +57,10 @@
                                 </a>
                                 <span class="card-location">
                                     <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                    <?= $offer['province_name']; ?>
+                                    ،
+                                    <?= $offer['city_name']; ?>
+                                    ،
                                     <?= $offer['place']; ?>
                                 </span>
                             </div>
@@ -168,6 +172,10 @@
                                 </a>
                                 <span class="card-location">
                                     <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
+                                    <?= $item['province_name']; ?>
+                                    ،
+                                    <?= $item['city_name']; ?>
+                                    ،
                                     <?= $item['place']; ?>
                                 </span>
                             </div>

@@ -19,6 +19,7 @@ class ProductModel extends HModel
             'p.max_cart_count', 'p.place', 'p.available', 'p.category_id', 'p.is_special', 'p.sold_count', 'p.product_type',
             'p.publish', 'c.slug AS category_slug', 'c.name AS category_name', 'c.icon AS category_icon',
             'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name',
+            'ci.name AS city_name', 'pr.name AS province_name'
         ])->from($this->table . ' AS p');
 
         try {
@@ -30,6 +31,14 @@ class ProductModel extends HModel
                 'LEFT',
                 AbstractPaymentController::TBL_USER . ' AS u',
                 'u.id=p.created_by'
+            )->join(
+                'INNER',
+                AbstractPaymentController::TBL_CITY . ' AS ci',
+                'p.city_id=ci.id'
+            )->join(
+                'INNER',
+                AbstractPaymentController::TBL_PROVINCE . ' AS pr',
+                'ci.province_id=pr.id'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -57,6 +66,7 @@ class ProductModel extends HModel
         $select = $this->select();
         $select->cols([
             'p.*', 'c.slug AS category_slug', 'c.name AS category_name', 'c.icon AS category_icon',
+            'ci.name AS city_name', 'pr.name AS province_name'
         ])->from($this->table . ' AS p');
 
         try {
@@ -64,6 +74,10 @@ class ProductModel extends HModel
                 'INNER',
                 AbstractPaymentController::TBL_CITY . ' AS ci',
                 'ci.id=p.city_id'
+            )->join(
+                'INNER',
+                AbstractPaymentController::TBL_PROVINCE . ' AS pr',
+                'ci.province_id=pr.id'
             )->join(
                 'LEFT',
                 AbstractPaymentController::TBL_CATEGORY . ' AS c',
