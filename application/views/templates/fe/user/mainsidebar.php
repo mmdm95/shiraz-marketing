@@ -21,7 +21,7 @@
                         </a>
                         <div class="text-size-mini text-muted">
                             <div class="text-size-mini text-muted">
-                                <?= $identity->role_desc ?? "<i class='icon-dash text-danger'></i>"; ?>
+                                <?= $identity->role_desc[0] ?? "<i class='icon-dash text-danger'></i>"; ?>
                             </div>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                     <li>
                         <a href="<?= base_url(); ?>user/manageReturnOrder">
                             <i class="icon-cancel-circle2"></i>
-                            <span>سفارشات مرجوعی</span>
+                            <span>درخواست‌های مرجوع سفارش</span>
                         </a>
                     </li>
                     <!-- /main -->

@@ -48,7 +48,7 @@ class UserController extends AbstractController
             'image', 'mobile', 'subset_of', 'password', 're_password', 'first_name', 'last_name', 'n_code'])
             ->setMethod('post', [
                 'image' => 'file'
-            ]);
+            ], ['image']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
                 foreach ($values as &$value) {
@@ -58,8 +58,9 @@ class UserController extends AbstractController
                 }
                 $form->isRequired(['mobile', 'subset_of', 'password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validatePersianMobile('mobile')
-                    ->validatePersianName(['first_name', 'last_name'], 'نام و نام خانوادگی باید از حروف فارسی باشند.')
-                    ->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                    ->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.')
+                    ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.')
+                    ->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
 
                 if ($values['password'] != $values['re_password']) {
@@ -112,11 +113,16 @@ class UserController extends AbstractController
                     'user_id' => $res,
                     'role_id' => AUTH_ROLE_USER,
                 ]);
+                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT, [
+                    'user_id' => $res,
+                    'account_balance' => 0,
+                ]);
+
                 if (!isset($values['image']['name']) && $res && $res3) {
                     $res4 = copy($values['image'], $image);
                 }
 
-                if ($res && $res3 && $res4) {
+                if ($res && $res2 && $res3 && $res4) {
                     if (isset($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $res);
                         if ($res5) {
@@ -776,7 +782,7 @@ class UserController extends AbstractController
                     }
                 }
                 $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                    ->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
 
                 if ($values['password'] != $values['re_password']) {

@@ -174,7 +174,7 @@ abstract class AbstractController extends AbstractPaymentController
                         }
                     })->afterCheckCallback(function ($values) use ($model, $form) {
                         $this->data['code'] = generateRandomString(6, GRS_NUMBER);
-                        $this->data['_username'] = $values['username'];
+                        $this->data['_username'] = convertNumbersToPersian($values['username'], true);
 
                         $res = $model->update_it(self::TBL_USER, [
                             'forgotten_password_code' => $this->data['code'],
@@ -192,7 +192,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $res = $form->checkForm()->isSuccess();
                 if ($form->isSubmit()) {
                     if ($res) {
-                        $_SESSION['username_forget_password_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
+                        $this->session->set('username_forget_password_sess', $this->data['_username']);
 
                         // Send SMS code goes here
                         $this->load->library('HSMS/rohamSMS');
@@ -223,8 +223,8 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 break;
             case 2:
-                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess'] ?? '');
-                if ($username == false) {
+                $username = $this->session->get('username_forget_password_sess');
+                if (empty($username)) {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                         'icon' => self::FLASH_MESSAGE_ICON_WARNING,
@@ -278,7 +278,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $res = $form->checkForm()->isSuccess();
                 if ($form->isSubmit()) {
                     if ($res) {
-                        $_SESSION['username_forget_password_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK_STEP2');
+                        $this->session->set('username_forget_password_sess_success', 'OK_STEP2');
 
                         $this->redirect(base_url('forgetPassword/step/3'));
                     } else {
@@ -288,7 +288,7 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 break;
             case 3:
-                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess_success'] ?? '');
+                $Ok = $this->session->get('username_forget_password_sess_success');
                 if ($Ok != 'OK_STEP3') {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_DANGER,
@@ -322,7 +322,7 @@ abstract class AbstractController extends AbstractPaymentController
                         }
 
                         $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.');
-                        $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                        $form->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                             ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
 
                         if ($values['password'] != $values['re_password']) {
@@ -344,10 +344,10 @@ abstract class AbstractController extends AbstractPaymentController
                 $res = $form->checkForm()->isSuccess();
                 if ($form->isSubmit()) {
                     if ($res) {
-                        $_SESSION['username_forget_password_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK_STEP3');
+                        $this->session->set('username_forget_password_sess_success', 'OK_STEP3');
 
                         // Unset data
-                        unset($_SESSION['username_forget_password_sess']);
+                        $this->session->remove('username_forget_password_sess');
 
                         $this->redirect(base_url('forgetPassword/step/4'));
                     } else {
@@ -357,7 +357,7 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 break;
             case 4:
-                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess_success'] ?? '');
+                $Ok = $this->session->get('username_forget_password_sess_success');
                 if ($Ok != 'OK_STEP3') {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_DANGER,
@@ -417,7 +417,7 @@ abstract class AbstractController extends AbstractPaymentController
                         }
                     })->afterCheckCallback(function ($values) use ($model, $form) {
                         $this->data['code'] = generateRandomString(6, GRS_NUMBER);
-                        $this->data['_username'] = $values['username'];
+                        $this->data['_username'] = convertNumbersToPersian($values['username'], true);
 
                         $res = $model->update_it(self::TBL_USER, [
                             'activation_code' => $this->data['code'],
@@ -435,7 +435,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $res = $form->checkForm()->isSuccess();
                 if ($form->isSubmit()) {
                     if ($res) {
-                        $_SESSION['username_validation_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
+                        $this->session->set('username_validation_sess', $this->data['_username']);
 
                         // Send SMS code goes here
                         $this->load->library('HSMS/rohamSMS');
@@ -466,8 +466,8 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 break;
             case 2:
-                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess'] ?? '');
-                if ($username == false) {
+                $username = $this->session->get('username_validation_sess');
+                if (empty($username)) {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                         'icon' => self::FLASH_MESSAGE_ICON_WARNING,
@@ -499,6 +499,7 @@ abstract class AbstractController extends AbstractPaymentController
                             ]);
                             $this->redirect(base_url('activation/step/1'));
                         }
+
                         $code = $model->select_it(null, self::TBL_USER, 'activation_code',
                             'mobile=:username', ['username' => $username])[0]['activation_code'];
                         if ($values['code'] != $code) {
@@ -521,10 +522,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $res = $form->checkForm()->isSuccess();
                 if ($form->isSubmit()) {
                     if ($res) {
-                        $_SESSION['username_validation_sess_success'] = encryption_decryption(ED_ENCRYPT, 'OK');
-
-                        // Unset data
-                        unset($_SESSION['username_validation_sess']);
+                        $this->session->set('username_validation_sess_success', 'OK');
 
                         $this->redirect(base_url('activation/step/3'));
                     } else {
@@ -534,8 +532,22 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 break;
             case 3:
-                $Ok = encryption_decryption(ED_DECRYPT, $_SESSION['username_validation_sess_success'] ?? '');
-                if ($Ok != 'OK') {
+                $Ok = $this->session->get('username_validation_sess_success');
+                if ($Ok == 'OK') {
+                    $username = $this->session->get('username_validation_sess');
+                    $userId = $model->select_it(null, self::TBL_USER, 'id',
+                        'mobile=:username', ['username' => $username])[0]['id'];
+                    try {
+                        $this->auth->loginWithID($userId);
+                    } catch (HAException $e) {
+                    }
+
+                    // Unset data
+                    $this->session->remove('username_validation_sess');
+
+                    sleep(2);
+                    $this->redirect(base_url('user/dashboard'), 'در حال انجام عملیات ورود. لطفا صبر کنید...', 1);
+                } else {
                     $this->redirect(base_url('activation/step/1'));
                 }
                 break;
@@ -596,7 +608,7 @@ abstract class AbstractController extends AbstractPaymentController
                     return;
                 }
                 $form->validatePersianMobile('username');
-                $form->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                $form->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
 
                 if ($values['password'] != $values['re_password']) {
@@ -612,7 +624,7 @@ abstract class AbstractController extends AbstractPaymentController
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $this->data['code'] = generateRandomString(6, GRS_NUMBER);
-                $this->data['_username'] = $values['username'];
+                $this->data['_username'] = convertNumbersToPersian($values['username'], true);
 
                 $userModel = new \UserModel();
                 $model->transactionBegin();
@@ -621,6 +633,7 @@ abstract class AbstractController extends AbstractPaymentController
                     'mobile' => convertNumbersToPersian(trim($values['username']), true),
                     'password' => password_hash(trim($values['password']), PASSWORD_DEFAULT),
                     'image' => PROFILE_DEFAULT_IMAGE,
+                    'active' => 0,
                     'activation_code' => $this->data['code'],
                     'activation_code_time' => time(),
                     'ip_address' => get_client_ip_env(),
@@ -649,7 +662,7 @@ abstract class AbstractController extends AbstractPaymentController
         $res = $form->checkForm()->isSuccess();
         if ($form->isSubmit()) {
             if ($res) {
-                $_SESSION['username_validation_sess'] = encryption_decryption(ED_ENCRYPT, $this->data['_username']);
+                $this->session->set('username_validation_sess', $this->data['_username']);
 
                 // Send SMS code goes here
                 $this->load->library('HSMS/rohamSMS');

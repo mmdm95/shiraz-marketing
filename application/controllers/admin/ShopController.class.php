@@ -280,7 +280,8 @@ class ShopController extends AbstractController
                     }
                 }
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->validate('numeric', ['price', 'min_price'], 'تمامی قیمت‌ها باید از نوع عدد باشند.')
+                    ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
+                    ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
@@ -370,7 +371,8 @@ class ShopController extends AbstractController
                     }
                 }
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->validate('numeric', ['price', 'min_price'], 'تمامی قیمت‌ها باید از نوع عدد باشند.')
+                    ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
+                    ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')

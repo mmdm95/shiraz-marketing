@@ -228,7 +228,7 @@ class UserController extends AbstractController
                     }
                 }
                 $form->isRequired(['password', 're_password'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->isLengthInRange('password', 9, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۹ کاراکتر باشد.')
+                    ->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
 
                 if ($values['password'] != $values['re_password']) {

@@ -686,7 +686,7 @@ class Form implements HIForm
     /**
      * Check if a name is valid persian name or not
      *
-     * @param array|string $name
+     * @param string $name
      * @param string $msg - to not show the error put empty string in this and be sure remove empty messages is set to true
      * @param callable|null $callback - use for doing something if validate is failed
      * @return Form

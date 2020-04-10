@@ -12,7 +12,7 @@
                 <a href="<?= base_url('user/dashboard'); ?>" class="btn login col">
                     داشبورد
                 </a>
-                <a href="<?= base_url('logout'); ?>" class="btn register col">
+                <a href="<?= base_url('logout?back_url=' . URITracker::get_last_uri()); ?>" class="btn register col">
                     خروج
                 </a>
             <?php else: ?>

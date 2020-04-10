@@ -117,7 +117,7 @@
                                                     <?php foreach ($categories as $key => $category): ?>
                                                         <option value="<?= $category['id']; ?>"
                                                             <?= set_value($blogValues['category'] ?? $blogTrueValues['category_id'] ?? '', $category['id'], 'selected', '', '=='); ?>>
-                                                            <?= $category['category_name']; ?>
+                                                            <?= $category['name']; ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>

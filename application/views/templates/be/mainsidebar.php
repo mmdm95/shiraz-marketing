@@ -255,7 +255,7 @@
                     <li>
                         <a href="<?= base_url(); ?>admin/shop/manageReturnOrders">
                             <i class="icon-cancel-circle2"></i>
-                            <span>سفارشات مرجوعی</span>
+                            <span>درخواست‌های مرجوع سفارش</span>
                         </a>
                     </li>
                     <!-- /main -->

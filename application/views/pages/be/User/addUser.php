@@ -103,14 +103,14 @@
                                     <div class="form-group col-lg-4">
                                         <span class="text-danger">*</span>
                                         <label>رمز عبور:</label>
-                                        <input name="password" type="text"
+                                        <input name="password" type="password"
                                                class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
                                                value="">
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <span class="text-danger">*</span>
                                         <label>تکرار رمز عبور:</label>
-                                        <input name="re_password" type="text"
+                                        <input name="re_password" type="password"
                                                class="form-control" placeholder="ترکیبی از حروف انگلیسی و عدد"
                                                value="">
                                     </div>

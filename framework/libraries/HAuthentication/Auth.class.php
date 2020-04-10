@@ -224,6 +224,78 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     }
 
     /**
+     * Authenticate user with user's id and store identities to cookie/session
+     *
+     * @param $id
+     * @param string $extraWhere
+     * @param array $extraParams
+     * @return array|Auth
+     *
+     * @throws HAException
+     */
+    public function loginWithID($id, $extraWhere = '', $extraParams = [])
+    {
+        $this->storageType = self::session;
+
+        $this->_removeStoredStorageType();
+        $this->_storeStorageType();
+
+        $extraWhere = is_string($extraWhere) ? $extraWhere : '';
+        $extraWhere = empty($extraWhere) ? '' : ' AND (' . $extraWhere . ')';
+        $extraParams = is_array($extraParams) ? $extraParams : [];
+
+        $row = $this->getDataFromDB($this->authData->tables->user, '*',
+            "{$this->authData->columns->user->id->column}=:id" . $extraWhere,
+            array_merge(['id' => $id], $extraParams));
+
+        if (!count($row)) {
+            return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
+        }
+        $row = $row[0];
+
+        $roleId = $this->getDataFromDB($this->authData->tables->user_role, '*',
+            "{$this->authData->columns->user_role->user_id->column}=:uId",
+            ['uId' => $row[$this->authData->columns->user->id->column]]);
+        // If we need to check admin roles but we don't have any role
+        if (!count($roleId)) {
+            return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
+        }
+        if (count($roleId)) {
+            $roleId = array_column($roleId, $this->authData->columns->user_role->role_id->column);
+            $row[$this->authData->columns->user_role->role_id->column] = $roleId;
+
+            $where = '';
+            $params = [];
+
+            foreach ($roleId as $k => $id) {
+                $where .= ':id' . ($k + 1) . ',';
+                $params['id' . ($k + 1)] = $id;
+            }
+
+            $where = trim($where, ',');
+
+            $role = $this->getDataFromDB($this->authData->tables->role, '*',
+                "{$this->authData->columns->role->id->column} IN (" . $where . ")",
+                $params);
+            if (count($role)) {
+                $row['role_name'] = array_column($role, $this->authData->columns->role->name->column);
+                $row['role_desc'] = array_column($role, $this->authData->columns->role->description->column);
+            }
+        }
+
+        $this->identity = (object)$row;
+        if (!isset($this->expiration)) {
+            throw new HAException('زمان پایان احراز هویت مشخص نشده است.');
+        }
+        $res = $this->storeIdentity();
+        if (!$res) {
+            return ['err' => 'نوع ذخیره‌سازی نامشخص است.'];
+        }
+
+        return $this;
+    }
+
+    /**
      * Update login sessions
      * It's not really necessary! use logout and then login instead
      *

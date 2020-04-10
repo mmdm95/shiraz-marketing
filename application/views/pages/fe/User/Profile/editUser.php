@@ -52,14 +52,14 @@
                                                  alt="<?= $uTrueValues['mobile']; ?>">
                                             <div class="caption-overflow">
                                                 <span>
-                                                    <a href="<?= base_url('admin/user/userProfile/' . $uTrueValues['id']); ?>"
+                                                    <a href="<?= base_url('user/userProfile'); ?>"
                                                        class="btn border-white text-white btn-flat btn-icon btn-rounded ml-5"><i
                                                                 class="icon-link2"></i></a>
                                                 </span>
                                             </div>
                                         </div>
                                         <div class="caption">
-                                            <a href="<?= base_url('admin/user/userProfile/' . $uTrueValues['id']); ?>"
+                                            <a href="<?= base_url('user/userProfile'); ?>"
                                                class="text-default">
                                                 <?php if (!empty($uTrueValues['first_name']) || !empty($uTrueValues['last_name'])): ?>
                                                     <?= $uTrueValues['first_name'] . ' ' . $uTrueValues['last_name']; ?>

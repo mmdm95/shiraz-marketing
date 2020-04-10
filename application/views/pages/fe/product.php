@@ -104,6 +104,7 @@
                                     <?php if ($discountPercentage != 0): ?>
                                         <span class="btn rounded-pill card-off-percentage">
                                         <?= convertNumbersToPersian($discountPercentage); ?>
+                                            ٪
                                             <span class="card-off-percentage-takhfif">
                                                 تخفیف
                                             </span>
