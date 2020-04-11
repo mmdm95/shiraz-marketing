@@ -51,6 +51,7 @@
                 }, function (response) {
                     // console.log(response);
                     // console.log(JSON.parse(response));
+
                     shop.processAjaxData(JSON.parse(response), function () {
                         shop.isInProgress = false;
                         fetchCartItems();
@@ -179,8 +180,6 @@
                     if (quantity) {
                         ajax_obj['add']['quantity'] = quantity;
                     }
-
-                    shop.log(ajax_obj);
 
                     doAddAjax();
                 }

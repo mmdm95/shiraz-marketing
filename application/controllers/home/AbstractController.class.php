@@ -810,9 +810,9 @@ abstract class AbstractController extends AbstractPaymentController
             if (count($stockCount)) {
                 $stockCount = convertNumbersToPersian($stockCount[0]['stock_count'], true);
                 if (isset($quantity)) {
-                    if ($quantity > $stockCount) {
+                    if ($saved_cart_items[$id]['quantity'] + $quantity > $stockCount) {
                         $type = self::AJAX_TYPE_WARNING;
-                        $msg = 'محصول به تعداد حداکثر خود رسیده است!';
+                        $msg = 'تعداد محصول مورد نظر از تعداد در انبار بیشتر است!';
                     } else {
                         // make quantity a minimum of 1
                         $quantity = !is_numeric($quantity) || $quantity <= 0 ? 1 : $quantity;
@@ -837,15 +837,25 @@ abstract class AbstractController extends AbstractPaymentController
 
             $cart_items = $saved_cart_items;
         } else {
+            $cart_items[$id] = [];
             if (isset($quantity)) {
                 // make quantity a minimum of 1
                 $quantity = !is_numeric($quantity) || $quantity <= 0 ? 1 : $quantity;
-                $cart_items[$id] = array('quantity' => $quantity);
+                $cart_items[$id]['quantity'] = $quantity;
             } else {
                 // add new item on array
-                $cart_items[$id] = array('quantity' => 1);
+                $cart_items[$id]['quantity'] = 1;
             }
-            $cart_items = array_merge_recursive_distinct($cart_items, $saved_cart_items);
+
+            // Merge two arrays
+            $tmp_cart_items = [];
+            foreach ($cart_items as $id => $item) {
+                $tmp_cart_items[$id] = $item;
+            }
+            foreach ($saved_cart_items as $id => $item) {
+                $tmp_cart_items[$id] = $item;
+            }
+            $cart_items = $tmp_cart_items;
         }
 
         $cart_items_count = count($cart_items);
@@ -1472,16 +1482,14 @@ abstract class AbstractController extends AbstractPaymentController
         //-----
         foreach ($tmpItems as $info) {
             $res = $info;
-            if($hasProductType !== true && $res['product_type'] == PRODUCT_TYPE_ITEM) {
+            if ($hasProductType !== true && $res['product_type'] == PRODUCT_TYPE_ITEM) {
                 $hasProductType = true;
             }
-            foreach ($saved_cart_items as $k => $v) {
-                $res['quantity'] = $v['quantity'] > $res['stock_count'] ? $res['stock_count'] : $v['quantity'];
-                $discount = $res['discount_until'] > time() ? convertNumbersToPersian($res['discount_price'], true) : 0;
-                $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - $discount) / convertNumbersToPersian($res['price'], true)) * 100);
+            $res['quantity'] = $res['quantity'] > $res['stock_count'] ? $res['stock_count'] : $res['quantity'];
+            $discount = $res['discount_until'] > time() ? convertNumbersToPersian($res['discount_price'], true) : 0;
+            $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - $discount) / convertNumbersToPersian($res['price'], true)) * 100);
 
-                $items[] = $res;
-            }
+            $items[] = $res;
         }
 
         return [
@@ -1532,6 +1540,7 @@ abstract class AbstractController extends AbstractPaymentController
                 unset($_POST['quantity']);
             }
             if (count($mainItem)) {
+                $mainItem[0]['quantity'] = $eachItem['quantity'];
                 $main_items_array[] = $mainItem[0];
             }
             $this->haveCartAccess = false;

@@ -27,7 +27,6 @@ class ReportController extends AbstractController
         $this->data['_params'] = [];
 
         $this->data['users'] = $userModel->getUsers();
-        $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name'],
             null, [], null, ['priority ASC']);
 
@@ -88,10 +87,11 @@ class ReportController extends AbstractController
                 $this->data['filters'] = $form->getValues();
             }
         }
-        //-----
-        $this->_export_excel();
+
         //-----
         $this->session->set('order_report_sess', ['where' => $this->data['_where'], 'params' => $this->data['_params']]);
+        //-----
+        $this->_export_excel();
         //-----
         $this->data['orders'] = $orderModel->getOrders($this->data['_where'], $this->data['_params']);
         unset($this->data['_where']);
@@ -121,7 +121,7 @@ class ReportController extends AbstractController
         $name = 'report-' . time();
         $this->load->library('HForm/Form');
         $form = new Form();
-        $this->data['form_token'] = $form->csrfToken('exportExcelOrders');
+        $this->data['form_token_export'] = $form->csrfToken('exportExcelOrders');
         $form->setFieldsName(['excelExport'])
             ->setMethod('post');
         try {

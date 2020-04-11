@@ -152,6 +152,8 @@
                                         <li>
                                             <form action="<?= base_url('admin/report/orderReport'); ?>"
                                                   method="post">
+                                                <?= $form_token_export; ?>
+
                                                 <button type="submit" name="excelExport"
                                                         class="btn btn-success">
                                                     <i class="icon-file-excel position-left"

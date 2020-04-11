@@ -41,8 +41,8 @@
                 </a>
             </div>
             <div class="items-slider-col-4 owl-carousel">
-                <div class="card-wrapper semi-col-4">
-                    <?php foreach ($offers as $offer): ?>
+                <?php foreach ($offers as $offer): ?>
+                    <div class="card-wrapper semi-col-4">
                         <div class="card">
                             <div class="off-label">
                                 ویژه
@@ -134,8 +134,8 @@
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     <?php endif; ?>
