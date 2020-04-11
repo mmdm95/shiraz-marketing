@@ -48,25 +48,25 @@
                                 $totalDiscountedAmount > (int)$setting['cart']['shipping_free_price']): ?>
                                 رایگان
                             <?php else: ?>
-                                <?php if ($identity->city == SHIRAZ_CITY): ?>
-                                    <?php if (isset($setting['cart']['shipping_price']['area1']) &&
-                                        !empty($setting['cart']['shipping_price']['area1'])): ?>
-                                        <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area1']; ?>
-                                        <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area1']); ?>
-                                        تومان
-                                    <?php else: ?>
-                                        رایگان
-                                    <?php endif; ?>
+                                <!--                                --><?php //if ($identity->city == SHIRAZ_CITY): ?>
+                                <!--                                    --><?php //if (isset($setting['cart']['shipping_price']['area1']) &&
+//                                        !empty($setting['cart']['shipping_price']['area1'])): ?>
+                                <!--                                        --><?php //$totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area1']; ?>
+                                <!--                                        --><? //= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area1']); ?>
+                                <!--                                        تومان-->
+                                <!--                                    --><?php //else: ?>
+                                <!--                                        رایگان-->
+                                <!--                                    --><?php //endif; ?>
+                                <!--                                --><?php //else: ?>
+                                <?php if (isset($setting['cart']['shipping_price']['area2']) &&
+                                    !empty($setting['cart']['shipping_price']['area2'])): ?>
+                                    <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area2']; ?>
+                                    <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area2']); ?>
+                                    تومان
                                 <?php else: ?>
-                                    <?php if (isset($setting['cart']['shipping_price']['area2']) &&
-                                        !empty($setting['cart']['shipping_price']['area2'])): ?>
-                                        <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area2']; ?>
-                                        <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area2']); ?>
-                                        تومان
-                                    <?php else: ?>
-                                        رایگان
-                                    <?php endif; ?>
+                                    رایگان
                                 <?php endif; ?>
+                                <!--                                --><?php //endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>

@@ -1728,19 +1728,19 @@ abstract class AbstractController extends AbstractPaymentController
             if (!isset($this->data['setting']['cart']['shipping_free_price']) ||
                 empty($this->data['setting']['cart']['shipping_free_price']) ||
                 $totalDiscountedAmount < (int)$this->data['setting']['cart']['shipping_free_price']) {
-                if ($this->data['identity']->city == SHIRAZ_CITY) {
-                    if (isset($this->data['setting']['cart']['shipping_price']['area1']) &&
-                        !empty($this->data['setting']['cart']['shipping_price']['area1'])) {
-                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area1'];
-                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area1'];
-                    }
-                } else {
-                    if (isset($this->data['setting']['cart']['shipping_price']['area2']) &&
-                        !empty($this->data['setting']['cart']['shipping_price']['area2'])) {
-                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area2'];
-                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area2'];
-                    }
+//                if ($this->data['identity']->city == SHIRAZ_CITY) {
+//                    if (isset($this->data['setting']['cart']['shipping_price']['area1']) &&
+//                        !empty($this->data['setting']['cart']['shipping_price']['area1'])) {
+//                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area1'];
+//                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area1'];
+//                    }
+//                } else {
+                if (isset($this->data['setting']['cart']['shipping_price']['area2']) &&
+                    !empty($this->data['setting']['cart']['shipping_price']['area2'])) {
+                    $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area2'];
+                    $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area2'];
                 }
+//                }
             }
         }
         $totalAmount += $shippingPrice;

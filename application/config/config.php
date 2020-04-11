@@ -67,9 +67,6 @@ defined('OWN_PAYMENT_STATUSES') OR define('OWN_PAYMENT_STATUSES', [
     OWN_PAYMENT_STATUS_WAIT_VERIFY => 'در انتظار تایید',
 ]);
 
-// Shiraz city
-defined('SHIRAZ_CITY') OR define('SHIRAZ_CITY', 232);
-
 // My custom order code prefix
 defined('ITEMS_EACH_PAGE_DEFAULT') OR define('ITEMS_EACH_PAGE_DEFAULT', 24);
 
