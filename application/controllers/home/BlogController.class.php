@@ -56,7 +56,9 @@ class BlogController extends AbstractController
             'publish=:pub AND show_in_side=:sis', ['pub' => 1, 'sis' => 1]);
         //-----
         $this->data['related'] = $blog->getRelatedBlog($this->data['blog'], 6);
-
+        //-----
+        $this->_view_count(self::TBL_BLOG, $param[0]);
+        //-----
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات بلاگ', @$this->data['blog']['title']);
 
         $this->_render_page([

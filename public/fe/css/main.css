@@ -422,7 +422,7 @@ ul.list-persian {
 }
 
 .form-control:focus {
-    border-color: var(--sub-title-color);
+    border-color: var(--icon-disable-color);
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
     box-shadow: none !important;

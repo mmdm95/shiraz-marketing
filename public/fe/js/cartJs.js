@@ -227,8 +227,6 @@
             qnt = $this.find(':selected');
             qnt = qnt ? qnt.val() : $this.find('option').first().val();
 
-            console.log(qnt);
-
             if (qnt && dist) {
                 dist.attr('data-item-quantity', qnt);
             }

@@ -191,6 +191,11 @@
                                     </span>
                                 </div>
                             </div>
+                            <div>
+                                <p class="text-danger">
+                                    با کلیک بر روی حذف کد تخفیف، محاسبه قیمت در مرحله بعد انجام می‌شود.
+                                </p>
+                            </div>
                             <div class="text-left">
                                 <button type="button" class="btn btn-light" id="couponDelete">
                                     <i class="la la-trash-alt float-right ml-3 font-size-21px"

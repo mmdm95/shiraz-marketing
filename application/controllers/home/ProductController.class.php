@@ -29,7 +29,7 @@ class ProductController extends AbstractController
         $model = new Model();
         $productModel = new ProductModel();
         //-----
-        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id AND publish=:pub', ['id' => $param[0], 'pub' => 1])) {
+        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id AND available=:av AND publish=:pub', ['id' => $param[0], 'av' => 1, 'pub' => 1])) {
             $this->session->setFlash($this->messageSession, [
                 'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                 'icon' => self::FLASH_MESSAGE_ICON_WARNING,
@@ -58,6 +58,8 @@ class ProductController extends AbstractController
         // Get cart item with current product item
         $cartItems = $this->_fetch_cart_items();
         $this->data['curCartItem'] = h_array_search($cartItems, 'id', $param[0]);
+        //-----
+        $this->_view_count(self::TBL_PRODUCT, $param[0]);
         //-----
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات محصول', @$this->data['product']['title']);
 

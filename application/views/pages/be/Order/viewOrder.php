@@ -75,7 +75,7 @@
                                         <div class="form-group">
                                             <select class="select-no-search" name="send_status">
                                                 <?php foreach ($status as $key => $st): ?>
-                                                    <option value="<?= $status['id']; ?>"
+                                                    <option value="<?= $st['id']; ?>"
                                                         <?= set_value($order['send_status'] ?? '', $st['id'], 'selected', '', '=='); ?>>
                                                         <?= $st['name']; ?>
                                                     </option>
@@ -117,7 +117,7 @@
                                             <div class="form-group">
                                                 <select class="select-no-search" name="payment_status">
                                                     <?php foreach (OWN_PAYMENT_STATUSES as $key => $st): ?>
-                                                        <option value="<?= $status['id']; ?>"
+                                                        <option value="<?= $st; ?>"
                                                             <?= set_value($order['payment_status'] ?? '', $key, 'selected', '', '=='); ?>>
                                                             <?= $st; ?>
                                                         </option>
@@ -289,6 +289,35 @@
                                             <strong>
                                                 <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['discount_price'], true))); ?>
                                                 تومان
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 text-center p-15 border border-grey-300">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                عنوان کد تخفیف :
+                                            </small>
+                                            <strong>
+                                                <?php if (!empty($order['coupon_title'])): ?>
+                                                    <?= $order['coupon_title']; ?>
+                                                <?php else: ?>
+                                                    <i class="icon-dash text-danger" aria-hidden="true"></i>
+                                                <?php endif; ?>
+                                            </strong>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 text-center p-15 border border-grey-300">
+                                        <h6 class="no-margin">
+                                            <small class="text-grey-800">
+                                                مبلغ کد تخفیف :
+                                            </small>
+                                            <strong>
+                                                <?php if (!empty($order['coupon_amount'])): ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['coupon_amount'], true))); ?>
+                                                    تومان
+                                                <?php else: ?>
+                                                    <i class="icon-dash text-danger" aria-hidden="true"></i>
+                                                <?php endif; ?>
                                             </strong>
                                         </h6>
                                     </div>

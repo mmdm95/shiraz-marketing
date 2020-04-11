@@ -215,6 +215,35 @@
                                             <div class="col-md-6 text-center p-15 border border-grey-300">
                                                 <h6 class="no-margin">
                                                     <small class="text-grey-800">
+                                                        عنوان کد تخفیف :
+                                                    </small>
+                                                    <strong>
+                                                        <?php if (!empty($order['coupon_title'])): ?>
+                                                            <?= $order['coupon_title']; ?>
+                                                        <?php else: ?>
+                                                            <i class="icon-dash text-danger" aria-hidden="true"></i>
+                                                        <?php endif; ?>
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                            <div class="col-md-6 text-center p-15 border border-grey-300">
+                                                <h6 class="no-margin">
+                                                    <small class="text-grey-800">
+                                                        مبلغ کد تخفیف :
+                                                    </small>
+                                                    <strong>
+                                                        <?php if (!empty($order['coupon_amount'])): ?>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['coupon_amount'], true))); ?>
+                                                            تومان
+                                                        <?php else: ?>
+                                                            <i class="icon-dash text-danger" aria-hidden="true"></i>
+                                                        <?php endif; ?>
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                            <div class="col-md-6 text-center p-15 border border-grey-300">
+                                                <h6 class="no-margin">
+                                                    <small class="text-grey-800">
                                                         هزینه ارسال :
                                                     </small>
                                                     <strong>

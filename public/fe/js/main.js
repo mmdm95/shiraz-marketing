@@ -25,7 +25,7 @@
             info_icon = 'la la-info-circle',
             warning_icon = 'la la-bell',
             success_icon = 'la la-check',
-            danger_icon = 'la la-times';
+            danger_icon = 'la la-times-circle';
 
         var
             loader = "<div class='loader-modal'>\

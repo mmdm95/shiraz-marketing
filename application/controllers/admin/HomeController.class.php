@@ -199,18 +199,18 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_STATIC_PAGES;
         if (!isset($id)) {
-            message('error', 200, 'شناسه نوشته نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه نوشته نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'نوشته وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'نوشته وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'نوشته با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'نوشته با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -337,18 +337,18 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_FAQ;
         if (!isset($id)) {
-            message('error', 200, 'شناسه پیام نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه پیام نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'سوال وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'سوال وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'سوال با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'سوال با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -519,18 +519,18 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_MAIN_SLIDER;
         if (!isset($id)) {
-            message('error', 200, 'شناسه اسلاید نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه اسلاید نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'اسلاید وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'اسلاید وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'اسلاید با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'اسلاید با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -582,18 +582,18 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_CONTACT_US;
         if (!isset($id)) {
-            message('error', 200, 'شناسه پیام نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه پیام نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'پیام وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'پیام وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'پیام با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'پیام با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -645,18 +645,18 @@ class HomeController extends AbstractController
         $id = @$_POST['postedId'];
         $table = self::TBL_COMPLAINT;
         if (!isset($id)) {
-            message('error', 200, 'شناسه شکایت نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه شکایت نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'شکایت وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'شکایت وجود ندارد.');
         }
 
         $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'شکایت با موفقیت حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'شکایت با موفقیت حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----

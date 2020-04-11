@@ -325,7 +325,7 @@
                                                     <?php foreach ($products as $product): ?>
                                                         <option value="<?= $product['id']; ?>"
                                                             <?= in_array($product['id'], $pValues['related'] ?? $pTrueValues['related'] ?? []) ? 'selected' : ''; ?>>
-                                                            <?= $product['product_title']; ?>
+                                                            <?= $product['title']; ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>

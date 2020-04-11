@@ -652,7 +652,7 @@ class ShopController extends AbstractController
 
         $this->data['categories'] = $model->select_it(null, self::TBL_CATEGORY, ['id', 'name']);
         $this->data['cities'] = $model->select_it(null, self::TBL_CITY, ['id', 'name']);
-        $this->data['products'] = $model->select_it(null, self::TBL_PRODUCT, ['id', 'title']);
+        $this->data['products'] = $model->select_it(null, self::TBL_PRODUCT, ['id', 'title'], 'id!=:id', ['id' => $param[0]]);
 
         $this->data['pTitle'] = $model->select_it(null, self::TBL_PRODUCT, ['title'], 'id=:id', ['id' => $param[0]])[0];
 
@@ -1081,7 +1081,7 @@ class ShopController extends AbstractController
             }
         }
 
-        $this->data['order'] = $orderModel->getSingleOrder('id=:id', ['id' => $param[0]]);
+        $this->data['order'] = $orderModel->getSingleOrder('o.id=:id', ['id' => $param[0]]);
         $this->data['order']['products'] = $orderModel->getOrderProducts('order_code=:code', ['code' => $this->data['order']['order_code']]);
 
         // Select gateway table if gateway code is one of the bank payment gateway's code

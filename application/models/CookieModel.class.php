@@ -144,8 +144,11 @@ class CookieModel
         $data = openssl_decrypt($first_encrypted, $method, $first_key, OPENSSL_RAW_DATA, $iv);
         $second_encrypted_new = hash_hmac('sha3-512', $first_encrypted, $second_key, TRUE);
 
-        if (hash_equals($second_encrypted, $second_encrypted_new))
-            return $data;
+        try {
+            if (hash_equals((string)$second_encrypted, $second_encrypted_new))
+                return $data;
+        } catch (Exception $e) {
+        }
 
         return false;
     }

@@ -31,7 +31,7 @@
         //------------------------------
         function discountBtnClick() {
             var $this, code;
-            discount_inp.on('click.' + namespace, function () {
+            discount_btn.on('click.' + namespace, function () {
                 $this = $(this);
                 if (!$this.is(':disabled')) {
                     code = discount_inp.val();
@@ -43,9 +43,10 @@
                                 postedCode: code
                             }
                         }, function (response) {
-                            var res = JSON.parse(response);
                             // console.log(response);
                             // console.log(JSON.parse(response));
+
+                            var res = JSON.parse(response);
                             shop.processAjaxData(res, function (content) {
                                 if (res.success) {
                                     shopping_side_card.html(content);
@@ -56,8 +57,6 @@
                                     repeaterCaller();
                                 }
                             });
-                        }, null, function () {
-                            // Do nothing
                         });
                     }
                 }

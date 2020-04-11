@@ -248,11 +248,11 @@ abstract class AbstractController extends AbstractPaymentController
                         }
 
                         $form->isRequired(['code'], 'فیلدهای ضروری را خالی نگذارید.');
-                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $username, 'active' => 0])) {
+                        if (!$model->is_exist(self::TBL_USER, 'mobile=:username ', ['username' => $username])) {
                             $this->session->setFlash($this->messageSession, [
                                 'type' => self::FLASH_MESSAGE_TYPE_DANGER,
                                 'icon' => self::FLASH_MESSAGE_ICON_DANGER,
-                                'message' => 'پارامترهای ورودی دستکاری شده‌اند!',
+                                'message' => 'این شماره موبایل وجود ندارد.',
                             ]);
                             $this->redirect(base_url('forgetPassword/step/1'));
                         }
@@ -921,17 +921,10 @@ abstract class AbstractController extends AbstractPaymentController
         }
 
         $cookieModel = new CookieModel();
-        $model = new Model();
 
         $id = $_POST['postedId'] ?? null;
         if (!isset($id) || !is_numeric($id)) {
             message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
-        }
-        if (!$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $id])) {
-            message(self::AJAX_TYPE_ERROR, 200, 'این محصول وجود ندارد.');
-        }
-        if (!$model->it_count(self::TBL_PRODUCT, 'id=:id AND stock_count>:sc AND available=:av', ['id' => $id, 'sc' => 0, 'av' => 1])) {
-            message(self::AJAX_TYPE_ERROR, 200, 'محصول ناموجود است.');
         }
 
         // read
@@ -1349,7 +1342,7 @@ abstract class AbstractController extends AbstractPaymentController
     public function shoppingSideCardAction()
     {
         if (is_ajax() && ($this->haveShoppingSideCardAccess !== true) || !$this->auth->isLoggedIn()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
         }
         if (!is_ajax() && ($this->haveShoppingSideCardAccess !== true) || !$this->auth->isLoggedIn()) {
             $this->error->access_denied();
@@ -1362,7 +1355,7 @@ abstract class AbstractController extends AbstractPaymentController
         //-----
         //-----
         if (!count($data['items'])) {
-            message('error', 200, 'در سبد خرید شما محصولی وجود ندارد!');
+            message(self::AJAX_TYPE_ERROR, 200, 'در سبد خرید شما محصولی وجود ندارد!');
         }
         //-----
         $totals = $this->_get_total_amounts($data['items']);
@@ -1380,7 +1373,7 @@ abstract class AbstractController extends AbstractPaymentController
     public function checkCouponCodeAction()
     {
         if (is_ajax() && !$this->auth->isLoggedIn()) {
-            message('error', 403, 'دسترسی غیر مجاز');
+            message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
         }
         if (!is_ajax() && !$this->auth->isLoggedIn()) {
             $this->error->access_denied();
@@ -1390,11 +1383,11 @@ abstract class AbstractController extends AbstractPaymentController
 
         $code = $_POST['postedCode'] ?? null;
         if (!isset($code)) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
         // If coupon is not exists
         if (!$model->is_exist(self::TBL_COUPON, 'coupon_code=:code AND expire_time>=:expire', ['code' => $code, 'expire' => time()])) {
-            message('error', 200, 'کد تخفیف وارد شده نامعتبر می‌باشد. دوباره امتحان نمایید.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کد تخفیف وارد شده نامعتبر می‌باشد. دوباره امتحان نمایید.');
         }
         // If coupon is used before
         if ($model->is_exist(self::TBL_ORDER, 'user_id=:uId AND coupon_code=:cc AND payment_date<:pd AND payment_status IN(:ps, :ps2)',
@@ -1405,8 +1398,8 @@ abstract class AbstractController extends AbstractPaymentController
 
         // Get previous stored data from session
         $prevData = $this->session->get('shopping_page_session');
-        if (!isset($prevData['receiver_name'])) {
-            message('error', 200, 'برخی داده‌های این صفحه دستکاری شده است! لطفا مراحل را مجددا طی نمایید.');
+        if (isset($prevData['receiver_name'])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'کد تخفیف را در مرحله اطلاعات ارسال وارد کنید.');
         }
 
         // Select current coupon
@@ -1418,7 +1411,7 @@ abstract class AbstractController extends AbstractPaymentController
         //-----
         //-----
         if (!count($data['items'])) {
-            message('error', 200, 'در سبد خرید شما محصولی وجود ندارد!');
+            message(self::AJAX_TYPE_ERROR, 200, 'در سبد خرید شما محصولی وجود ندارد!');
         }
         //-----
         $totals = $this->_get_total_amounts($data['items']);
@@ -1429,16 +1422,17 @@ abstract class AbstractController extends AbstractPaymentController
             if ($data['totalDiscountedAmount'] - $coupon['price'] > 0) {
                 $data['totalDiscountedAmount'] = $data['totalDiscountedAmount'] - $coupon['price'];
             } else {
-                message('error', 200, 'این کد تخفیف دچار نقص فنی شده است!');
+                message(self::AJAX_TYPE_ERROR, 200, 'این کد تخفیف دچار نقص فنی شده است!');
             }
 
             if ($coupon['max_price'] == '' || ($coupon['max_price'] != '' && $data['totalDiscountedAmount'] <= $coupon['max_price'])) {
-                message('success', 200, ['کد تخفیف اعمال شد.', $this->load->view('templates/fe/cart/side-shopping-card', $data, true)]);
+                $data['auth'] = $this->auth;
+                message(self::AJAX_TYPE_SUCCESS, 200, ['کد تخفیف اعمال شد.', $this->load->view('templates/fe/cart/side-shopping-card', $data, true)]);
             } else {
-                message('error', 200, 'قیمت کالا‌ها از حداکثر قیمت برای اعمال این کد تخفیف، بیشتر است!');
+                message(self::AJAX_TYPE_ERROR, 200, 'قیمت کالا‌ها از حداکثر قیمت برای اعمال این کد تخفیف، بیشتر است!');
             }
         } else {
-            message('error', 200, 'قیمت کالا‌ها از حداقل قیمت برای اعمال این کد تخفیف، کمتر است!');
+            message(self::AJAX_TYPE_ERROR, 200, 'قیمت کالا‌ها از حداقل قیمت برای اعمال این کد تخفیف، کمتر است!');
         }
     }
 
@@ -1650,7 +1644,7 @@ abstract class AbstractController extends AbstractPaymentController
             'last_name' => $this->data['identity']->last_name,
             'mobile' => $this->data['identity']->mobile,
             'receipt_code' => $prev['receipt_code'] ?? '',
-            'receipt_date' => $prev['receipt_date'] ?? '',
+            'receipt_date' => $prev['receipt_date'] ?? null,
             'method_code' => $gatewayCode,
             'payment_method' => $paymentMethod,
             'payment_title' => PAYMENT_METHODS[$paymentMethod],
@@ -1699,9 +1693,10 @@ abstract class AbstractController extends AbstractPaymentController
         $couponCode = '';
         $couponTitle = '';
         $couponAmount = '';
-        if (!empty($prev['coupon_code']) && $this->_validate_coupon($prev['coupon_code'])) {
-            $theCoupon = $model->select_it(null, 'coupons', ['coupon_code', 'title', 'price'],
-                'coupon_code=:code AND expire_time>=:expire', ['code' => $prev['coupon_code'], 'expire' => time()])[0];
+        $isValidCoupon = $this->_validate_coupon($prev['coupon_code']['code'] ?? '');
+        if (!empty($prev['coupon_code']['code']) && $isValidCoupon['status'] === true) {
+            $theCoupon = $model->select_it(null, self::TBL_COUPON, ['coupon_code', 'title', 'price'],
+                'coupon_code=:code AND expire_time>=:expire', ['code' => $prev['coupon_code']['code'], 'expire' => time()])[0];
             $couponCode = $theCoupon['coupon_code'];
             $couponTitle = $theCoupon['title'];
             $couponAmount = $theCoupon['price'];
@@ -2397,26 +2392,8 @@ abstract class AbstractController extends AbstractPaymentController
                             'price' => (int)$orderPrice['final_price'],
                             'payment_date' => time(),
                         ]);
-                        // Calculate reward
-                        $productModel = new \ProductModel();
-                        $commonModel = new CommonModel();
-                        $reward = $productModel->getProductsReward($orderCode);
-                        $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
-                            'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                        $res4 = true;
-                        if ($reward > 0) {
-                            // Store reward to wallet
-                            $res4 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                                'deposit_code' => 'DEP-' . $code,
-                                'user_id' => $this->data['identity']->id,
-                                'deposit_price' => $reward,
-                                'description' => 'پاداش خرید',
-                                'deposit_type' => DEPOSIT_TYPE_REWARD,
-                                'deposit_date' => time(),
-                            ]);
-                        }
                         //-----
-                        if ($res && $res2 && $res3 && $res4) {
+                        if ($res && $res2 && $res3) {
                             $model->transactionComplete();
                             //-----
                             $this->data['order_code'] = $orderCode;
@@ -2468,26 +2445,8 @@ abstract class AbstractController extends AbstractPaymentController
                     'payment_status' => OWN_PAYMENT_STATUS_WAIT,
                     'payment_date' => time(),
                 ], 'order_code=:oc', ['oc' => $orderCode]);
-                // Calculate reward
-                $productModel = new \ProductModel();
-                $commonModel = new CommonModel();
-                $reward = $productModel->getProductsReward($orderCode);
-                $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
-                    'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                $res2 = true;
-                if ($reward > 0) {
-                    // Store reward to wallet
-                    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                        'deposit_code' => 'DEP-' . $code,
-                        'user_id' => $this->data['identity']->id,
-                        'deposit_price' => $reward,
-                        'description' => 'پاداش خرید',
-                        'deposit_type' => DEPOSIT_TYPE_REWARD,
-                        'deposit_date' => time(),
-                    ]);
-                }
 
-                if ($res && $res2) {
+                if ($res) {
                     $model->transactionComplete();
                     //-----
                     $this->data['order_code'] = $orderCode;
@@ -2531,26 +2490,8 @@ abstract class AbstractController extends AbstractPaymentController
                     'payment_status' => OWN_PAYMENT_STATUS_WAIT_VERIFY,
                     'payment_date' => time(),
                 ], 'order_code=:oc', ['oc' => $orderCode]);
-                // Calculate reward
-                $productModel = new \ProductModel();
-                $commonModel = new CommonModel();
-                $reward = $productModel->getProductsReward($orderCode);
-                $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
-                    'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                $res2 = true;
-                if ($reward > 0) {
-                    // Store reward to wallet
-                    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                        'deposit_code' => 'DEP-' . $code,
-                        'user_id' => $this->data['identity']->id,
-                        'deposit_price' => $reward,
-                        'description' => 'پاداش خرید',
-                        'deposit_type' => DEPOSIT_TYPE_REWARD,
-                        'deposit_date' => time(),
-                    ]);
-                }
 
-                if ($res && $res2) {
+                if ($res) {
                     $model->transactionComplete();
                     //-----
                     $this->data['order_code'] = $orderCode;
@@ -2610,6 +2551,31 @@ abstract class AbstractController extends AbstractPaymentController
             $model->delete_it(self::TBL_ORDER_RESERVED, 'expire_time<=:et', ['et' => $reservedTime]);
         }
         //-----
+    }
+
+    //-----
+
+    protected function _view_count($table, $id)
+    {
+        $model = new Model();
+        $cookieModel = new CookieModel();
+        $name = $table == self::TBL_PRODUCT ? 'product' : ($table == self::TBL_BLOG ? 'blog' : 'default');
+        $cookieName = 'view-' . $name . '-' . $id;
+        if ($cookieModel->is_cookie_set($cookieName)) {
+            $prevCookie = $cookieModel->is_cookie_set($cookieName, true, true);
+            $prevCookie = stripslashes($prevCookie);
+            $prevCookie = json_decode($prevCookie, true);
+            if ($prevCookie == get_client_ip_server()) {
+                return;
+            };
+        }
+        //-----
+        $cookieModel->set_cookie($cookieName, json_encode(get_client_ip_server()),
+            time() + 30 * 24 * 60 * 60, '/', null, null, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
+        //-----
+        $model->update_it($table, [], 'id=:id', ['id' => $id], [
+            'view_count' => 'view_count+1'
+        ]);
     }
 
     //-----

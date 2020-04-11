@@ -46,12 +46,12 @@
                                             <?php if ($item['discount_percentage'] == 100): ?>
                                                 رایگان
                                             <?php else: ?>
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true) * $item['quantity'])); ?>
                                                 تومان
                                             <?php endif; ?>
                                         </span>
                                         <span class="card-price">
-                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true) * $item['quantity'])); ?>
                                             تومان
                                         </span>
                                     <?php else: ?>
@@ -59,7 +59,7 @@
                                             <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
                                                 رایگان
                                             <?php else: ?>
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true) * $item['quantity'])); ?>
                                                 تومان
                                             <?php endif; ?>
                                         </span>

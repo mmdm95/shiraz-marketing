@@ -6,3 +6,22 @@
         </span>
     </div>
 </div>
+
+// Calculate reward
+$productModel = new \ProductModel();
+$commonModel = new CommonModel();
+$reward = $productModel->getProductsReward($orderCode);
+$code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
+    'DEP-', 6, 15, 10, CommonModel::DIGITS);
+$res2 = true;
+if ($reward > 0) {
+    // Store reward to wallet
+    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+        'deposit_code' => 'DEP-' . $code,
+        'user_id' => $this->data['identity']->id,
+        'deposit_price' => $reward,
+        'description' => 'پاداش خرید',
+        'deposit_type' => DEPOSIT_TYPE_REWARD,
+        'deposit_date' => time(),
+    ]);
+}
