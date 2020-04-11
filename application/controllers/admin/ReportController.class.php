@@ -89,9 +89,9 @@ class ReportController extends AbstractController
         }
 
         //-----
-        $this->session->set('order_report_sess', ['where' => $this->data['_where'], 'params' => $this->data['_params']]);
-        //-----
         $this->_export_excel();
+        //-----
+        $this->session->set('order_report_sess', ['where' => $this->data['_where'], 'params' => $this->data['_params']]);
         //-----
         $this->data['orders'] = $orderModel->getOrders($this->data['_where'], $this->data['_params']);
         unset($this->data['_where']);
@@ -125,7 +125,7 @@ class ReportController extends AbstractController
         $form->setFieldsName(['excelExport'])
             ->setMethod('post');
         try {
-            $form->afterCheckCallback(function ($values) use ($form, $name) {
+            $form->afterCheckCallback(function () use ($form, $name) {
                 $this->load->library('PhpSpreadsheet/vendor/autoload');
                 // Create empty xlsx file
                 fopen(PUBLIC_PATH . $name . '.xlsx', "w");
@@ -133,6 +133,7 @@ class ReportController extends AbstractController
                 $orderModel = new OrderModel();
                 //-----
                 $info = $this->session->get('order_report_sess');
+                var_dump($info);
                 $orders = $orderModel->getOrders($info['where'], $info['params']);
                 //-----
                 // Create IO for file
@@ -165,6 +166,7 @@ class ReportController extends AbstractController
                 $totalOrders = count($orders);
                 foreach ($orders as $k => $order) {
                     $spreadsheetArray[($k + 1)][] = $k + 1;
+                    $spreadsheetArray[($k + 1)][] = $order['order_code'];
                     $spreadsheetArray[($k + 1)][] = $order['first_name'] . ' ' . $order['last_name'];
                     $spreadsheetArray[($k + 1)][] = convertNumbersToPersian($order['mobile']);
                     $spreadsheetArray[($k + 1)][] = $order['receiver_name'];
