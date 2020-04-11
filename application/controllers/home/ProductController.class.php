@@ -109,8 +109,8 @@ class ProductController extends AbstractController
             //-----
             $extraWhere .= ' AND (p.title LIKE :q1 OR';
             $extraWhere .= ' c.name LIKE :q2)';
-            $extraParams[':q1'] = '%' . $_GET['q'] . '%';
-            $extraParams[':q2'] = '%' . $_GET['q'] . '%';
+            $extraParams['q1'] = '%' . $_GET['q'] . '%';
+            $extraParams['q2'] = '%' . $_GET['q'] . '%';
         }
         if (isset($param[0])) {
             $param = array_map('mb_strtolower', $param);

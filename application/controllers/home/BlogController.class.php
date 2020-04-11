@@ -103,11 +103,11 @@ class BlogController extends AbstractController
             $extraWhere .= ' b.abstract LIKE :q3 OR';
             $extraWhere .= ' b.keywords LIKE :q4 OR';
             $extraWhere .= ' c.name LIKE :q5)';
-            $extraParams[':q1'] = '%' . $_GET['q'] . '%';
-            $extraParams[':q2'] = '%' . $_GET['q'] . '%';
-            $extraParams[':q3'] = '%' . $_GET['q'] . '%';
-            $extraParams[':q4'] = '%' . $_GET['q'] . '%';
-            $extraParams[':q5'] = '%' . $_GET['q'] . '%';
+            $extraParams['q1'] = '%' . $_GET['q'] . '%';
+            $extraParams['q2'] = '%' . $_GET['q'] . '%';
+            $extraParams['q3'] = '%' . $_GET['q'] . '%';
+            $extraParams['q4'] = '%' . $_GET['q'] . '%';
+            $extraParams['q5'] = '%' . $_GET['q'] . '%';
         }
         if (isset($param[0])) {
             $param = array_map('mb_strtolower', $param);

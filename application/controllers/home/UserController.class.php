@@ -471,6 +471,13 @@ class UserController extends AbstractController
         $this->data['order'] = $orderModel->getSingleReturnOrder('o.user_id=:uId AND ro.order_code=:code', [
             'uId' => $this->data['identity']->id, 'code' => $param[0]]);
 
+        if ($this->data['order']['status'] == 2) {
+            $model->update_it(self::TBL_RETURN_ORDER, [
+                'status' => 3,
+            ], 'order_code=:code AND user_id=:uId', ['code' => $param[0], 'uId' => $this->data['identity']->id]);
+            $this->data['order']['status'] = 3;
+        }
+
         if (!count($this->data['order'])) {
             $this->error->show_404();
         }
