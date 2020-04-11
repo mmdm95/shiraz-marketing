@@ -190,7 +190,7 @@
                                                 <input type="hidden" name="discount_expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
-                                                       value="<?= date('Y/m/d H:i', (int)$pValues['discount_expire'] ?? time()); ?>">
+                                                       value="<?= date('Y/m/d H:i', (int)($pValues['discount_expire'] ?? time())); ?>">
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <label>پاداش خرید:</label>

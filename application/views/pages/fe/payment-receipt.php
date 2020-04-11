@@ -190,7 +190,7 @@
                                     <input type="text" id="pr-rd" class="form-control myAltDatepicker"
                                            data-time="true" data-format="L H:m:s"
                                            placeholder="تاریخ رسید" readonly data-alt-field="#altDateField"
-                                           value="<?= date('Y/m/d H:i', (int)$values['receipt_date'] ?? time()); ?>">
+                                           value="<?= date('Y/m/d H:i', (int)($values['receipt_date'] ?? time())); ?>">
                                     <span class="input-icon right">
                                     <i class="la la-calendar-check"></i>
                                 </span>

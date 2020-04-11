@@ -80,7 +80,7 @@
                                         <input type="hidden" name="from_date" id="altDateField">
                                         <input type="text" class="form-control range-from"
                                                placeholder="" readonly data-alt-field="#altDateField"
-                                               value="<?= date('Y/m/d H:i', (int)$filters['from_date'] ?? time()); ?>">
+                                               value="<?= date('Y/m/d H:i', (int)($filters['from_date'] ?? time())); ?>">
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label>تا تاریخ:</label>
@@ -88,7 +88,7 @@
                                         <input type="text" class="form-control range-to"
                                                placeholder="تاریخ انقضا" readonly
                                                data-alt-field="#altDateField2"
-                                               value="<?= date('Y/m/d H:i', (int)$filters['to_date'] ?? time()); ?>">
+                                               value="<?= date('Y/m/d H:i', (int)($filters['to_date'] ?? time())); ?>">
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label>وضعیت سفارش:</label>
