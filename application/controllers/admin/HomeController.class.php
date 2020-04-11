@@ -26,6 +26,7 @@ class HomeController extends AbstractController
 
         $model = new Model();
         $userModel = new UserModel();
+        $orderModel = new OrderModel();
 
         $this->data['unreadContacts'] = $model->it_count(self::TBL_CONTACT_US, 'status=:status', ['status' => 0]);
         //-----
@@ -37,8 +38,27 @@ class HomeController extends AbstractController
         //-----
         $this->data['staticPageCount'] = $model->it_count(self::TBL_STATIC_PAGES);
         $this->data['categoryCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+        //-----
+        $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, [
+            'name', 'badge', 'priority'
+        ], null, [], null, ['priority DESC']);
+        $this->data['status'] = array_group_by('priority', $this->data['status'], ['name', 'badge']);
+        //-----
+        $this->data['orderCount'] = $orderModel->getOrdersCount();
+        $this->data['todayOrderCount'] = $orderModel->getOrdersCount('order_date>:od', ['od' => strtotime('today')]);
+        $this->data['totalPaid'] = $model->select_it(null, self::TBL_ORDER, 'SUM(final_price) AS sum', 'payment_status=:ps', ['ps' => OWN_PAYMENT_STATUS_SUCCESSFUL]);
+        $this->data['totalPaid'] = count($this->data['totalPaid']) ? $this->data['totalPaid'][0]['sum'] : 0;
+        //-----
+        $this->data['statusCount' . SEND_STATUS_IN_QUEUE] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_IN_QUEUE]);
+        $this->data['statusCount' . SEND_STATUS_UNVERIFIED] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_UNVERIFIED]);
+        $this->data['statusCount' . SEND_STATUS_PREPARATION] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_PREPARATION]);
+        $this->data['statusCount' . SEND_STATUS_OUT_OF_WAREHOUSE] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_OUT_OF_WAREHOUSE]);
+        $this->data['statusCount' . SEND_STATUS_DELIVERED_TO_POST] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_DELIVERED_TO_POST]);
+        $this->data['statusCount' . SEND_STATUS_DELIVERED_TO_CUSTOMER] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_DELIVERED_TO_CUSTOMER]);
+        $this->data['statusCount' . SEND_STATUS_REFERRED] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_REFERRED]);
+        $this->data['statusCount' . SEND_STATUS_CANCELED] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_CANCELED]);
 
-        // Base configuration
+            // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
 
         $this->_render_page('pages/be/index');

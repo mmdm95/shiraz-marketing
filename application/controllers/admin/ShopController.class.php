@@ -978,7 +978,7 @@ class ShopController extends AbstractController
         }
 
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name']);
-        $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['order_code', 'mobile', 'payment_status', 'send_status'], 'id=:id', ['id' => $param[0]])[0];
+        $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['order_code', 'mobile', 'payment_status', 'send_status', 'got_reward'], 'id=:id', ['id' => $param[0]])[0];
 
         $this->data['param'] = $param;
 
@@ -1000,11 +1000,44 @@ class ShopController extends AbstractController
                     $form->setError('وضعیت ارسال انتخاب شده نامعتبر است.');
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
+                $orderModel = new OrderModel();
+
+                $model->transactionBegin();
+
                 $res = $model->update_it(self::TBL_ORDER, [
                     'send_status' => (int)$values['send_status'],
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
+                $res2 = true;
+                $res3 = true;
+                if ($values['send_status'] == $orderModel->getStatusId(SEND_STATUS_DELIVERED_TO_CUSTOMER) &&
+                    !$model->is_exist(self::TBL_ORDER, 'order_code=:oc AND got_reward=:gr', ['oc' => $this->data['order']['order_code'], 'gr' => 1])) {
+                    // Calculate reward
+                    $productModel = new \ProductModel();
+                    $commonModel = new CommonModel();
+                    $reward = $productModel->getProductsReward($this->data['order']['order_code']);
+                    $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
+                        'DEP-', 6, 15, 10, CommonModel::DIGITS);
+                    $res2 = true;
+                    if ($reward > 0) {
+                        // Store reward to wallet
+                        $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                            'deposit_code' => 'DEP-' . $code,
+                            'user_id' => $this->data['identity']->id,
+                            'deposit_price' => $reward,
+                            'description' => 'پاداش خرید',
+                            'deposit_type' => DEPOSIT_TYPE_REWARD,
+                            'deposit_date' => time(),
+                        ]);
+                    }
+                    // Update reward gotten status
+                    $res3 = $model->update_it(self::TBL_ORDER, [
+                        'got_reward' => 1
+                    ], 'order_code=:oc', ['oc' => $this->data['order']['order_code']]);
+                }
 
-                if ($res) {
+                if ($res && $res2 && $res3) {
+                    $model->transactionComplete();
+
                     if ($values['send_status'] != $this->data['order']['send_status']) {
                         // Send SMS code goes here
                         $this->load->library('HSMS/rohamSMS');
@@ -1022,6 +1055,7 @@ class ShopController extends AbstractController
                         }
                     }
                 } else {
+                    $model->transactionRollback();
                     $form->setError('خطا در انجام عملیات!');
                 }
             });

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2020 at 02:19 PM
+-- Generation Time: Apr 11, 2020 at 04:10 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.13
 
@@ -669,6 +669,18 @@ CREATE TABLE `gateway_zarinpal` (
   `msg` text NOT NULL,
   `exportation_type` tinyint(1) UNSIGNED NOT NULL,
   `payment_date` int(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hits`
+--
+
+CREATE TABLE `hits` (
+  `pageid` varchar(100) NOT NULL,
+  `isunique` tinyint(1) NOT NULL,
+  `hitcount` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1724,6 +1736,17 @@ CREATE TABLE `main_sliders` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `nodupes`
+--
+
+CREATE TABLE `nodupes` (
+  `ids_hash` char(64) NOT NULL,
+  `time` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `orders`
 --
 
@@ -1754,7 +1777,7 @@ CREATE TABLE `orders` (
   `city` varchar(50) NOT NULL,
   `postal_code` varchar(10) NOT NULL,
   `address` text NOT NULL,
-  `is_returned` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `got_reward` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `payment_date` int(11) UNSIGNED DEFAULT NULL,
   `shipping_date` int(11) UNSIGNED DEFAULT NULL,
   `order_date` int(11) UNSIGNED NOT NULL
@@ -2010,12 +2033,12 @@ CREATE TABLE `send_status` (
 
 INSERT INTO `send_status` (`id`, `name`, `badge`, `priority`) VALUES
 (1, 'در صف بررسی', 'bg-slate', 1),
-(3, 'خروج از انبار', 'label-info', 4),
+(3, 'خروج از انبار', 'bg-info', 4),
 (4, 'تحویل به پست', 'bg-purple', 5),
-(5, 'تایید نشده', 'label-danger', 2),
-(6, 'تحویل به مشتری', 'label-primary', 6),
-(7, 'آماده سازی سفارش', 'label-success', 3),
-(8, 'لغو شده', 'label-danger', 8),
+(5, 'تایید نشده', 'bg-danger', 2),
+(6, 'تحویل به مشتری', 'bg-primary', 6),
+(7, 'آماده سازی سفارش', 'bg-success', 3),
+(8, 'لغو شده', 'bg-danger', 8),
 (9, 'مرجوع شده', 'bg-pink', 7);
 
 -- --------------------------------------------------------
@@ -2072,7 +2095,6 @@ CREATE TABLE `users` (
   `description` text NOT NULL,
   `is_in_team` tinyint(1) UNSIGNED NOT NULL,
   `flag_marketer_request` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-  `flag_buy` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `flag_info` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `active` tinyint(1) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
@@ -2087,8 +2109,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `user_code`, `subset_of`, `mobile`, `password`, `first_name`, `last_name`, `n_code`, `province`, `city`, `address`, `postal_code`, `image`, `credit_card_number`, `father_name`, `gender`, `military_status`, `birth_certificate_code`, `birth_certificate_code_place`, `birth_date`, `question1`, `question2`, `question3`, `question4`, `question5`, `question6`, `question7`, `description`, `is_in_team`, `flag_marketer_request`, `flag_buy`, `flag_info`, `active`, `ip_address`, `activation_code`, `activation_code_time`, `forgotten_password_code`, `forgotten_password_time`, `created_at`) VALUES
-(1, 'U-1000001', NULL, '09139518055', '$2y$10$SJJmXLT3/IlhEi3WBXPB0OBSprsz61BKeioRnPMN62gNQb5ZkIzTq', 'سعید', 'گرامی فر', '4420440392', '', '', '', '', 'public/fe/images/user-default.jpg', '', '', NULL, NULL, '', '', NULL, '', '', '', '', '', '', '', '', 0, 0, 0, 0, 1, '::1', NULL, NULL, NULL, NULL, 1584977257);
+INSERT INTO `users` (`id`, `user_code`, `subset_of`, `mobile`, `password`, `first_name`, `last_name`, `n_code`, `province`, `city`, `address`, `postal_code`, `image`, `credit_card_number`, `father_name`, `gender`, `military_status`, `birth_certificate_code`, `birth_certificate_code_place`, `birth_date`, `question1`, `question2`, `question3`, `question4`, `question5`, `question6`, `question7`, `description`, `is_in_team`, `flag_marketer_request`, `flag_info`, `active`, `ip_address`, `activation_code`, `activation_code_time`, `forgotten_password_code`, `forgotten_password_time`, `created_at`) VALUES
+(1, 'U-1000001', NULL, '09139518055', '$2y$10$SJJmXLT3/IlhEi3WBXPB0OBSprsz61BKeioRnPMN62gNQb5ZkIzTq', 'سعید', 'گرامی فر', '4420440392', '', '', '', '', 'public/fe/images/user-default.jpg', '', '', NULL, NULL, '', '', NULL, '', '', '', '', '', '', '', '', 0, 0, 0, 1, '::1', NULL, NULL, NULL, NULL, 1584977257),
+(4, 'U-1000002', NULL, '09179516271', '$2y$10$j7/CmRVsqtSPAcBc/P3goe0JPX9G8EuTjWTnQztOc6Nu9uvls9soG', '', '', '', '', '', '', '', 'public/fe/images/user-default.jpg', '', '', NULL, NULL, '', '', NULL, '', '', '', '', '', '', '', '', 0, 0, 0, 1, '::1', '', 1586533029, NULL, NULL, 1586533029);
 
 -- --------------------------------------------------------
 
@@ -2122,7 +2145,8 @@ CREATE TABLE `users_roles` (
 
 INSERT INTO `users_roles` (`id`, `user_id`, `role_id`) VALUES
 (1, 1, 1),
-(2, 1, 4);
+(2, 1, 4),
+(5, 4, 5);
 
 -- --------------------------------------------------------
 
@@ -2244,6 +2268,13 @@ ALTER TABLE `gateway_zarinpal`
   ADD KEY `fk_zarinpal_factors` (`order_code`);
 
 --
+-- Indexes for table `hits`
+--
+ALTER TABLE `hits`
+  ADD PRIMARY KEY (`pageid`,`isunique`),
+  ADD KEY `pageid` (`pageid`);
+
+--
 -- Indexes for table `icons`
 --
 ALTER TABLE `icons`
@@ -2254,6 +2285,12 @@ ALTER TABLE `icons`
 --
 ALTER TABLE `main_sliders`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `nodupes`
+--
+ALTER TABLE `nodupes`
+  ADD PRIMARY KEY (`ids_hash`);
 
 --
 -- Indexes for table `orders`
@@ -2537,7 +2574,7 @@ ALTER TABLE `static_pages`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users_pages_perms`
@@ -2549,7 +2586,7 @@ ALTER TABLE `users_pages_perms`
 -- AUTO_INCREMENT for table `users_roles`
 --
 ALTER TABLE `users_roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `user_accounts`

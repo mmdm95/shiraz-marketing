@@ -1614,6 +1614,7 @@ abstract class AbstractController extends AbstractPaymentController
     private function _gateway_processor($prev, $paymentMethod, $hasLimited = false)
     {
         $model = new Model();
+        $orderModel = new \OrderModel();
 
         $gatewayCode = '';
         // Select gateway table if gateway code is one of the bank payment gateway's code
@@ -1649,7 +1650,7 @@ abstract class AbstractController extends AbstractPaymentController
             'payment_method' => $paymentMethod,
             'payment_title' => PAYMENT_METHODS[$paymentMethod],
             'payment_status' => OWN_PAYMENT_STATUS_NOT_PAYED,
-            'send_status' => SEND_STATUS_IN_QUEUE,
+            'send_status' => $orderModel->getStatusId(SEND_STATUS_IN_QUEUE),
             'receiver_name' => $prev['receiver_name'],
             'receiver_phone' => $prev['receiver_mobile'],
             'province' => $prev['receiver_province'],
@@ -2525,6 +2526,7 @@ abstract class AbstractController extends AbstractPaymentController
     {
         // Remove not payed items from reserved factors and return item(s) count to stock
         $model = new Model();
+        $orderModel = new \OrderModel();
         $reservedTime = time() - OWN_WAIT_TIME;
         $previouslyReserved = $model->select_it(null, self::TBL_ORDER_RESERVED, '*', 'expire_time<=:et', ['et' => $reservedTime]);
         if (count($previouslyReserved)) {
@@ -2544,7 +2546,7 @@ abstract class AbstractController extends AbstractPaymentController
                     $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 } else if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
                     $model->update_it(self::TBL_ORDER, [
-                        'send_status' => SEND_STATUS_CANCELED
+                        'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
                     ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 }
             }

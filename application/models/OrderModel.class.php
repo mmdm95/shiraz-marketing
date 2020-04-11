@@ -24,7 +24,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.priority=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -56,7 +56,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.priority=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -72,6 +72,35 @@ class OrderModel extends HModel
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0];
         return [];
+    }
+
+    public function getOrdersCount($where = '', $bindParams = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'COUNT(*) AS count'
+        ])->from($this->table . ' AS o');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
+                'ss.priority=o.send_status'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
+
+        $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+        if (count($res)) return $res[0]['count'];
+        return 0;
     }
 
     public function getOrderProducts($where, $bindValues = [])
@@ -112,7 +141,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.priority=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -149,7 +178,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.priority=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -207,5 +236,12 @@ class OrderModel extends HModel
         $select->offset((int)$offset);
 
         return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
+
+    public function getStatusId($priority)
+    {
+        $model = new Model();
+        $res = $model->select_it(null, AbstractPaymentController::TBL_SEND_STATUS, 'id', 'priority=:pr', ['pr' => $priority]);
+        return count($res) ? $res[0]['id'] : -1;
     }
 }
