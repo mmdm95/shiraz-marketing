@@ -35,7 +35,8 @@ class ReportController extends AbstractController
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('exportFilterOrders');
         $form->setFieldsName(['user', 'from_date', 'to_date', 'send_status', 'province', 'city'])
-            ->setMethod('post');
+            ->setMethod('post')
+            ->clearVariablesOnSuccess(false);
         try {
             $form->afterCheckCallback(function ($values) use ($model, $orderModel, $form) {
                 $where = '';
@@ -61,17 +62,14 @@ class ReportController extends AbstractController
                     $params['ss'] = $values['send_status'];
                 }
                 // province and city
-                if (!empty($values['province']) && $values['province'] != -1 &&
-                    in_array($values['province'], array_column($this->data['provinces'], 'id'))) {
-                    $where .= 'province=:province AND ';
-                    $params['province'] = $model->select_it(null, self::TBL_PROVINCE, 'name', 'id=:id', ['id' => $values['province']])[0]['name'];
-                    if (!empty($values['city']) && $values['city'] != -1) {
-                        if ($model->is_exist(self::TBL_CITY, 'id=:id AND province_id=:pId',
-                            ['id' => $values['city'], 'pId' => $values['province']])) {
-                            $where .= 'city=:city AND ';
-                            $params['city'] = $model->select_it(null, self::TBL_CITY, 'name', 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name'];
-                        }
-                    }
+                if (!empty($values['province'])) {
+                    $where .= 'province LIKE :province AND ';
+                    $params['province'] = '%' . $values['province'] . '%';
+
+                }
+                if (!empty($values['city'])) {
+                    $where .= 'city LIKE :city AND ';
+                    $params['city'] = '%' . $values['city'] . '%';
                 }
                 //-----
                 $where = trim(trim($where), 'AND');

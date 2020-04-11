@@ -80,7 +80,7 @@
                                         <input type="hidden" name="from_date" id="altDateField">
                                         <input type="text" class="form-control range-from"
                                                placeholder="" readonly data-alt-field="#altDateField"
-                                               value="<?= $filters['from_date'] ?? ''; ?>">
+                                               value="<?= date('Y/m/d H:i', (int)$filters['from_date'] ?? time()); ?>">
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label>تا تاریخ:</label>
@@ -88,7 +88,7 @@
                                         <input type="text" class="form-control range-to"
                                                placeholder="تاریخ انقضا" readonly
                                                data-alt-field="#altDateField2"
-                                               value="<?= $filters['to_date'] ?? ''; ?>">
+                                               value="<?= date('Y/m/d H:i', (int)$filters['to_date'] ?? time()); ?>">
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label>وضعیت سفارش:</label>
@@ -105,27 +105,17 @@
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label>استان:</label>
-                                        <select class="select cityLoader" data-target-for="#citySelect"
-                                                name="province">
-                                            <option value="-1">انتخاب کنید</option>
-                                            <?php foreach ($provinces as $province): ?>
-                                                <option value="<?= $province['id']; ?>"
-                                                    <?= set_value($filters['province'] ?? '', $province['id'], 'selected', '', '=='); ?>>
-                                                    <?= $province['name']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <input name="province" type="text"
+                                               class="form-control"
+                                               placeholder="نام استان"
+                                               value="<?= $filters['province'] ?? '' ?>">
                                     </div>
                                     <div class="form-group col-lg-4">
-                                        <label>
-                                            شهر
-                                            <?= !empty($filters['city_name']) ? '(' . $filters['city_name'] . ')' : ''; ?>
-                                            :
-                                        </label>
-                                        <select class="select" id="citySelect"
-                                                name="city">
-                                            <option value="-1">انتخاب کنید</option>
-                                        </select>
+                                        <label>شهر:</label>
+                                        <input name="city" type="text"
+                                               class="form-control"
+                                               placeholder="نام شهر"
+                                               value="<?= $filters['city'] ?? '' ?>">
                                     </div>
 
                                     <div class="form-group col-lg-12">
