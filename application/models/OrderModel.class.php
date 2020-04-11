@@ -171,7 +171,7 @@ class OrderModel extends HModel
         $select = $this->select();
         $select->cols([
             'o.*', 'ss.name AS send_status_name', 'ss.badge', 'ro.description', 'ro.status',
-            'ro.created_at', 'ro.id AS return_order_id', 'ro.respond', 'ro.respond_at'
+            'ro.created_at', 'ro.id AS return_order_id', 'ro.respond', 'ro.respond_at', 'ro.is_closed',
         ])->from($this->table . ' AS o');
 
         try {
