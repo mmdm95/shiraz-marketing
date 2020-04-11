@@ -57,7 +57,7 @@
                             <div class="panel-heading">
                                 <h6 class="panel-title">مشخصات سفارش</h6>
                                 <div class="heading-elements">
-                                    <?php if ($order['status'] != 4): ?>
+                                    <?php if ($order['is_closed'] != 1): ?>
                                         <a href="javascript:void(0);"
                                            id="closeReturnOrderBtn"
                                            class="btn btn-default btn-rounded heading-btn-group border-orange-600 text-orange-600 p-10"
@@ -170,7 +170,7 @@
                                                 </span>
                                             </h6>
                                         <?php endif; ?>
-                                        <?php if ($order['status'] != 4): ?>
+                                        <?php if ($order['is_closed'] != 1): ?>
                                             <form action="<?= base_url('admin/shop/viewReturnOrder/' . $param[0]); ?>"
                                                   method="post">
                                                 <?= $form_token_answer; ?>

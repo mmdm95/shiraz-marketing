@@ -89,9 +89,12 @@
                                                             <?php elseif ($order['status'] == 1): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-info">مشاهده شده</span>
-                                                            <?php elseif ($order['status'] >= 2): ?>
+                                                            <?php elseif ($order['status'] = 2): ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-primary">پاسخ داده شده</span>
+                                                            <?php elseif ($order['status'] = 3): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-purple">مشاهده کرده‌ام</span>
                                                             <?php endif; ?>
                                                         </td>
                                                         <td style="width: 115px;" class="text-center">

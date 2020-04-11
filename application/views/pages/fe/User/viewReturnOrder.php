@@ -105,6 +105,18 @@
                                             </strong>
                                         </h6>
                                     </div>
+                                    <?php if (!empty($order['respond'])): ?>
+                                        <div class="col-md-12 text-center p-15 border border-grey-300 alert-warning">
+                                            <h6 class="no-margin">
+                                                <small class="text-grey-800">
+                                                    پاسخ درخواست مرجوعی:
+                                                </small>
+                                                <strong class="display-block mt-10">
+                                                    <?= $order['respond']; ?>
+                                                </strong>
+                                            </h6>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="row mt-20 mb-20"></div>

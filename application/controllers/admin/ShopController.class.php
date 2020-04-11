@@ -1191,7 +1191,7 @@ class ShopController extends AbstractController
                     'respond' => trim($values['answer']),
                     'respond_at' => time(),
                     'status' => 2
-                ], 'order_code=:code AND status!=:st', ['code' => $this->data['param'][0], 'st' => 4]);
+                ], 'order_code=:code AND is_closed!=:ic', ['code' => $this->data['param'][0], 'ic' => 1]);
 
                 if (!$res) {
                     $form->setError('عملیات با خطا مواجه شد!');
@@ -1266,7 +1266,7 @@ class ShopController extends AbstractController
             message(self::AJAX_TYPE_ERROR, 200, 'درخواست مرجوعی وجود ندارد.');
         }
 
-        $res = $model->update_it($table, ['status' => 4], 'id=:id', ['id' => $id]);
+        $res = $model->update_it($table, ['is_closed' => 1], 'id=:id', ['id' => $id]);
         if ($res) {
             message(self::AJAX_TYPE_SUCCESS, 200, 'درخواست مرجوعی بسته شد.');
         }
