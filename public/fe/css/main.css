@@ -2847,6 +2847,7 @@ a {
     align-items: center;
     -ms-flex-direction: row-reverse;
     flex-direction: row-reverse;
+    font-size: .9rem;
 }
 
 .page-product-detail .product-detail-side .product-detail-side-time [data-days],
@@ -2856,6 +2857,8 @@ a {
     font-family: var(--font-medium);
     display: block;
     text-align: center;
+    font-size: 1.25rem;
+    color: var(--danger);
 }
 
 /*++++++++++++++

@@ -184,31 +184,38 @@
                                     </div>
                                 </div>
                             <?php endif; ?>
-                            <div class="product-detail-side-item">
-                                <div class="product-detail-side col">
-                                    <div class="d-flex justify-content-between">
-                                        <span class="mx-3 text-secondary">
-                                            اشتراک گذاری در
-                                        </span>
-                                        <ul class="list-unstyled product-detail-side-share col p-0">
-                                            <li class="list-inline-item">
-                                                <a href="#" class="btn-link-black-reverse">
-                                                    <i class="la la-telegram" aria-hidden="true"></i>
-                                                </a>
-                                            </li>
-                                            <li class="list-inline-item">
-                                                <a href="#" class="btn-link-black-reverse">
-                                                    <i class="la la-instagram" aria-hidden="true"></i>
-                                                </a>
-                                            </li>
-                                            <li class="list-inline-item">
-                                                <a href="#" class="btn-link-black-reverse">
-                                                    <i class="la la-whatsapp" aria-hidden="true"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+                            <div class="product-detail-side-item justify-content-between align-items-center">
+                                <span class="mx-3 text-secondary">
+                                    اشتراک گذاری در
+                                </span>
+                                <?php
+                                $shareLink = str_replace('\\', '/', URITracker::get_last_uri());
+                                ?>
+                                <ul class="list-unstyled product-detail-side-share col p-0">
+                                    <li class="list-inline-item">
+                                        <a href="https://t.me/share/url?url=<?= $shareLink; ?>"
+                                           onClick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                                           class="btn-link-black-reverse" target="_blank"
+                                           title="اشتراک گذاری در تلگرام">
+                                            <i class="la la-telegram" aria-hidden="true"></i>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="https://www.instagram.com/?url=<?= $shareLink; ?>" target="_blank"
+                                           onClick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                                           class="btn-link-black-reverse" title="اشتراک گذاری در اینستاگرام">
+                                            <i class="la la-instagram" aria-hidden="true"></i>
+                                        </a>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="whatsapp://send?text=<?= $shareLink; ?>" class="btn-link-black-reverse"
+                                           data-action="share/whatsapp/share"
+                                           onClick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
+                                           target="_blank" title="اشتراک گذاری در واتس‌اَپ">
+                                            <i class="la la-whatsapp" aria-hidden="true"></i>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
