@@ -59,7 +59,7 @@ class UserModel extends HModel
         $select = $this->select();
         $select->cols([
             'u.*', 'r.name AS role_name', 'r.id AS role_id', 'uu.mobile AS superset_username',
-            'uu.first_name AS superset_first_name', 'uu.last_name AS superset_last_name'
+            'uu.first_name AS superset_first_name', 'uu.last_name AS superset_last_name', 'uu.user_code AS superset_code',
         ])->from($this->table . ' AS u');
 
         try {
@@ -74,7 +74,7 @@ class UserModel extends HModel
             )->join(
                 'LEFT',
                 $this->table . ' AS uu',
-                'uu.user_code=u.subset_of'
+                'uu.id=u.subset_of'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -121,7 +121,7 @@ class UserModel extends HModel
         }
 
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
-        if(count($res)) {
+        if (count($res)) {
             return $res[0]['count'];
         }
         return 0;
@@ -155,6 +155,7 @@ class UserModel extends HModel
         $newMarketerCode = 'M-' . ((int)$code[1]);
         $res = $model->update_it($this->table, [
             'user_code' => $newMarketerCode,
+            'flag_marketer_request' => 2,
         ], 'id=:id', ['id' => $id]);
         $res2 = true;
         if (!$model->is_exist(AbstractPaymentController::TBL_USER_ROLE, 'user_id=:uId AND role_id=:rId', ['uId' => $id, 'rId' => AUTH_ROLE_MARKETER])) {

@@ -45,7 +45,7 @@ class UserController extends AbstractController
             $this->error->show_404();
         }
 
-        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $this->data['identity']->id])[0];
+        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image'], 'id=:id', ['id' => $this->data['identity']->id])[0];
         $this->data['marketers'] = $userModel->getUsers('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
         $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
 
@@ -59,7 +59,7 @@ class UserController extends AbstractController
             'birth_certificate_code', 'birth_certificate_code_place', 'birth_date', 'province',
             'city', 'address', 'postal_code', 'credit_card_number', 'gender', 'military_status',
             'question1', 'question2', 'question3', 'question4', 'question5', 'question6', 'question7', 'description'
-        ])->setMethod('post');
+        ])->setMethod('post', ['image' => 'file'], ['image']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
                 foreach ($values as &$value) {
@@ -69,29 +69,25 @@ class UserController extends AbstractController
                 }
                 $form->isRequired(['mobile', 'subset_of'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validatePersianMobile('mobile')
-                    ->validatePersianName(['first_name', 'last_name'], 'نام و نام خانوادگی باید از حروف فارسی باشند.');
+                    ->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.')
+                    ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.');
 
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile'] &&
                     $model->is_exist(self::TBL_USER, 'mobile=:mob', ['mob' => $values['mobile']])) {
                     $form->setError('کاربر با این نام کاربری (موبایل) وجود دارد!');
                 }
 
-                // Validate image
-                if (empty($values['image'])) {
-                    $values['image'] = PROFILE_DEFAULT_IMAGE;
-                }
-
                 $marketers = array_column($this->data['marketers'], 'id');
                 $marketers[] = -1;
-                if (!in_array($values['icon'], $marketers)) {
+                if (!in_array($values['subset_of'], $marketers)) {
                     $form->setError('معرف انتخاب شده نامعتبر است.');
                 }
 
                 if (!empty($values['n_code'])) {
                     $form->validateNationalCode('n_code');
                 }
-                if (!empty($values['birth_date'] && $values['birth_date'] < time())) {
-                    $form->validateDate('birth_date', 'Y-m-d', 'تاریخ تولد نامعتبر است.', 'Y-m-d');
+                if (!empty($values['birth_date'] && $values['birth_date'] > time())) {
+                    $form->validateDate('birth_date', date('Y-m-d', $values['birth_date']), 'تاریخ تولد نامعتبر است.', 'Y-m-d');
                 }
                 if (!empty($values['province']) && $values['province'] != -1) {
                     if (!in_array($values['province'], array_column($this->data['provinces'], 'id'))) {
@@ -117,7 +113,7 @@ class UserController extends AbstractController
 
                 // upload image
                 $res4 = true;
-                $img = isset($values['image']['name']) ? $values['image']['name'] : $values['image'];
+                $img = isset($values['image']['name']) && !empty($values['image']['name']) ? $values['image']['name'] : $this->data['uTrueValues']['image'];
                 $imageExt = pathinfo($img, PATHINFO_EXTENSION);
                 $imageName = convertNumbersToPersian($values['mobile'], true);
                 $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
@@ -126,7 +122,7 @@ class UserController extends AbstractController
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
                     $res2 = unlink(realpath($values['image']));
                 }
-                $res = $model->update_it(self::TBL_USER, [
+                $this->data['_updatedColumns'] = [
                     'subset_of' => $values['subset_of'],
                     'mobile' => convertNumbersToPersian($values['mobile'], true),
                     'first_name' => $values['first_name'],
@@ -136,7 +132,7 @@ class UserController extends AbstractController
                     'n_code' => convertNumbersToPersian($values['n_code'], true),
                     'address' => $values['address'],
                     'postal_code' => $values['postal_code'],
-                    'image' => $values['image'],
+                    'image' => $image,
                     'credit_card_number' => $values['credit_card_number'],
                     'father_name' => $values['father_name'],
                     'gender' => $values['gender'] != -1 ? $values['gender'] : '',
@@ -152,14 +148,15 @@ class UserController extends AbstractController
                     'question6' => $values['question6'],
                     'question7' => $values['question7'],
                     'description' => $values['description'],
-                ], 'id=:id', ['id' => $this->data['identity']->id]);
-                if (!isset($values['image']['name']) && $res &&
+                ];
+                $res = $model->update_it(self::TBL_USER, $this->data['_updatedColumns'], 'id=:id', ['id' => $this->data['identity']->id]);
+                if ((!isset($values['image']['name']) || !empty($values['image']['name'])) && $res &&
                     convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
                     $res4 = copy($values['image'], $image);
                 }
 
                 if ($res && $res2 && $res4) {
-                    if (isset($values['image']['name'])) {
+                    if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $this->data['identity']->id);
                         if ($res5) {
                             $model->transactionComplete();
@@ -182,6 +179,9 @@ class UserController extends AbstractController
         $res = $form->checkForm()->isSuccess();
         if ($form->isSubmit()) {
             if ($res) {
+                $this->auth->storeIdentity($this->data['_updatedColumns']);
+                $this->data['identity'] = $this->auth->getIdentity();
+                unset($this->data['_updatedColumns']);
                 $this->data['success'] = 'عملیات با موفقیت انجام شد.';
             } else {
                 $this->data['errors'] = $form->getError();
@@ -191,7 +191,6 @@ class UserController extends AbstractController
 
         $this->data['uTrueValues'] = $userModel->getSingleUser('u.id=:id', ['id' => $this->data['identity']->id]);
         $this->_isInfoFlagOK($this->data['identity']->id);
-        $this->_isBuyFlagOK($this->data['identity']->id);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش حساب کاربری');
@@ -281,13 +280,13 @@ class UserController extends AbstractController
         try {
             $form->afterCheckCallback(function () use ($model, $form) {
                 if ($model->is_exist(self::TBL_USER_ROLE, 'user_id=:uId AND role_id=:rId',
-                    ['uId' => $this->data['identity']->id, 'rId' => AUTH_ROLE_USER])) {
+                    ['uId' => $this->data['identity']->id, 'rId' => AUTH_ROLE_MARKETER])) {
                     $form->setError('شما هم اکنون بازاریاب هستید.');
                     return;
                 }
                 $res = $model->update_it(self::TBL_USER, [
                     'flag_marketer_request' => 1
-                ]);
+                ], 'id=:id', ['id' => $this->data['identity']->id]);
 
                 if ($res) {
                     $this->auth->storeIdentity([
@@ -348,7 +347,7 @@ class UserController extends AbstractController
 
         $this->data['param'] = $param;
 
-        $this->data['order'] = $orderModel->getSingleOrder('id=:id', ['id' => $param[0]]);
+        $this->data['order'] = $orderModel->getSingleOrder('o.id=:id', ['id' => $param[0]]);
         $this->data['order']['products'] = $orderModel->getOrderProducts('order_code=:code', ['code' => $this->data['order']['order_code']]);
 
         // Select gateway table if gateway code is one of the bank payment gateway's code
@@ -488,6 +487,7 @@ class UserController extends AbstractController
     public function userDepositAction()
     {
         $model = new Model();
+        $orderModel = new OrderModel();
 
         $this->data['deposit_errors'] = [];
         $this->load->library('HForm/Form');
@@ -537,9 +537,7 @@ class UserController extends AbstractController
         $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],
             'user_id=:uId', ['uId' => $this->data['identity']->id])[0]['sum'];
         // Deposit transactions
-        $this->data['user']['transactions'] = $model->select_it(null, self::TBL_USER_ACCOUNT_DEPOSIT, [
-            'deposit_code', 'deposit_price', 'deposit_type', 'deposit_date'
-        ]);
+        $this->data['user']['transactions'] = $orderModel->getUserDeposit('ud.user_id=:uId', ['uId' => $this->data['identity']->id]);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'کیف پول');

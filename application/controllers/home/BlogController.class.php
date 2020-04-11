@@ -44,7 +44,7 @@ class BlogController extends AbstractController
         }
         //-----
         $blog = new BlogModel();
-        $this->data['blog'] = $blog->getBlogDetail('id=:id', ['id' => $param[0]]);
+        $this->data['blog'] = $blog->getBlogDetail('b.id=:id', ['id' => $param[0]]);
         $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
         $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
         $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
@@ -86,7 +86,7 @@ class BlogController extends AbstractController
         $orderTypeKeys = array_keys($this->_order_types);
 
         $this->data['categoryParam'] = '';
-        $this->data['categoryText'] = '';
+        $this->data['categoryText'] = 'همه';
 
         $this->data['orderParam'] = 'newest';
         $this->data['orderText'] = $this->_order_type_globalization['newest'];

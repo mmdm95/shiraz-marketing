@@ -41,7 +41,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url('user/editUser'); ?>" method="post">
+                        <form action="<?= base_url('user/editUser'); ?>" method="post" enctype="multipart/form-data">
                             <?= $form_token; ?>
 
                             <div class="row">
@@ -204,7 +204,14 @@
                                             <div class="form-group col-lg-4">
                                                 <span class="note-size bg-green mr-5 mt-5 pull-lef"></span>
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
-                                                <label>استان:</label>
+                                                <label>
+                                                    استان:
+                                                    <?php if (isset($uTrueValues['province'])): ?>
+                                                        <label class="label label-primary">
+                                                            <?= $uTrueValues['province']; ?>
+                                                        </label>
+                                                    <?php endif; ?>
+                                                </label>
                                                 <select class="select cityLoader" data-target-for="#citySelect"
                                                         name="province">
                                                     <option value="-1">انتخاب کنید</option>
@@ -219,7 +226,14 @@
                                             <div class="form-group col-lg-4">
                                                 <span class="note-size bg-green mr-5 mt-5 pull-lef"></span>
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
-                                                <label>شهر:</label>
+                                                <label>
+                                                    شهر:
+                                                    <?php if (isset($uTrueValues['city'])): ?>
+                                                        <label class="label label-primary">
+                                                            <?= $uTrueValues['city']; ?>
+                                                        </label>
+                                                    <?php endif; ?>
+                                                </label>
                                                 <select class="select" id="citySelect"
                                                         name="city">
                                                     <option value="-1">انتخاب کنید</option>
@@ -229,7 +243,7 @@
                                                 <span class="note-size bg-green mr-5 mt-5 pull-lef"></span>
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
                                                 <label>آدرس:</label>
-                                                <input name="address" type="text" required
+                                                <input name="address" type="text"
                                                        class="form-control"
                                                        placeholder="اینجا وارد کنید ..."
                                                        value="<?= $uValues['address'] ?? $uTrueValues['address'] ?? '' ?>">
@@ -238,14 +252,14 @@
                                                 <span class="note-size bg-green mr-5 mt-5 pull-lef"></span>
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
                                                 <label>کدپستی:</label>
-                                                <input name="postal_code" type="text" required
+                                                <input name="postal_code" type="text"
                                                        class="form-control"
                                                        placeholder="کد پستی ۱۰ رقمی"
                                                        value="<?= $uValues['postal_code'] ?? $uTrueValues['postal_code'] ?? '' ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>شماره کارت:</label>
-                                                <input name="credit_card_number" type="text" required
+                                                <input name="credit_card_number" type="text"
                                                        class="form-control"
                                                        placeholder="شماره کارت ۱۶ رقمی"
                                                        value="<?= $uValues['credit_card_number'] ?? $uTrueValues['credit_card_number'] ?? '' ?>">

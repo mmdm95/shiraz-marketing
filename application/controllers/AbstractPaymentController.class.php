@@ -28,8 +28,8 @@ abstract class AbstractPaymentController extends HController
         self::PAYMENT_TABLE_ZARINPAL => [],
     ];
     protected $gatewayFunctions = [
-        self::PAYMENT_TABLE_IDPAY => [__CLASS__, '_idpay_connection'],
-        self::PAYMENT_TABLE_ZARINPAL => [__CLASS__, '_zarinpal_connection'],
+        self::PAYMENT_TABLE_IDPAY => [\Home\AbstractController\AbstractController::class, '_idpay_connection'],
+        self::PAYMENT_TABLE_ZARINPAL => [\Home\AbstractController\AbstractController::class, '_zarinpal_connection'],
     ];
     //-----
     const PAYMENT_RESULT_PARAM_IDPAY = 'idpay';
@@ -39,12 +39,12 @@ abstract class AbstractPaymentController extends HController
     const PAYMENT_RESULT_PARAM_IN_PLACE = 'in_place';
     const PAYMENT_RESULT_PARAM_RECEIPT = 'receipt';
     protected $paymentResultParam = [
-        self::PAYMENT_RESULT_PARAM_IDPAY => [__CLASS__, '_idpay_result'],
-        self::PAYMENT_RESULT_PARAM_MABNA => [__CLASS__, '_mabna_result'],
-        self::PAYMENT_RESULT_PARAM_ZARINPAL => [__CLASS__, '_zarinpal_result'],
-        self::PAYMENT_RESULT_PARAM_WALLET => [__CLASS__, '_wallet_result'],
-        self::PAYMENT_RESULT_PARAM_IN_PLACE => [__CLASS__, '_in_place_result'],
-        self::PAYMENT_RESULT_PARAM_RECEIPT => [__CLASS__, '_receipt_result'],
+        self::PAYMENT_RESULT_PARAM_IDPAY => [\Home\AbstractController\AbstractController::class, '_idpay_result'],
+        self::PAYMENT_RESULT_PARAM_MABNA => [\Home\AbstractController\AbstractController::class, '_mabna_result'],
+        self::PAYMENT_RESULT_PARAM_ZARINPAL => [\Home\AbstractController\AbstractController::class, '_zarinpal_result'],
+        self::PAYMENT_RESULT_PARAM_WALLET => [\Home\AbstractController\AbstractController::class, '_wallet_result'],
+        self::PAYMENT_RESULT_PARAM_IN_PLACE => [\Home\AbstractController\AbstractController::class, '_in_place_result'],
+        self::PAYMENT_RESULT_PARAM_RECEIPT => [\Home\AbstractController\AbstractController::class, '_receipt_result'],
     ];
     protected $paymentParamTable = [
         self::PAYMENT_RESULT_PARAM_IDPAY => self::PAYMENT_TABLE_IDPAY,
@@ -107,17 +107,17 @@ abstract class AbstractPaymentController extends HController
         $id = @$_POST['postedId'];
         $table = self::TBL_CITY;
         if (!isset($id)) {
-            message('error', 200, []);
+            message(self::AJAX_TYPE_ERROR, 200, []);
         }
         if (!$model->is_exist(self::TBL_PROVINCE, 'id=:id', ['id' => $id])) {
-            message('error', 200, []);
+            message(self::AJAX_TYPE_ERROR, 200, []);
         }
 
         $res = $model->select_it(null, $table, [
             'id', 'name'
         ], 'province_id=:id', ['id' => $id]);
 
-        message('success', 200, $res);
+        message(self::AJAX_TYPE_SUCCESS, 200, $res);
     }
 
     //-----
@@ -142,26 +142,6 @@ abstract class AbstractPaymentController extends HController
         }
         $model->update_it(self::TBL_USER, [
             'flag_info' => 0
-        ], 'id=:id', ['id' => $uId]);
-        return false;
-    }
-
-    protected function _isBuyFlagOK($uId)
-    {
-        $model = new Model();
-        if (!$model->is_exist(self::TBL_USER, 'id=:id', ['id' => $uId])) {
-            return false;
-        }
-        $user = $model->select_it(null, self::TBL_USER, '*', 'id=:id', ['id' => $uId])[0];
-        if (!empty($user['first_name']) && !empty($user['last_name']) && !empty($user['province']) &&
-            !empty($user['city']) && !empty($user['address']) && !empty($user['postal_code'])) {
-            $model->update_it(self::TBL_USER, [
-                'flag_buy' => 1
-            ], 'id=:id', ['id' => $uId]);
-            return true;
-        }
-        $model->update_it(self::TBL_USER, [
-            'flag_buy' => 0
         ], 'id=:id', ['id' => $uId]);
         return false;
     }

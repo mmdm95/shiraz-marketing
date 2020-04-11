@@ -291,7 +291,7 @@
                                     </li>
                                     <li class="list-inline-item">
                                         <i class="la la-eye"></i>
-                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($news['view_count']), true)); ?>
+                                        <?= convertNumbersToPersian(number_format($news['view_count'])); ?>
                                         بازدید
                                     </li>
                                 </ul>

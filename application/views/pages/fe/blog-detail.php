@@ -13,7 +13,7 @@
                 <li class="breadcrumb-item"><a href="<?= base_url('blog/all'); ?>" class="btn-link-black">اخبار و
                         اطلاعیه‌ها</a></li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    این مطلب فاقد اهمیت است
+                    <?= $blog['title']; ?>
                 </li>
             </ol>
         </nav>

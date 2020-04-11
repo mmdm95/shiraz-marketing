@@ -228,7 +228,7 @@ class PaymentMabna extends Payment
             CURLOPT_URL => $this->_parameters[$this->urlStr],
             CURLOPT_CUSTOMREQUEST => $this->_parameters[$this->methodStr],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYHOST => FALSE,
             CURLOPT_POSTFIELDS => $data
         ]);
 

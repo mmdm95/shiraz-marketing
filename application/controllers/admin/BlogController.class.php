@@ -390,7 +390,7 @@ class BlogController extends AbstractController
                     'category_id' => $values['category'],
                     'keywords' => $values['keywords'],
                     'publish' => $form->isChecked('publish') ? 1 : 0,
-                    'update_by' => $this->data['identity']->id,
+                    'updated_by' => $this->data['identity']->id,
                     'updated_at' => time(),
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
 

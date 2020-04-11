@@ -66,7 +66,7 @@
                                           method="post">
                                         <?= $form_token; ?>
 
-                                        <button type="submit"
+                                        <button type="submit" name="upgrade"
                                                 class="btn btn-primary display-inline-block pull-right mt-5">
                                             <i class="icon-statistics position-left"></i>
                                             درخواست ارتقاء به بازاریاب
@@ -108,7 +108,7 @@
                                                     <?php endif; ?>
                                                     <i class="icon-minus2 text-danger" aria-hidden="true"></i>
                                                     با کد
-                                                    <?= $user['subset_of'] ?? '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                    <?= $user['superset_code'] ?? '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                 </span>
                                     </div>
                                 </div>

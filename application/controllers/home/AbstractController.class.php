@@ -50,7 +50,7 @@ abstract class AbstractController extends AbstractPaymentController
         $this->load->library('HAuthentication/Auth');
         try {
             $this->auth = new Auth();
-            $_SESSION['home_panel_namespace'] = 'home_hva_ms_rhm_7472';
+            $_SESSION['home_panel_namespace'] = 'home_new_hva_ms_rhm_7472';
             $this->auth->setNamespace($_SESSION['home_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
         } catch (HAException $e) {
             echo $e;
@@ -1048,14 +1048,6 @@ abstract class AbstractController extends AbstractPaymentController
             ]);
             $this->redirect(base_url('login?back_url=' . base_url('shopping')));
         }
-        if ($this->data['identity']->flag_buy != 1) {
-            $this->session->setFlash($this->messageSession, [
-                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
-                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
-                'message' => 'لطفا اطلاعات حساب خود را تکمیل کنید.',
-            ]);
-            $this->redirect(base_url('user/editUser?back_url=' . base_url('shopping')));
-        }
 
         // Check cart and cart items
         $cartItems = $this->_fetch_cart_items();
@@ -1074,7 +1066,8 @@ abstract class AbstractController extends AbstractPaymentController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('shopping');
-        $form->setFieldsName(['receiver_name', 'receiver_mobile', 'coupon_code'])
+        $form->setFieldsName(['receiver_province', 'receiver_city', 'receiver_address', 'receiver_postal_code',
+            'receiver_name', 'receiver_mobile', 'coupon_code'])
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($form) {
@@ -1083,6 +1076,9 @@ abstract class AbstractController extends AbstractPaymentController
                         $value = trim($value);
                     }
                 }
+                //-----
+                $form->isRequired(['receiver_province', 'receiver_city', 'receiver_address',
+                    'receiver_postal_code', 'receiver_name', 'receiver_mobile'], 'اطلاعات ضروری را تکمیل نمایید.');
                 //-----
                 $this->data['_shopping_arr'] = [];
                 //-----
@@ -1098,6 +1094,11 @@ abstract class AbstractController extends AbstractPaymentController
             })->afterCheckCallback(function (&$values) use ($form) {
                 $this->data['_shopping_arr']['receiver_name'] = $values['receiver_name'];
                 $this->data['_shopping_arr']['receiver_mobile'] = $values['receiver_mobile'];
+                $this->data['_shopping_arr']['receiver_province'] = $values['receiver_province'];
+                $this->data['_shopping_arr']['receiver_city'] = $values['receiver_city'];
+                $this->data['_shopping_arr']['receiver_address'] = $values['receiver_address'];
+                $this->data['_shopping_arr']['receiver_postal_code'] = $values['receiver_postal_code'];
+
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -1144,22 +1145,19 @@ abstract class AbstractController extends AbstractPaymentController
             ]);
             $this->redirect(base_url('login?back_url=' . base_url('prepareToPay')));
         }
-        if ($this->data['identity']->flag_buy != 1) {
-            $this->session->setFlash($this->messageSession, [
-                'type' => self::FLASH_MESSAGE_TYPE_WARNING,
-                'icon' => self::FLASH_MESSAGE_ICON_WARNING,
-                'message' => 'لطفا اطلاعات حساب خود را تکمیل کنید.',
-            ]);
-            $this->redirect(base_url('user/editUser?back_url=' . base_url('prepareToPay')));
-        }
 
         // Get previous stored data from session
         $prevData = $this->session->get('shopping_page_session');
-        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile'])) {
+        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile']) ||
+            !isset($prevData['receiver_province']) || !isset($prevData['receiver_city']) ||
+            !isset($prevData['receiver_address']) || !isset($prevData['receiver_postal_code']) ||
+            empty($prevData['receiver_name']) || empty($prevData['receiver_mobile']) ||
+            empty($prevData['receiver_province']) || empty($prevData['receiver_city']) ||
+            empty($prevData['receiver_address']) || empty($prevData['receiver_postal_code'])) {
             $this->session->setFlash($this->messageSession, [
                 'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                 'icon' => self::FLASH_MESSAGE_ICON_WARNING,
-                'message' => 'پارمترهای ارسال شده دستکاری شده‌اند! لطفا مراحل را دوباره طی کنید.',
+                'message' => 'اطلاعات مورد نیاز جهت ثبت سفارش را وارد کنید.',
             ]);
             $this->redirect(base_url('shopping'));
         }
@@ -1244,11 +1242,16 @@ abstract class AbstractController extends AbstractPaymentController
 
         // Get previous stored data from session
         $prevData = $this->session->get('shopping_page_session');
-        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile'])) {
+        if (!isset($prevData['receiver_name']) || !isset($prevData['receiver_mobile']) ||
+            !isset($prevData['receiver_province']) || !isset($prevData['receiver_city']) ||
+            !isset($prevData['receiver_address']) || !isset($prevData['receiver_postal_code']) ||
+            empty($prevData['receiver_name']) || empty($prevData['receiver_mobile']) ||
+            empty($prevData['receiver_province']) || empty($prevData['receiver_city']) ||
+            empty($prevData['receiver_address']) || empty($prevData['receiver_postal_code'])) {
             $this->session->setFlash($this->messageSession, [
                 'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                 'icon' => self::FLASH_MESSAGE_ICON_WARNING,
-                'message' => 'پارمترهای ارسال شده دستکاری شده‌اند! لطفا مراحل را دوباره طی کنید.',
+                'message' => 'اطلاعات مورد نیاز جهت ثبت سفارش را وارد کنید.',
             ]);
             $this->redirect(base_url('shopping'));
         }
@@ -1287,11 +1290,11 @@ abstract class AbstractController extends AbstractPaymentController
         $form->setFieldsName(['receipt_code', 'receipt_date'])
             ->setMethod('post');
         try {
-            $form->beforeCheckCallback(function () use ($form) {
-                $form->validateDate('receipt_date', 'Y-m-d H:i:s', 'تاریخ رسید نامعتبر است.');
-            })->afterCheckCallback(function () use ($form, &$prevData) {
-                $prevData['receipt_code'] = ['receipt_code'];
-                $prevData['receipt_date'] = ['receipt_date'];
+            $form->beforeCheckCallback(function ($values) use ($form) {
+                $form->validateDate('receipt_date', date('Y-m-d H:i:s', $values['receipt_date']), 'تاریخ رسید نامعتبر است.', 'Y-m-d H:i:s');
+            })->afterCheckCallback(function ($values) use ($form, &$prevData) {
+                $prevData['receipt_code'] = $values['receipt_code'];
+                $prevData['receipt_date'] = $values['receipt_date'];
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -1655,10 +1658,10 @@ abstract class AbstractController extends AbstractPaymentController
             'send_status' => SEND_STATUS_IN_QUEUE,
             'receiver_name' => $prev['receiver_name'],
             'receiver_phone' => $prev['receiver_mobile'],
-            'province' => $this->data['identity']->province,
-            'city' => $this->data['identity']->city,
-            'postal_code' => $this->data['identity']->postal_code,
-            'address' => $this->data['identity']->address,
+            'province' => $prev['receiver_province'],
+            'city' => $prev['receiver_city'],
+            'postal_code' => $prev['receiver_postal_code'],
+            'address' => $prev['receiver_address'],
             'order_date' => time()
         ]);
         // Calculate price of product(s) and store in factors_item
@@ -1758,9 +1761,6 @@ abstract class AbstractController extends AbstractPaymentController
 
             // If any gateway exists (if method code is one of the bank payment gateways)
             if (isset($gatewayTable)) {
-                // Delete cart items
-                $this->removeAllFromCartAction();
-
                 // Fill parameters variable to pass between gateway connection functions
                 $parameters = [
                     'price' => $discountPrice,
@@ -1770,7 +1770,7 @@ abstract class AbstractController extends AbstractPaymentController
                 ];
 
                 if ($hasLimited === true) {
-                    return true;
+                    return $parameters;
                 }
 
                 // Call one of the [_*_connection] functions
@@ -1830,6 +1830,9 @@ abstract class AbstractController extends AbstractPaymentController
                 ]);
 
                 if ($res) {
+                    // Delete cart items
+                    $this->removeAllFromCartAction();
+
                     // Send user to idpay for transaction
                     $this->redirect($payRes['link'], $redirectMessage, $wait);
                     return true;
@@ -1844,7 +1847,7 @@ abstract class AbstractController extends AbstractPaymentController
         }
     }
 
-    protected function _mabna_connection($parameters)
+    public function _mabna_connectionAction()
     {
         if (is_ajax() && !$this->auth->isLoggedIn()) {
             message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
@@ -1859,8 +1862,8 @@ abstract class AbstractController extends AbstractPaymentController
         }
         //-----
         $prevData = $this->session->get('shopping_page_session');
-        $status = $this->_gateway_processor($prevData, $code, true);
-        if (!$status) {
+        $parameters = $this->_gateway_processor($prevData, $code, true);
+        if ($parameters == false) {
             message(self::AJAX_TYPE_ERROR, 200, 'خطا در ثبت سفارش! لطفا مجددا تلاش نمایید.');
         }
         //-----
@@ -1874,6 +1877,7 @@ abstract class AbstractController extends AbstractPaymentController
                 'Amount' => $parameters['price'] * 10,
                 'callbackURL' => $parameters['backUrl'],
                 'terminalID' => '69005147'])->get_result();
+
             // Handle result of payment gateway
             if (isset($payRes['Status']) && isset($payRes['AccessToken']) && $payRes['Status'] == 0) {
                 // Insert new payment in DB
@@ -1889,6 +1893,9 @@ abstract class AbstractController extends AbstractPaymentController
                 $url = $mabna->urls[PaymentMabna::PAYMENT_URL_PAYMENT_MABNA];
 
                 if ($res) {
+                    // Delete cart items
+                    $this->removeAllFromCartAction();
+
                     // Send user to mabna for transaction
                     message(self::AJAX_TYPE_SUCCESS, 200, ['', $url, $terminal, $token]);
                 } else {
@@ -2396,15 +2403,18 @@ abstract class AbstractController extends AbstractPaymentController
                         $reward = $productModel->getProductsReward($orderCode);
                         $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
                             'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                        // Store reward to wallet
-                        $res4 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                            'deposit_code' => 'DEP-' . $code,
-                            'user_id' => $this->data['identity']->id,
-                            'deposit_price' => $reward,
-                            'description' => 'پاداش خرید',
-                            'deposit_type' => DEPOSIT_TYPE_REWARD,
-                            'deposit_date' => time(),
-                        ]);
+                        $res4 = true;
+                        if ($reward > 0) {
+                            // Store reward to wallet
+                            $res4 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                                'deposit_code' => 'DEP-' . $code,
+                                'user_id' => $this->data['identity']->id,
+                                'deposit_price' => $reward,
+                                'description' => 'پاداش خرید',
+                                'deposit_type' => DEPOSIT_TYPE_REWARD,
+                                'deposit_date' => time(),
+                            ]);
+                        }
                         //-----
                         if ($res && $res2 && $res3 && $res4) {
                             $model->transactionComplete();
@@ -2464,15 +2474,18 @@ abstract class AbstractController extends AbstractPaymentController
                 $reward = $productModel->getProductsReward($orderCode);
                 $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
                     'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                // Store reward to wallet
-                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                    'deposit_code' => 'DEP-' . $code,
-                    'user_id' => $this->data['identity']->id,
-                    'deposit_price' => $reward,
-                    'description' => 'پاداش خرید',
-                    'deposit_type' => DEPOSIT_TYPE_REWARD,
-                    'deposit_date' => time(),
-                ]);
+                $res2 = true;
+                if ($reward > 0) {
+                    // Store reward to wallet
+                    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                        'deposit_code' => 'DEP-' . $code,
+                        'user_id' => $this->data['identity']->id,
+                        'deposit_price' => $reward,
+                        'description' => 'پاداش خرید',
+                        'deposit_type' => DEPOSIT_TYPE_REWARD,
+                        'deposit_date' => time(),
+                    ]);
+                }
 
                 if ($res && $res2) {
                     $model->transactionComplete();
@@ -2524,15 +2537,18 @@ abstract class AbstractController extends AbstractPaymentController
                 $reward = $productModel->getProductsReward($orderCode);
                 $code = $commonModel->generate_random_unique_code(self::TBL_USER_ACCOUNT_DEPOSIT, 'deposit_code',
                     'DEP-', 6, 15, 10, CommonModel::DIGITS);
-                // Store reward to wallet
-                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                    'deposit_code' => 'DEP-' . $code,
-                    'user_id' => $this->data['identity']->id,
-                    'deposit_price' => $reward,
-                    'description' => 'پاداش خرید',
-                    'deposit_type' => DEPOSIT_TYPE_REWARD,
-                    'deposit_date' => time(),
-                ]);
+                $res2 = true;
+                if ($reward > 0) {
+                    // Store reward to wallet
+                    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                        'deposit_code' => 'DEP-' . $code,
+                        'user_id' => $this->data['identity']->id,
+                        'deposit_price' => $reward,
+                        'description' => 'پاداش خرید',
+                        'deposit_type' => DEPOSIT_TYPE_REWARD,
+                        'deposit_date' => time(),
+                    ]);
+                }
 
                 if ($res && $res2) {
                     $model->transactionComplete();

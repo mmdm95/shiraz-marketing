@@ -68,13 +68,13 @@
                                              style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
                                             <input class="image-file" type="hidden"
                                                    name="image"
-                                                   value="<?= $slideValues['image'] ?? ''; ?>">
+                                                   value="<?= $slideValues['image'] ?? $slideTrueValues['image'] ?? ''; ?>">
                                             <div class="media stack-media-on-mobile">
                                                 <div class="media-left">
                                                     <div class="thumb">
                                                         <a class="display-inline-block"
                                                            style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
-                                                            <img src="<?= set_value($slideValues['image'] ?? '', '', base_url($slideValues['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                            <img src="<?= set_value($slideValues['image'] ?? $slideTrueValues['image'] ?? '', '', base_url($slideValues['image'] ?? $slideTrueValues['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
                                                                  class="img-rounded" alt=""
                                                                  style="width: 100px; height: 100px; object-fit: contain;"
                                                                  data-base-url="<?= base_url(); ?>">
@@ -88,7 +88,7 @@
                                                             انتخاب تصویر:
                                                         </a>
                                                         <a class="io-image-name display-block">
-                                                            <?= basename($slideValues['image'] ?? ''); ?>
+                                                            <?= basename($slideValues['image'] ?? $slideTrueValues['image'] ?? ''); ?>
                                                         </a>
                                                     </h6>
                                                 </div>

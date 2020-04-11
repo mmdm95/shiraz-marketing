@@ -78,7 +78,7 @@
                                                 <td style="width: 115px;" class="text-center">
                                                     <ul class="icons-list">
                                                         <li class="text-primary-600">
-                                                            <a href="<?= base_url(); ?>admin/editFAQ/"
+                                                            <a href="<?= base_url('admin/editFAQ/' . $faq['id']); ?>"
                                                                title="ویرایش" data-popup="tooltip">
                                                                 <i class="icon-pencil7"></i>
                                                             </a>

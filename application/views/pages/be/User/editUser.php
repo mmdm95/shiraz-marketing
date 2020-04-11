@@ -47,7 +47,7 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-md-12">
-                        <form action="<?= base_url('admin/editUser/' . $param[0]); ?>" method="post">
+                        <form action="<?= base_url('admin/user/editUser/' . $param[0]); ?>" method="post" enctype="multipart/form-data">
                             <?= $form_token; ?>
 
                             <div class="row">
@@ -198,21 +198,21 @@
                                             </div>
                                             <div class="form-group col-lg-8">
                                                 <label>آدرس:</label>
-                                                <input name="address" type="text" required
+                                                <input name="address" type="text"
                                                        class="form-control"
                                                        placeholder="اینجا وارد کنید ..."
                                                        value="<?= $uValues['address'] ?? $uTrueValues['address'] ?? '' ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>کدپستی:</label>
-                                                <input name="postal_code" type="text" required
+                                                <input name="postal_code" type="text"
                                                        class="form-control"
                                                        placeholder="کد پستی ۱۰ رقمی"
                                                        value="<?= $uValues['postal_code'] ?? $uTrueValues['postal_code'] ?? '' ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
                                                 <label>شماره کارت:</label>
-                                                <input name="credit_card_number" type="text" required
+                                                <input name="credit_card_number" type="text"
                                                        class="form-control"
                                                        placeholder="شماره کارت ۱۶ رقمی"
                                                        value="<?= $uValues['credit_card_number'] ?? $uTrueValues['credit_card_number'] ?? '' ?>">

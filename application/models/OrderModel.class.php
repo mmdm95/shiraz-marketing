@@ -49,7 +49,7 @@ class OrderModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'o.*', 'ss.name AS send_status_name', 'ss.badge',
+            'o.*', 'ss.name AS send_status_name', 'ss.badge AS send_status_badge',
         ])->from($this->table . ' AS o');
 
         try {
@@ -176,22 +176,19 @@ class OrderModel extends HModel
         $select = $this->select();
         $select->cols([
             'ud.id', 'ud.payer_id AS payer', 'ud.deposit_price', 'ud.description', 'ud.deposit_type',
-            'ud.deposit_date', 'u.first_name', 'u.last_name', 'u.mobile', 'r.description AS role_name'
+            'ud.deposit_date', 'u1.first_name', 'u1.last_name', 'u1.mobile',
+            'CONCAT(u2.first_name, " ", u2.last_name) AS payer_name', 'u2.mobile AS payer_mobile'
         ])->from(AbstractPaymentController::TBL_USER_ACCOUNT_DEPOSIT . ' AS ud');
 
         try {
             $select->join(
                 'LEFT',
-                AbstractPaymentController::TBL_USER . ' AS u',
-                'u.id=ud.user_id'
+                AbstractPaymentController::TBL_USER . ' AS u1',
+                'u1.id=ud.user_id'
             )->join(
                 'LEFT',
-                AbstractPaymentController::TBL_USER_ROLE . ' AS ur',
-                'ur.user_id=ud.user_id'
-            )->join(
-                'LEFT',
-                AbstractPaymentController::TBL_ROLE . ' AS r',
-                'r.id=ur.role_id'
+                AbstractPaymentController::TBL_USER . ' AS u2',
+                'u2.id=ud.payer_id'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());

@@ -25,7 +25,7 @@ class HomeController extends AbstractController
         $this->data['lastNews'] = $blogModel->getAllBlog('b.publish=:pub', ['pub' => 1], 6);
         //-----
         $this->data['ourTeam'] = $this->setting['pages']['index']['showOurTeam'] == 1
-            ? $model->select_it(null, self::TBL_USER, ['first_name', 'last_name', 'image', 'province', 'city'])
+            ? $model->select_it(null, self::TBL_USER, ['first_name', 'last_name', 'image', 'province', 'city'], 'is_in_team=:iit', ['iit' => 1])
             : [];
 
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'صفحه اصلی');
@@ -79,7 +79,7 @@ class HomeController extends AbstractController
     public function contactUsAction()
     {
         $this->_shared();
-        $this->_contactSubmit();
+        $this->_contactSubmit(['captcha' => ACTION]);
 
         $this->data['page_image'] = $this->setting['pages']['contactUs']['topImage'] ?? '';
         $this->data['page_title'] = 'تماس با ما';
@@ -94,7 +94,7 @@ class HomeController extends AbstractController
     public function complaintAction()
     {
         $this->_shared();
-        $this->_complaintSubmit();
+        $this->_complaintSubmit(['captcha' => ACTION]);
 
         $this->data['page_image'] = $this->setting['pages']['complaint']['topImage'] ?? '';
         $this->data['page_title'] = 'ثبت شکایت';
@@ -115,7 +115,7 @@ class HomeController extends AbstractController
 
     //-----
 
-    protected function _contactSubmit()
+    protected function _contactSubmit($param)
     {
         //-----
         $model = new Model();
@@ -128,9 +128,10 @@ class HomeController extends AbstractController
             'title', 'first_name', 'last_name', 'mobile', 'email', 'body', 'contactCaptcha',
         ])->setMethod('post');
         try {
-            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+            $form->beforeCheckCallback(function ($values) use ($model, $form, $param) {
                 $form->isRequired(['title', 'first_name', 'mobile', 'body', 'contactCaptcha'], 'فیلدهای اجباری را خالی نگذارید.');
-                $form->validatePersianName('name', 'نام باید حروف فارسی باشد.')
+                $form->validatePersianName('first_name', 'نام باید حروف فارسی باشد.')
+                    ->validatePersianName('last_name', 'نام خانوادگی باید حروف فارسی باشد.')
                     ->validate('numeric', 'mobile', 'شماره باید از نوع عدد باشد.')
                     ->validatePersianMobile('mobile');
 
@@ -138,12 +139,13 @@ class HomeController extends AbstractController
                 if (!isset($config['captcha_session_name']) ||
                     !isset($_SESSION[$config['captcha_session_name']][$param['captcha']]) ||
                     !isset($param['captcha']) ||
-                    encryption_decryption(ED_DECRYPT, $_SESSION[$config['captcha_session_name']][ACTION]) != strtolower($values['contactCaptcha'])) {
+                    encryption_decryption(ED_DECRYPT, $_SESSION[$config['captcha_session_name']][$param['captcha']]) != strtolower($values['contactCaptcha'])) {
                     $form->setError('کد وارد شده با کد تصویر مغایرت دارد. دوباره تلاش کنید.');
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $res = $model->insert_it(self::TBL_CONTACT_US, [
-                    'user_code' => $this->auth->isLoggedIn() ? $this->data['identity']->user_code : null,
+                    'user_code' => $this->auth->isLoggedIn() ? $this->data['identity']->user_code : '',
+                    'title' => trim($values['title']),
                     'first_name' => trim($values['first_name']),
                     'last_name' => trim($values['last_name']),
                     'mobile' => trim($values['mobile']),
@@ -171,7 +173,7 @@ class HomeController extends AbstractController
         }
     }
 
-    protected function _complaintSubmit()
+    protected function _complaintSubmit($param)
     {
         //-----
         $model = new Model();
@@ -184,9 +186,10 @@ class HomeController extends AbstractController
             'title', 'first_name', 'last_name', 'mobile', 'email', 'body', 'complaintCaptcha',
         ])->setMethod('post');
         try {
-            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+            $form->beforeCheckCallback(function ($values) use ($model, $form, $param) {
                 $form->isRequired(['title', 'first_name', 'mobile', 'body', 'complaintCaptcha'], 'فیلدهای اجباری را خالی نگذارید.');
-                $form->validatePersianName('name', 'نام باید حروف فارسی باشد.')
+                $form->validatePersianName('first_name', 'نام باید حروف فارسی باشد.')
+                    ->validatePersianName('last_name', 'نام خانوادگی باید حروف فارسی باشد.')
                     ->validate('numeric', 'mobile', 'شماره باید از نوع عدد باشد.')
                     ->validatePersianMobile('mobile');
 
@@ -194,11 +197,12 @@ class HomeController extends AbstractController
                 if (!isset($config['captcha_session_name']) ||
                     !isset($_SESSION[$config['captcha_session_name']][$param['captcha']]) ||
                     !isset($param['captcha']) ||
-                    encryption_decryption(ED_DECRYPT, $_SESSION[$config['captcha_session_name']][ACTION]) != strtolower($values['complaintCaptcha'])) {
+                    encryption_decryption(ED_DECRYPT, $_SESSION[$config['captcha_session_name']][$param['captcha']]) != strtolower($values['complaintCaptcha'])) {
                     $form->setError('کد وارد شده با کد تصویر مغایرت دارد. دوباره تلاش کنید.');
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $res = $model->insert_it(self::TBL_COMPLAINT, [
+                    'title' => trim($values['title']),
                     'first_name' => trim($values['first_name']),
                     'last_name' => trim($values['last_name']),
                     'mobile' => trim($values['mobile']),

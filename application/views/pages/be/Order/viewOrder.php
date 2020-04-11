@@ -184,7 +184,7 @@
                                                 نحوه پرداخت:
                                             </small>
                                             <strong>
-                                                <?php if (in_array($order['payment_method'], array_keys(OWN_PAYMENT_STATUSES))): ?>
+                                                <?php if (in_array($order['payment_method'], array_keys(PAYMENT_METHODS))): ?>
                                                     <?= PAYMENT_METHODS[$order['payment_method']]; ?>
                                                 <?php else: ?>
                                                     نامشخص
@@ -307,22 +307,23 @@
                                             </strong>
                                         </h6>
                                     </div>
-                                    <div class="col-md-6 text-center p-10 border-grey-300">
-                                        <form action="<?= base_url('admin/shop/viewOrder/' . $order['id']); ?>"
-                                              method="post">
-                                            <?= $form_token_pdf; ?>
-
-                                            <h6 class="no-margin">
-                                                <label class="no-margin">
-                                                    <button type="submit" class="btn btn-danger btn-sm no-margin">
-                                                        <i class="icon-file-pdf position-left" aria-hidden="true">
-                                                        </i>
-                                                        چاپ فاکتور
-                                                    </button>
-                                                </label>
-                                            </h6>
-                                        </form>
-                                    </div>
+                                    <!--                                    <div class="col-md-6 text-center p-10 border-grey-300">-->
+                                    <!--                                        <form action="-->
+                                    <? //= base_url('admin/shop/viewOrder/' . $order['id']); ?><!--"-->
+                                    <!--                                              method="post">-->
+                                    <!--                                            --><? //= $form_token_pdf; ?>
+                                    <!---->
+                                    <!--                                            <h6 class="no-margin">-->
+                                    <!--                                                <label class="no-margin">-->
+                                    <!--                                                    <button type="submit" class="btn btn-danger btn-sm no-margin">-->
+                                    <!--                                                        <i class="icon-file-pdf position-left" aria-hidden="true">-->
+                                    <!--                                                        </i>-->
+                                    <!--                                                        چاپ فاکتور-->
+                                    <!--                                                    </button>-->
+                                    <!--                                                </label>-->
+                                    <!--                                            </h6>-->
+                                    <!--                                        </form>-->
+                                    <!--                                    </div>-->
                                     <div class="col-md-12 text-center p-15 border border-grey-300"
                                          style="background-color: #e7e7e7;">
                                         <h6 class="no-margin">
@@ -350,7 +351,12 @@
                                                 نام و نام خانوادگی :
                                             </small>
                                             <strong>
-                                                <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
+                                                    <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                <?php else: ?>
+                                                    <i class="icon-minus text-danger"
+                                                       aria-hidden="true"></i>
+                                                <?php endif; ?>
                                             </strong>
                                         </h6>
                                     </div>

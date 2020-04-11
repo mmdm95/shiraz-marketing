@@ -76,6 +76,9 @@
                                                         <td width="50px">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
+                                                        <td>
+                                                            <?= $coupon['title']; ?>
+                                                        </td>
                                                         <td class="info">
                                                             <?= $coupon['coupon_code']; ?>
                                                         </td>
@@ -95,8 +98,8 @@
                                                                 <i class="icon-dash text-danger" aria-hidden="true"></i>
                                                             <?php endif; ?>
                                                         </td>
-                                                        <td class="<?= $coupon['coupon_expire_time'] > time() ? 'success' : 'danger'; ?>">
-                                                            <?= jDateTime::date('Y/m/d', $coupon['coupon_expire_time']); ?>
+                                                        <td class="<?= $coupon['expire_time'] > time() ? 'success' : 'danger'; ?>">
+                                                            <?= jDateTime::date('Y/m/d', $coupon['expire_time']); ?>
                                                         </td>
                                                         <td align="center">
                                                             <?php if ($coupon['publish'] == 1): ?>

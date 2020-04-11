@@ -22,7 +22,7 @@ abstract class AbstractController extends AbstractPaymentController
         $this->load->library('HAuthentication/Auth');
         try {
             $this->auth = new Auth();
-            $_SESSION['admin_panel_namespace'] = 'admin_hva_ms_rhm_7472';
+            $_SESSION['admin_panel_namespace'] = 'admin_new_hva_ms_rhm_7472';
             $this->auth->setNamespace($_SESSION['admin_panel_namespace'])->setExpiration(365 * 24 * 60 * 60);
         } catch (HAException $e) {
             echo $e;

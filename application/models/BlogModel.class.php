@@ -16,7 +16,7 @@ class BlogModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'b.image', 'b.title', 'b.slug', 'b.abstract', 'b.view_count',
+            'b.id', 'b.image', 'b.title', 'b.slug', 'b.abstract', 'b.view_count', 'b.publish',
             'b.created_at', 'b.updated_at', 'b.category_id', 'c.name AS category_name',
             'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name'
         ])->from($this->table . ' AS b');
@@ -91,7 +91,7 @@ class BlogModel extends HModel
         $select = $this->select();
         $select->cols([
             'b.*', 'b.id As id', 'b.publish AS publish', 'b.keywords',
-            'c.id AS category_id', 'c.publish AS category_publish'
+            'c.id AS category_id', 'c.name AS category_name', 'c.publish AS category_publish'
         ])->from($this->table . ' AS b');
 
         try {
@@ -120,7 +120,8 @@ class BlogModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'b.id', 'b.title', 'b.slug', 'b.created_at', 'b.updated_at', 'c.category_name', 'c.id AS category_id'
+            'b.id', 'b.title', 'b.slug', 'b.image', 'b.created_at',
+            'b.updated_at', 'c.name AS category_name', 'c.id AS category_id'
         ])->from($this->table . ' AS b');
 
         try {

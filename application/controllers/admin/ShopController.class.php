@@ -282,7 +282,8 @@ class ShopController extends AbstractController
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
-                    ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
+                    ->isInRange('price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
+                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                         ->isInRange('max_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -292,7 +293,7 @@ class ShopController extends AbstractController
                     $form->setError('کوپن با این عنوان وجود دارد!');
                 }
                 // Check for price and min-price
-                if ($values['price'] > $values['min-price']) {
+                if ($values['price'] > $values['min_price']) {
                     $form->setError('حداقل قیمت اعمال تخفیف باید از مبلغ تخفیف بیشتر باشد.');
                 }
                 if (!empty($values['max_price']) && $values['min_price'] > $values['max_price']) {
@@ -373,7 +374,8 @@ class ShopController extends AbstractController
                 $form->isRequired(['code', 'title', 'price', 'min_price', 'expire'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
-                    ->isInRange(['price', 'min_price'], 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
+                    ->isInRange('price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
+                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                         ->isInRange('max_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -384,7 +386,7 @@ class ShopController extends AbstractController
                     $form->setError('کوپن با این عنوان وجود دارد!');
                 }
                 // Check for price and min-price
-                if ($values['price'] > $values['min-price']) {
+                if ($values['price'] > $values['min_price']) {
                     $form->setError('حداقل قیمت اعمال تخفیف باید از مبلغ تخفیف بیشتر باشد.');
                 }
                 if (!empty($values['max_price']) && $values['min_price'] > $values['max_price']) {
@@ -402,7 +404,7 @@ class ShopController extends AbstractController
                     'publish' => !$form->isChecked('publish') ? 0 : 1,
                     'updated_by' => $this->data['identity']->id,
                     'updated_at' => time(),
-                ], 'id=:id', $this->data['param'][0]);
+                ], 'id=:id', ['id' => $this->data['param'][0]]);
 
                 if (!$res) {
                     $form->setError('خطا در انجام عملیات!');

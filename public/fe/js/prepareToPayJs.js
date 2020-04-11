@@ -8,7 +8,6 @@
         //------------------------------
         var
             theForm,
-            payment_radio,
             //-----
             get_token_url;
 
@@ -19,29 +18,18 @@
             //-----
             ajax_obj = {};
 
-        get_token_url = baseUrl + '';
+        get_token_url = baseUrl + '_mabna_connection';
 
         //------------------------------
         //---------- Functions ---------
         //------------------------------
-        function formSubmission(url, terminal, token) {
+        function formSubmission() {
             var $this, terminal_field, token_field;
+            var code;
             theForm.submit(function () {
                 $this = $(this);
-                $this.attr('action', url).attr('method', 'post');
-                terminal_field = _hiddenField('terminalID', terminal);
-                token_field = _hiddenField('token', token);
-                $this.prepend(terminal_field);
-                $this.prepend(token_field);
-                return true;
-            });
-        }
-
-        function paymentRadioChange() {
-            var $this, code;
-            payment_radio.on('change.' + namespace, function () {
-                $this = $(this);
-                code = $this.val();
+                code = $("input[name='payment-radio']:checked").val();
+                //-----
                 if ($.trim(code) !== '' && code == 'PAY_342515312') {
                     shop.ajaxRequest({
                         url: get_token_url,
@@ -50,15 +38,23 @@
                             paymentCode: code,
                         }
                     }, function (response) {
+                        // console.log(response);
+
                         var res = JSON.parse(response);
 
                         shop.processAjaxData(res, function (content) {
                             if (res.success) {
-                                formSubmission(content[0], content[1], content[2]);
+                                $this.attr('action', content[0] /* url */).attr('method', 'post');
+                                terminal_field = _hiddenField('terminalID', content[1] /* terminal */);
+                                token_field = _hiddenField('token', content[2] /* token */);
+                                $this.prepend(terminal_field);
+                                $this.prepend(token_field);
                             }
                         });
                     });
                 }
+                //-----
+                return true;
             });
         }
 
@@ -68,9 +64,8 @@
 
         function functionsCaller() {
             theForm = $('#paymentForm');
-            payment_radio = $('input[name="payment-radio"]');
             //-----
-            paymentRadioChange();
+            formSubmission();
         }
 
         //------------------------------

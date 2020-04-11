@@ -1155,7 +1155,7 @@ $(function () {
         });
 
         $(function () {
-            var default_rout = baseUrl + 'admin/';
+            var default_rout = baseUrl;
 
             $('.cityLoader').on('change.' + namespace, function () {
                 var $this, target, province, options;

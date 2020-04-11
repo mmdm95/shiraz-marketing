@@ -179,7 +179,7 @@
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <span class="text-danger">*</span>
-                                                <label>قیمت تخفیفی کالا:</label>
+                                                <label>قیمت با تخفیف:</label>
                                                 <input name="discount_price" type="text" class="form-control"
                                                        placeholder="تومان"
                                                        value="<?= $pValues['discount_price'] ?? $pTrueValues['discount_price'] ?? ''; ?>">

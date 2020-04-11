@@ -72,7 +72,7 @@ class UserController extends AbstractController
                 }
 
                 // Validate image
-                if (empty($values['image'])) {
+                if (!isset($values['image']['name']) || empty($values['image']['name'])) {
                     $values['image'] = PROFILE_DEFAULT_IMAGE;
                 }
 
@@ -91,7 +91,7 @@ class UserController extends AbstractController
 
                 // upload image
                 $res4 = true;
-                $img = isset($values['image']['name']) ? $values['image']['name'] : $values['image'];
+                $img = isset($values['image']['name']) && !empty($values['image']['name']) ? $values['image']['name'] : $values['image'];
                 $imageExt = pathinfo($img, PATHINFO_EXTENSION);
                 $imageName = convertNumbersToPersian($values['mobile'], true);
                 $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
@@ -118,12 +118,12 @@ class UserController extends AbstractController
                     'account_balance' => 0,
                 ]);
 
-                if (!isset($values['image']['name']) && $res && $res3) {
+                if ((!isset($values['image']['name']) || empty($values['image']['name'])) && $res && $res3) {
                     $res4 = copy($values['image'], $image);
                 }
 
                 if ($res && $res2 && $res3 && $res4) {
-                    if (isset($values['image']['name'])) {
+                    if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $res);
                         if ($res5) {
                             $model->transactionComplete();
@@ -177,7 +177,7 @@ class UserController extends AbstractController
             $this->redirect(base_url('admin/user/manageUser'));
         }
 
-        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $param[0]])[0];
+        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image'], 'id=:id', ['id' => $param[0]])[0];
         $this->data['marketers'] = $userModel->getUsers('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
         $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
 
@@ -193,7 +193,7 @@ class UserController extends AbstractController
             'birth_certificate_code', 'birth_certificate_code_place', 'birth_date', 'province',
             'city', 'address', 'postal_code', 'credit_card_number', 'gender', 'military_status',
             'question1', 'question2', 'question3', 'question4', 'question5', 'question6', 'question7', 'description'
-        ])->setMethod('post');
+        ])->setMethod('post', ['image' => 'file'], ['image']);
         try {
             $form->beforeCheckCallback(function (&$values) use ($model, $form) {
                 foreach ($values as &$value) {
@@ -203,7 +203,8 @@ class UserController extends AbstractController
                 }
                 $form->isRequired(['mobile', 'subset_of'], 'فیلدهای ضروری را خالی نگذارید.')
                     ->validatePersianMobile('mobile')
-                    ->validatePersianName(['first_name', 'last_name'], 'نام و نام خانوادگی باید از حروف فارسی باشند.');
+                    ->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.')
+                    ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.');
 
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile'] &&
                     $model->is_exist(self::TBL_USER, 'mobile=:mob', ['mob' => $values['mobile']])) {
@@ -217,15 +218,15 @@ class UserController extends AbstractController
 
                 $marketers = array_column($this->data['marketers'], 'id');
                 $marketers[] = -1;
-                if (!in_array($values['icon'], $marketers)) {
+                if (!in_array($values['subset_of'], $marketers)) {
                     $form->setError('معرف انتخاب شده نامعتبر است.');
                 }
 
                 if (!empty($values['n_code'])) {
                     $form->validateNationalCode('n_code');
                 }
-                if (!empty($values['birth_date'] && $values['birth_date'] < time())) {
-                    $form->validateDate('birth_date', 'Y-m-d', 'تاریخ تولد نامعتبر است.', 'Y-m-d');
+                if (!empty($values['birth_date'] && $values['birth_date'] > time())) {
+                    $form->validateDate('birth_date', date('Y-m-d', $values['birth_date']), 'تاریخ تولد نامعتبر است.', 'Y-m-d');
                 }
                 if (!empty($values['province']) && $values['province'] != -1) {
                     if (!in_array($values['province'], array_column($this->data['provinces'], 'id'))) {
@@ -251,7 +252,7 @@ class UserController extends AbstractController
 
                 // upload image
                 $res4 = true;
-                $img = isset($values['image']['name']) ? $values['image']['name'] : $values['image'];
+                $img = isset($values['image']['name']) && !empty($values['image']['name']) ? $values['image']['name'] : $this->data['uTrueValues']['image'];
                 $imageExt = pathinfo($img, PATHINFO_EXTENSION);
                 $imageName = convertNumbersToPersian($values['mobile'], true);
                 $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
@@ -270,7 +271,7 @@ class UserController extends AbstractController
                     'n_code' => convertNumbersToPersian($values['n_code'], true),
                     'address' => $values['address'],
                     'postal_code' => $values['postal_code'],
-                    'image' => $values['image'],
+                    'image' => $image,
                     'credit_card_number' => $values['credit_card_number'],
                     'father_name' => $values['father_name'],
                     'gender' => $values['gender'] != -1 ? $values['gender'] : '',
@@ -287,13 +288,13 @@ class UserController extends AbstractController
                     'question7' => $values['question7'],
                     'description' => $values['description'],
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
-                if (!isset($values['image']['name']) && $res &&
+                if ((!isset($values['image']['name']) || empty($values['image']['name'])) && $res &&
                     convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
                     $res4 = copy($values['image'], $image);
                 }
 
                 if ($res && $res2 && $res4) {
-                    if (isset($values['image']['name'])) {
+                    if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $this->data['param'][0]);
                         if ($res5) {
                             $model->transactionComplete();
@@ -325,7 +326,6 @@ class UserController extends AbstractController
 
         $this->data['uTrueValues'] = $userModel->getSingleUser('u.id=:id', ['id' => $param[0]]);
         $this->_isInfoFlagOK($param[0]);
-        $this->_isBuyFlagOK($param[0]);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش کاربر');
@@ -350,7 +350,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_DELETE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -363,20 +363,20 @@ class UserController extends AbstractController
 
         try {
             if (!isset($id) || $id == $this->data['identity']->id) {
-                message('error', 200, 'کاربر نامعتبر است.');
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر نامعتبر است.');
             }
             if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-                message('error', 200, 'کاربر وجود ندارد.');
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
             }
 
             $res = $model->delete_it($table, 'id=:id', ['id' => $id]);
             if ($res) {
-                message('success', 200, 'کاربر با موفقیت حذف شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر با موفقیت حذف شد.');
             }
 
-            message('error', 200, 'عملیات با خطا مواجه شد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
         } catch (Exception $e) {
-            message('error', 200, 'امکان حذف کاربر وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'امکان حذف کاربر وجود ندارد.');
         }
     }
 
@@ -388,7 +388,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -400,23 +400,23 @@ class UserController extends AbstractController
         $stat = $_POST['stat'];
         $table = self::TBL_USER;
         if (!isset($id) || !isset($stat) || !in_array($stat, [0, 1])) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'کاربر وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
         }
 
         $res = $model->update_it($table, ['active' => $stat], 'id=:id', ['id' => $id]);
         if ($res) {
             if ($stat == 1) {
-                message('success', 200, 'کاربر فعال شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر فعال شد.');
             } else {
-                message('warning', 200, 'کاربر غیر فعال شد.');
+                message(self::AJAX_TYPE_WARNING, 200, 'کاربر غیر فعال شد.');
             }
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -436,7 +436,7 @@ class UserController extends AbstractController
         $this->_render_page('pages/be/User/manageMarketer');
     }
 
-    public function inOurTeamAvtion()
+    public function inOurTeamAction()
     {
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
@@ -444,7 +444,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -456,23 +456,23 @@ class UserController extends AbstractController
         $stat = $_POST['stat'];
         $table = self::TBL_USER;
         if (!isset($id) || !isset($stat) || !in_array($stat, [0, 1])) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'کاربر وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
         }
 
         $res = $model->update_it($table, ['is_in_team' => $stat], 'id=:id', ['id' => $id]);
         if ($res) {
             if ($stat == 1) {
-                message('success', 200, 'کاربر در تیم ما قرار گرفت.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر در تیم ما قرار گرفت.');
             } else {
-                message('warning', 200, 'کاربر از تیم ما خارج شد.');
+                message(self::AJAX_TYPE_WARNING, 200, 'کاربر از تیم ما خارج شد.');
             }
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     public function deleteMarketerAction()
@@ -483,7 +483,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_DELETE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -497,20 +497,20 @@ class UserController extends AbstractController
 
         try {
             if (!isset($id) || $id == $this->data['identity']->id) {
-                message('error', 200, 'کاربر نامعتبر است.');
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر نامعتبر است.');
             }
             if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-                message('error', 200, 'کاربر وجود ندارد.');
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
             }
 
             $res = $userModel->changeToUser($id);
             if ($res) {
-                message('success', 200, 'کاربر از لیست بازاریابان حذف شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر از لیست بازاریابان حذف شد.');
             }
 
-            message('error', 200, 'عملیات با خطا مواجه شد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
         } catch (Exception $e) {
-            message('error', 200, 'امکان حذف کاربر از لیست بازاریابان وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'امکان حذف کاربر از لیست بازاریابان وجود ندارد.');
         }
     }
 
@@ -522,7 +522,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_DELETE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -534,20 +534,20 @@ class UserController extends AbstractController
         $table = self::TBL_USER;
 
         if (!isset($id) || $id == $this->data['identity']->id) {
-            message('error', 200, 'کاربر نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کاربر نامعتبر است.');
         }
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'کاربر وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
         }
 
         $res = $model->update_it($table, [
             'flag_marketer_request' => 0
         ], 'id=:id', ['id' => $id]);
         if ($res) {
-            message('success', 200, 'کاربر از لیست درخواست‌ها حذف شد.');
+            message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر از لیست درخواست‌ها حذف شد.');
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     public function acceptMarketerAction()
@@ -558,7 +558,7 @@ class UserController extends AbstractController
 
         try {
             if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
-                message('error', 403, 'دسترسی غیر مجاز');
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
             }
         } catch (HAException $e) {
             echo $e;
@@ -571,11 +571,11 @@ class UserController extends AbstractController
         $stat = $_POST['stat'];
         $table = self::TBL_USER;
         if (!isset($id) || !isset($stat) || !in_array($stat, [0, 1])) {
-            message('error', 200, 'ورودی نامعتبر است.');
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
 
         if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
-            message('error', 200, 'کاربر وجود ندارد.');
+            message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
         }
 
         if ($stat == 1) {
@@ -585,13 +585,13 @@ class UserController extends AbstractController
         }
         if ($res) {
             if ($stat == 1) {
-                message('success', 200, 'کاربر به بازاریاب تبدیل شد.');
+                message(self::AJAX_TYPE_SUCCESS, 200, 'کاربر به بازاریاب تبدیل شد.');
             } else {
-                message('warning', 200, 'کاربر از لیست بازاریابان خارج شد.');
+                message(self::AJAX_TYPE_WARNING, 200, 'کاربر از لیست بازاریابان خارج شد.');
             }
         }
 
-        message('error', 200, 'عملیات با خطا مواجه شد.');
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----

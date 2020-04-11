@@ -33,7 +33,7 @@
                         <?php $this->view('templates/fe/alert/error', ['errors' => $complaintErrors ?? null]); ?>
                         <?php $this->view('templates/fe/alert/success', ['success' => $complaintSuccess ?? null]); ?>
 
-                        <form action="<?= base_url('contactUs'); ?>" method="post">
+                        <form action="<?= base_url('complaint'); ?>" method="post">
                             <?= $form_token_complaint; ?>
 
                             <div class="form-group">
@@ -120,7 +120,7 @@
                                           id="co-body"
                                           cols="30" rows="10"
                                           class="form-control"
-                                          placeholder="متن مورد نظر شما"> value="<?= $complaintValues['body'] ?? ''; ?>"</textarea>
+                                          placeholder="متن مورد نظر شما"><?= $complaintValues['body'] ?? ''; ?></textarea>
                             </div>
                             <div class="form-group text-center">
                                 <div class="form-group form-account-captcha" data-captcha-url="<?= ACTION; ?>">

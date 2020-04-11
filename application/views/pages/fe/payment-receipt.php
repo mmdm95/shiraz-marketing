@@ -148,64 +148,65 @@
         <form action="<?= base_url('paymentReceipt'); ?>" method="post">
             <?= $form_token; ?>
 
-        <div class="row">
-            <div class="col-lg-8 order-2 order-lg-1">
-                <?php $this->view('templates/fe/alert/error', ['errors' => $errors ?? null]); ?>
+            <div class="row">
+                <div class="col-lg-8 order-2 order-lg-1">
+                    <?php $this->view('templates/fe/alert/error', ['errors' => $errors ?? null]); ?>
 
-                <div class="box-header-info">
-                    اطلاعات رسید واریز
-                </div>
-                <div class="box box-info">
-                    <div class="box-body text-secondary">
-                        <div class="form-group">
-                            <label for="pr-rc" class="d-inline-block">
-                                شماره رسید واریز
-                                <span class="text-danger">
+                    <div class="box-header-info">
+                        اطلاعات رسید واریز
+                    </div>
+                    <div class="box box-info">
+                        <div class="box-body text-secondary">
+                            <div class="form-group">
+                                <label for="pr-rc" class="d-inline-block">
+                                    شماره رسید واریز
+                                    <span class="text-danger">
                                     (اجباری)
                                 </span>
-                                :
-                            </label>
-                            <div class="main-input__wrapper">
-                                <input type="text" id="pr-rc" class="form-control"
-                                       name="receipt_code" placeholder=""
-                                       value="<?= $values['receipt_code'] ?? ''; ?>">
-                                <span class="input-icon right">
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="pr-rc" class="form-control"
+                                           name="receipt_code" placeholder=""
+                                           value="<?= $values['receipt_code'] ?? ''; ?>">
+                                    <span class="input-icon right">
                                     <i class="la la-barcode"></i>
                                 </span>
-                                <span class="input-icon left clear-icon">
+                                    <span class="input-icon left clear-icon">
                                     <i class="la la-times"></i>
                                 </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="pr-rd" class="d-inline-block">
-                                تاریخ رسید واریز
-                                <span class="text-danger">
+                            <div class="form-group">
+                                <label for="pr-rd" class="d-inline-block">
+                                    تاریخ رسید واریز
+                                    <span class="text-danger">
                                     (اجباری)
                                 </span>
-                                :
-                            </label>
-                            <div class="main-input__wrapper">
-                                <input type="hidden" name="receipt_date" id="altDateField">
-                                <input type="text" id="pr-rd" class="form-control myAltDatepicker" data-time="true"
-                                       placeholder="تاریخ رسید" readonly data-alt-field="#altDateField"
-                                       value="<?= date('Y/m/d H:i', $values['receipt_date'] ?? time()); ?>">
-                                <span class="input-icon right">
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="hidden" name="receipt_date" id="altDateField">
+                                    <input type="text" id="pr-rd" class="form-control myAltDatepicker"
+                                           data-time="true" data-format="L H:m:s"
+                                           placeholder="تاریخ رسید" readonly data-alt-field="#altDateField"
+                                           value="<?= date('Y/m/d H:i', $values['receipt_date'] ?? time()); ?>">
+                                    <span class="input-icon right">
                                     <i class="la la-calendar-check"></i>
                                 </span>
-                                <span class="input-icon left clear-icon">
+                                    <span class="input-icon left clear-icon">
                                     <i class="la la-times"></i>
                                 </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4 col-md-6 order-1 order-lg-2 mx-auto">
-                <?= $sideCard; ?>
+                <div class="col-lg-4 col-md-6 order-1 order-lg-2 mx-auto">
+                    <?= $sideCard; ?>
+                </div>
             </div>
-        </div>
         </form>
     </div>
 </main>

@@ -127,7 +127,7 @@
                                     </li>
                                     <li class="list-inline-item">
                                         <i class="la la-eye"></i>
-                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($b['view_count']), true)); ?>
+                                        <?= convertNumbersToPersian(number_format($b['view_count'])); ?>
                                         بازدید
                                     </li>
                                 </ul>

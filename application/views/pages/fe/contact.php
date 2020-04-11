@@ -34,6 +34,8 @@
                         <?php $this->view('templates/fe/alert/success', ['success' => $contactSuccess ?? null]); ?>
 
                         <form action="<?= base_url('contactUs'); ?>" method="post">
+                            <?= $form_token_contact; ?>
+
                             <div class="form-group">
                                 <label for="c-title">
                                     عنوان

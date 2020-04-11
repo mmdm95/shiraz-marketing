@@ -46,10 +46,6 @@
                                 <span class="text-primary">
                                     به صورت پیش فرض از اطلاعات شما برای گیرنده استفاده می‌شود.
                                 </span>
-                                <a href="<?= base_url('user/editUser?back_url=' . base_url('shopping')); ?>"
-                                   class="btn btn-light mr-2">
-                                    اصلاح اطلاعات
-                                </a>
                             </div>
                             <div class="form-group">
                                 <label for="sh-rn" class="d-inline-block">
@@ -60,7 +56,7 @@
                                     :
                                 </label>
                                 <div class="main-input__wrapper">
-                                    <input type="text" id="sh-rn" class="form-control"
+                                    <input type="text" id="sh-rn" class="form-control" required
                                            name="receiver_name" placeholder="حروف فارسی"
                                            value="<?= $values['receiver_name'] ?? trim(($identity->first_name ?? '') . ' ' . ($identity->last_name ?? '')); ?>">
                                     <span class="input-icon right">
@@ -80,7 +76,7 @@
                                     :
                                 </label>
                                 <div class="main-input__wrapper">
-                                    <input type="text" id="sh-rm" class="form-control"
+                                    <input type="text" id="sh-rm" class="form-control" required
                                            name="receiver_mobile" placeholder="۰۹۱۷xxxxxxx"
                                            value="<?= $values['receiver_mobile'] ?? $identity->mobile ?? ''; ?>">
                                     <span class="input-icon right">
@@ -91,27 +87,85 @@
                                     </span>
                                 </div>
                             </div>
-                            <div>
-                                کد پستی :
-                                <span>
-                                <?= $identity->postal_code ?? 'نامشخص'; ?>
-                            </span>
-                                <span class="mx-2">
-                                |
-                            </span>
-                                استان
-                                <span>
-                                <?= $identity->province ?? 'نامشخص'; ?>
-                                ،
-                            </span>
-                                شهر
-                                <span>
-                                <?= $identity->city ?? 'نامشخص'; ?>
-                                ،
-                            </span>
-                                <span>
-                                <?= $identity->address ?? 'نامشخص'; ?>
-                            </span>
+                            <div class="form-group">
+                                <label for="sh-rp" class="d-inline-block">
+                                    استان
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-rp" class="form-control" required
+                                           name="receiver_province" placeholder="وارد کنید"
+                                           value="<?= $values['receiver_province'] ?? $identity->province ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-map-marker"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sh-rc" class="d-inline-block">
+                                    شهر
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-rc" class="form-control" required
+                                           name="receiver_city" placeholder="وارد کنید"
+                                           value="<?= $values['receiver_city'] ?? $identity->city ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-map-marker"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sh-ra" class="d-inline-block">
+                                    آدرس
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-ra" class="form-control" required
+                                           name="receiver_address" placeholder="وارد کنید"
+                                           value="<?= $values['receiver_address'] ?? $identity->address ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-map-marker"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sh-rpc" class="d-inline-block">
+                                    کد پستی
+                                    <span class="text-danger">
+                                        (اجباری)
+                                    </span>
+                                    :
+                                </label>
+                                <div class="main-input__wrapper">
+                                    <input type="text" id="sh-rpc" class="form-control" required
+                                           name="receiver_postal_code" placeholder="کد ۱۰ رقمی"
+                                           value="<?= $values['receiver_postal_code'] ?? $identity->postal_code ?? ''; ?>">
+                                    <span class="input-icon right">
+                                        <i class="la la-envelope"></i>
+                                    </span>
+                                    <span class="input-icon left clear-icon">
+                                        <i class="la la-times"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>

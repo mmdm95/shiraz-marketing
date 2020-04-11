@@ -80,7 +80,11 @@
                                                             <?= $order['order_code']; ?>
                                                         </td>
                                                         <td>
-                                                            <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                            <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
+                                                                <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                            <?php else: ?>
+                                                                <?= $order['mobile']; ?>
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td>
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
@@ -89,7 +93,7 @@
                                                             <?= PAYMENT_METHODS[$order['payment_method']] ?: 'نامشخص'; ?>
                                                         </td>
                                                         <td>
-                                                            <?= jDateTime::date('j F Y در ساعت H:i', $order['payment_date']); ?>
+                                                            <?= !empty($order['payment_date']) ? jDateTime::date('j F Y در ساعت H:i', $order['payment_date']) : '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                         </td>
                                                         <td class="info">
                                                             <?= convertNumbersToPersian(number_format(convertNumbersToPersian($order['final_price'], true))); ?>
@@ -115,6 +119,11 @@
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-orange-400">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT]; ?>
+                                                                </span>
+                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_WAIT_VERIFY): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-orange-400">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT_VERIFY]; ?>
                                                                 </span>
                                                             <?php else: ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left

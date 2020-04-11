@@ -79,7 +79,7 @@
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <a href="<?= base_url('admin/user/editUser'); ?>"
+                                    <a href="<?= base_url('admin/user/editUser/' . $user['id']); ?>"
                                        class="btn btn-warning display-inline-block pull-right mt-5">
                                         <i class="icon-pencil position-left"></i>
                                         تکمیل اطلاعات کاربر
@@ -424,6 +424,11 @@
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
                                                                  border-left-lg border-left-orange-400">
                                                                     <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT]; ?>
+                                                                </span>
+                                                            <?php elseif ($order['payment_status'] == OWN_PAYMENT_STATUS_WAIT_VERIFY): ?>
+                                                                <span class="label label-striped no-border-top no-border-right no-border-bottom border-left
+                                                                 border-left-lg border-left-orange-400">
+                                                                    <?= OWN_PAYMENT_STATUSES[OWN_PAYMENT_STATUS_WAIT_VERIFY]; ?>
                                                                 </span>
                                                             <?php else: ?>
                                                                 <span class="label label-striped no-border-top no-border-right no-border-bottom border-left

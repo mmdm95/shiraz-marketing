@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 09, 2020 at 11:15 PM
+-- Generation Time: Apr 10, 2020 at 02:19 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.13
 
@@ -570,7 +570,7 @@ CREATE TABLE `contact_us` (
   `mobile` varchar(11) NOT NULL,
   `email` varchar(300) NOT NULL,
   `title` varchar(300) NOT NULL,
-  `body` int(11) NOT NULL,
+  `body` text NOT NULL,
   `status` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` int(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2537,7 +2537,7 @@ ALTER TABLE `static_pages`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users_pages_perms`
@@ -2549,7 +2549,7 @@ ALTER TABLE `users_pages_perms`
 -- AUTO_INCREMENT for table `users_roles`
 --
 ALTER TABLE `users_roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user_accounts`

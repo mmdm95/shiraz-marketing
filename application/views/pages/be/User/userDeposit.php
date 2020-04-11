@@ -192,14 +192,11 @@
                                                         </td>
                                                         <td>
                                                             <?php if ($transaction['deposit_type'] == DEPOSIT_TYPE_OTHER): ?>
-                                                                <?php if (!empty($transaction['first_name']) || !empty($transaction['last_name'])): ?>
-                                                                    <?= $transaction['first_name'] . ' ' . $transaction['last_name']; ?>
-                                                                <?php else: ?>
-                                                                    <?= $transaction['mobile']; ?>
+                                                                <?php if (!empty($transaction['payer_name'])): ?>
+                                                                    <?= $transaction['payer_name']; ?>
                                                                 <?php endif; ?>
-                                                                <small class="display-block">
-                                                                    <?= $transaction['role_name'] ?: ''; ?>
-                                                                </small>
+                                                                -
+                                                                <?= convertNumbersToPersian($transaction['payer_mobile']) ?? ''; ?>
                                                             <?php elseif ($transaction['deposit_type'] == DEPOSIT_TYPE_SELF): ?>
                                                                 کاربر
                                                             <?php elseif ($transaction['deposit_type'] == DEPOSIT_TYPE_REWARD): ?>
@@ -211,6 +208,7 @@
                                                         </td>
                                                         <td>
                                                             <?= convertNumbersToPersian(number_format($transaction['deposit_price'])); ?>
+                                                            تومان
                                                         </td>
                                                         <td>
                                                             <?= $transaction['description'] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
