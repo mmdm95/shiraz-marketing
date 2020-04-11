@@ -178,8 +178,8 @@ class ReportController extends AbstractController
                     $products = $orderModel->getOrderProducts('oi.order_code=:oc', ['oc' => $order['order_code']]);
                     foreach ($products as $product) {
                         $productInfo .= $product['title'] . ' - ' . 'تعداد:' . convertNumbersToPersian(number_format($product['product_count'])) .
-                            ' - ' . 'قیمت واحد:' . convertNumbersToPersian(number_format(convertNumbersToPersian($order['product_unit_price'], true))) .
-                            ' - ' . 'مجموع قیمت' . convertNumbersToPersian(number_format(convertNumbersToPersian($order['product_price'], true))) . PHP_EOL;
+                            ' - ' . 'قیمت واحد:' . convertNumbersToPersian(number_format(convertNumbersToPersian($product['product_unit_price'], true))) .
+                            ' - ' . 'مجموع قیمت' . convertNumbersToPersian(number_format(convertNumbersToPersian($product['product_price'], true))) . PHP_EOL;
                     }
                     $spreadsheetArray[($k + 1)][] = $productInfo;
                     //-----
