@@ -977,7 +977,7 @@ class ShopController extends AbstractController
             $this->redirect(base_url('admin/shop/manageOrders'));
         }
 
-        $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name']);
+        $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name', 'priority']);
         $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['order_code', 'mobile', 'payment_status', 'send_status', 'got_reward'], 'id=:id', ['id' => $param[0]])[0];
 
         $this->data['param'] = $param;
@@ -1044,7 +1044,9 @@ class ShopController extends AbstractController
                         $sms = new rohamSMS();
 
                         try {
-                            $status = array_column($this->data['status'], 'id')[$values['send_status']];
+                            $status = $model->select_it(null, self::TBL_SEND_STATUS, 'name', 'id=:id', ['id' => (int)$values['send_status']]);
+                            $status = count($status) ? $status[0]['name'] : 'نامشخص';
+
                             $body = $this->setting['sms']['changeStatusMsg'];
                             $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['order']['mobile'], $body);
                             $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $this->data['order']['order_code'], $body);

@@ -24,7 +24,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.priority=o.send_status'
+                'ss.id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -56,7 +56,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.priority=o.send_status'
+                'ss.id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -85,7 +85,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.priority=o.send_status'
+                'ss.id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -141,7 +141,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.priority=o.send_status'
+                'ss.id=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -178,7 +178,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.priority=o.send_status'
+                'ss.id=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -218,6 +218,38 @@ class OrderModel extends HModel
                 'LEFT',
                 AbstractPaymentController::TBL_USER . ' AS u2',
                 'u2.id=ud.payer_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindValues) && is_array($bindValues)) {
+            $select->bindValues($bindValues);
+        }
+
+        if (!empty($limit) && is_numeric($limit)) {
+            $select->limit((int)$limit);
+        }
+        $select->offset((int)$offset);
+
+        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
+
+    public function getUserBuy($where, $bindValues = [], $limit = null, $offset = 0)
+    {
+        $select = $this->select();
+        $select->cols([
+            'ub.order_code', 'ub.price', 'ub.payment_date', 'o.id AS order_id',
+        ])->from(AbstractPaymentController::TBL_USER_ACCOUNT_BUY . ' AS ub');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_ORDER . ' AS o',
+                'o.order_code=ub.order_code'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());

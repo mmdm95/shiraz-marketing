@@ -256,8 +256,8 @@ abstract class AbstractController extends AbstractPaymentController
                             ]);
                             $this->redirect(base_url('forgetPassword/step/1'));
                         }
-                        $code = $model->select_it(null, self::TBL_USER, 'activation_code',
-                            'mobile=:username', ['username' => $username])[0]['activation_code'];
+                        $code = $model->select_it(null, self::TBL_USER, 'forgotten_password_code',
+                            'mobile=:username', ['username' => $username])[0]['forgotten_password_code'];
                         if ($values['code'] != $code) {
                             $form->setError('کد وارد شده نادرست است.');
                         }
@@ -289,7 +289,7 @@ abstract class AbstractController extends AbstractPaymentController
                 break;
             case 3:
                 $Ok = $this->session->get('username_forget_password_sess_success');
-                if ($Ok != 'OK_STEP3') {
+                if ($Ok != 'OK_STEP2') {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_DANGER,
                         'icon' => self::FLASH_MESSAGE_ICON_DANGER,
@@ -297,8 +297,8 @@ abstract class AbstractController extends AbstractPaymentController
                     ]);
                     $this->redirect(base_url('forgetPassword/step/1'));
                 }
-                $username = encryption_decryption(ED_DECRYPT, $_SESSION['username_forget_password_sess'] ?? '');
-                if ($username == false) {
+                $username = $this->session->get('username_forget_password_sess');
+                if (empty($username)) {
                     $this->session->setFlash($this->messageSession, [
                         'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                         'icon' => self::FLASH_MESSAGE_ICON_WARNING,
@@ -1207,7 +1207,11 @@ abstract class AbstractController extends AbstractPaymentController
                 }
                 $status = $this->_gateway_processor($prevData, $formValues['payment_radio']);
                 if (!$status) {
-                    $this->data['errors'][] = 'خطا در انجام عملیات پرداخت! لطفا مجددا تلاش نمایید.';
+                    if ($formValues['payment_radio'] == PAYMENT_METHOD_WALLET) {
+                        $this->data['errors'][] = 'کیف پول شما فاقد اعتبار لازم جهت انجام تراکنش است.';
+                    } else {
+                        $this->data['errors'][] = 'خطا در انجام عملیات پرداخت! لطفا مجددا تلاش نمایید.';
+                    }
                 }
             } else {
                 $this->data['errors'] = $form->getError();
@@ -1468,6 +1472,9 @@ abstract class AbstractController extends AbstractPaymentController
         //-----
         foreach ($tmpItems as $info) {
             $res = $info;
+            if($hasProductType !== true && $res['product_type'] == PRODUCT_TYPE_ITEM) {
+                $hasProductType = true;
+            }
             foreach ($saved_cart_items as $k => $v) {
                 $res['quantity'] = $v['quantity'] > $res['stock_count'] ? $res['stock_count'] : $v['quantity'];
                 $discount = $res['discount_until'] > time() ? convertNumbersToPersian($res['discount_price'], true) : 0;
@@ -1752,11 +1759,11 @@ abstract class AbstractController extends AbstractPaymentController
             $model->transactionRollback();
             return false;
         } else {
-            // Make transaction complete
-            $model->transactionComplete();
-
             // If any gateway exists (if method code is one of the bank payment gateways)
             if (isset($gatewayTable)) {
+                // Make transaction complete
+                $model->transactionComplete();
+
                 // Fill parameters variable to pass between gateway connection functions
                 $parameters = [
                     'price' => $discountPrice,
@@ -1779,9 +1786,26 @@ abstract class AbstractController extends AbstractPaymentController
                 $param = '';
                 if ($paymentMethod == PAYMENT_METHOD_WALLET) {
                     $param = self::PAYMENT_RESULT_PARAM_WALLET;
+                    $account = $model->select_it(null, self::TBL_USER_ACCOUNT, ['account_balance'],
+                        'user_id=:uId', ['uId' => $this->data['identity']->id]);
+                    if (count($account)) {
+                        $account = $account[0];
+                        if ((int)$totalDiscountedAmount <= (int)$account['account_balance']) {
+                            // Make transaction complete
+                            $model->transactionComplete();
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
                 } elseif ($paymentMethod == PAYMENT_METHOD_IN_PLACE) {
+                    // Make transaction complete
+                    $model->transactionComplete();
                     $param = self::PAYMENT_RESULT_PARAM_IN_PLACE;
                 } elseif ($paymentMethod == PAYMENT_METHOD_RECEIPT) {
+                    // Make transaction complete
+                    $model->transactionComplete();
                     $param = self::PAYMENT_RESULT_PARAM_RECEIPT;
                 }
 
@@ -2542,8 +2566,11 @@ abstract class AbstractController extends AbstractPaymentController
                     } catch (Exception $e) {
                     }
                 }
-                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
-                    $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_WAIT) {
+                    $model->update_it(self::TBL_ORDER, [
+                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                        'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
+                    ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
                 } else if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
                     $model->update_it(self::TBL_ORDER, [
                         'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),

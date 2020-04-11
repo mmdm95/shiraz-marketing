@@ -177,7 +177,14 @@
                                                        value="<?= date('Y/m/d H:i', $uValues['birth_date'] ?? $uTrueValues['birth_date'] ?? time()); ?>">
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <label>استان:</label>
+                                                <label>
+                                                    استان:
+                                                    <?php if (isset($uTrueValues['province'])): ?>
+                                                        <label class="label label-primary">
+                                                            <?= $uTrueValues['province']; ?>
+                                                        </label>
+                                                    <?php endif; ?>
+                                                </label>
                                                 <select class="select cityLoader" data-target-for="#citySelect"
                                                         name="province">
                                                     <option value="-1">انتخاب کنید</option>
@@ -190,7 +197,14 @@
                                                 </select>
                                             </div>
                                             <div class="form-group col-lg-4">
-                                                <label>شهر:</label>
+                                                <label>
+                                                    شهر:
+                                                    <?php if (isset($uTrueValues['city'])): ?>
+                                                        <label class="label label-primary">
+                                                            <?= $uTrueValues['city']; ?>
+                                                        </label>
+                                                    <?php endif; ?>
+                                                </label>
                                                 <select class="select" id="citySelect"
                                                         name="city">
                                                     <option value="-1">انتخاب کنید</option>

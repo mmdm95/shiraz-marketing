@@ -202,9 +202,14 @@ class UserController extends AbstractController
                     }
                 }
                 $form->isRequired(['mobile', 'subset_of'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->validatePersianMobile('mobile')
-                    ->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.')
-                    ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.');
+                    ->validatePersianMobile('mobile');
+
+                if (!empty($values['first_name'])) {
+                    $form->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.');
+                }
+                if (!empty($values['last_name'])) {
+                    $form->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.');
+                }
 
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile'] &&
                     $model->is_exist(self::TBL_USER, 'mobile=:mob', ['mob' => $values['mobile']])) {

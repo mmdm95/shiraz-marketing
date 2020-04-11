@@ -62,7 +62,6 @@
                                                     <th>#</th>
                                                     <th>کد سفارش</th>
                                                     <th>تاریخ درخواست</th>
-                                                    <th>شماره فاکتور</th>
                                                     <th>نحوه پرداخت</th>
                                                     <th>وضعیت</th>
                                                     <th>عملیات</th>
@@ -81,7 +80,7 @@
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $order['created_at']); ?>
                                                         </td>
                                                         <td>
-                                                            <?= OWN_PAYMENT_STATUSES[$order['payment_method']] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                            <?= PAYMENT_METHODS[$order['payment_method']] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                         </td>
                                                         <td>
                                                             <?php if ($order['status'] == 0): ?>

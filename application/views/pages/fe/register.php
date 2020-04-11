@@ -16,7 +16,7 @@
                     </div>
                     <div class="box-body">
                         <div class="alert alert-info">
-                            کلمه عبور باید شامل حروف و اعداد انگلیسی باشد و حداقل ۹ کاراکتر داشته باشد.
+                            کلمه عبور باید شامل حروف و اعداد انگلیسی باشد و حداقل ۸ کاراکتر داشته باشد.
                         </div>
                         <?php $this->view('templates/fe/alert/error', ['errors' => $registerErrors ?? null]); ?>
 

@@ -81,7 +81,7 @@
                                                             <?php if (!empty($user['first_name']) || !empty($user['last_name'])): ?>
                                                                 <?= $user['first_name'] . ' ' . $user['last_name']; ?>
                                                             <?php else: ?>
-                                                                <i class="icon-minus text-danger"
+                                                                <i class="icon-minus2 text-danger"
                                                                    aria-hidden="true"></i>
                                                             <?php endif; ?>
                                                         </td>

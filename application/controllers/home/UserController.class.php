@@ -68,9 +68,7 @@ class UserController extends AbstractController
                     }
                 }
                 $form->isRequired(['mobile', 'subset_of'], 'فیلدهای ضروری را خالی نگذارید.')
-                    ->validatePersianMobile('mobile')
-                    ->validatePersianName('first_name', 'نام باید از حروف فارسی باشند.')
-                    ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.');
+                    ->validatePersianMobile('mobile');
 
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile'] &&
                     $model->is_exist(self::TBL_USER, 'mobile=:mob', ['mob' => $values['mobile']])) {
@@ -404,7 +402,7 @@ class UserController extends AbstractController
                     }
                 }
                 $form->isRequired(['description'], 'وارد کردن توضیحات ضروری می‌باشد.');
-                if (!in_array($values['order_code'], array_column($this->data['orderCodes'], 'id'))) {
+                if (!in_array($values['order_code'], array_column($this->data['orderCodes'], 'order_code'))) {
                     $form->setError('کد سفارش انتخاب شده نامعتبر است.');
                     return;
                 }
@@ -414,6 +412,7 @@ class UserController extends AbstractController
             })->afterCheckCallback(function ($values) use ($model, $form) {
                 $res = $model->insert_it(self::TBL_RETURN_ORDER, [
                     'order_code' => $values['order_code'],
+                    'user_id' => $this->data['identity']->id,
                     'description' => $values['description'],
                     'created_at' => time(),
                 ]);
@@ -445,7 +444,7 @@ class UserController extends AbstractController
     public function manageReturnOrderAction()
     {
         $orderModel = new OrderModel();
-        $this->data['orders'] = $orderModel->getReturnOrders();
+        $this->data['orders'] = $orderModel->getReturnOrders('ro.user_id=:uId', ['uId' => $this->data['identity']->id]);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'سفارش‌های مرجوعی');
@@ -463,7 +462,7 @@ class UserController extends AbstractController
         $orderModel = new OrderModel();
 
         if (!isset($param[0]) || is_numeric($param[0]) ||
-            !$model->is_exist(self::TBL_RETURN_ORDER, 'order_code=:code', ['code' => $param[0]])) {
+            !$model->is_exist(self::TBL_RETURN_ORDER, 'order_code=:code AND user_id=:uId', ['code' => $param[0], 'uId' => $this->data['identity']->id])) {
             $this->error->show_404();
         }
 
@@ -480,6 +479,34 @@ class UserController extends AbstractController
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده سفارش‌ مرجوعی');
 
         $this->_render_page('pages/fe/User/viewReturnOrder');
+    }
+
+    public function deleteReturnOrderAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $id = @$_POST['postedId'];
+        $table = self::TBL_RETURN_ORDER;
+        if (!isset($id)) {
+            message(self::AJAX_TYPE_ERROR, 200, 'شناسه درخواست مرجوع سفارش نامعتبر است.');
+        }
+        if (!$model->is_exist($table, 'id=:id AND user_id=:uId', ['id' => $id, 'uId' => $this->data['identity']->id])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'درخواست مرجوع سفارش وجود ندارد.');
+        }
+        if ($model->is_exist($table, 'id=:id AND user_id=:uId AND status!=:status', ['id' => $id, 'uId' => $this->data['identity']->id, 'status' => 0])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'امکان حذف درخواست مرجوع سفارش وجود ندارد.');
+        }
+
+        $res = $model->delete_it($table, 'id=:id AND user_id=:uId AND status=:status', ['id' => $id, 'uId' => $this->data['identity']->id, 'status' => 0]);
+        if ($res) {
+            message(self::AJAX_TYPE_SUCCESS, 200, 'درخواست مرجوع سفارش با موفقیت حذف شد.');
+        }
+
+        message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
     //-----
@@ -537,7 +564,8 @@ class UserController extends AbstractController
         $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],
             'user_id=:uId', ['uId' => $this->data['identity']->id])[0]['sum'];
         // Deposit transactions
-        $this->data['user']['transactions'] = $orderModel->getUserDeposit('ud.user_id=:uId', ['uId' => $this->data['identity']->id]);
+        $this->data['user']['transactions']['income'] = $orderModel->getUserDeposit('ud.user_id=:uId', ['uId' => $this->data['identity']->id]);
+        $this->data['user']['transactions']['outcome'] = $orderModel->getUserBuy('ub.user_id=:uId', ['uId' => $this->data['identity']->id]);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'کیف پول');

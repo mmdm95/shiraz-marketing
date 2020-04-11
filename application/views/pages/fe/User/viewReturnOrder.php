@@ -67,7 +67,7 @@
                                             شماره سفارش
                                         </strong>
                                     </div>
-                                    <div class="col-md-12 text-center p-15 border border-grey-300 text-white">
+                                    <div class="col-md-12 text-center p-15 border border-grey-300">
                                         <h6 class="no-margin">
                                             <strong>
                                                 <?= $order['order_code']; ?>
@@ -100,7 +100,7 @@
                                             <small class="text-grey-800">
                                                 دلیل درخواست مرجوعی و توضیحات خریدار:
                                             </small>
-                                            <strong>
+                                            <strong class="display-block mt-10">
                                                 <?= $order['description']; ?>
                                             </strong>
                                         </h6>
@@ -122,7 +122,12 @@
                                                 نام و نام خانوادگی :
                                             </small>
                                             <strong>
-                                                <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
+                                                    <?= $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                <?php else: ?>
+                                                    <i class="icon-minus2 text-danger"
+                                                       aria-hidden="true"></i>
+                                                <?php endif; ?>
                                             </strong>
                                         </h6>
                                     </div>

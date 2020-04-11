@@ -242,7 +242,7 @@
                                     <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($totalPaid, true))); ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian((int)$totalPaid, true))); ?>
                                                 تومان
                                             </h3>
                                             پرداختی‌ها تا کنون

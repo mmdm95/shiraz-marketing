@@ -75,7 +75,7 @@
                                                             <?php if (!empty($marketer['first_name']) || !empty($marketer['last_name'])): ?>
                                                                 <?= $marketer['first_name'] . ' ' . $marketer['last_name']; ?>
                                                             <?php else: ?>
-                                                                <i class="icon-minus text-danger"
+                                                                <i class="icon-minus2 text-danger"
                                                                    aria-hidden="true"></i>
                                                             <?php endif; ?>
                                                         </td>

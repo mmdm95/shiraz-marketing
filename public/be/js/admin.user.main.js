@@ -3,25 +3,25 @@
     'use strict';
 
     $(function () {
-        var default_rout = $('#BASE_URL').val() + 'admin/';
+        var default_rout = $('#BASE_URL').val() + 'user/';
         var dataTable = $('.datatable-highlight');
 
         //********** ManageContacts Action
-        // $('.').on('click', function (e) {
-        //     e.preventDefault();
-        //     var del_btn = $(this);
-        //
-        //     delete_something_action(this, '', function () {
-        //         $(del_btn).closest('tr').fadeOut(800, function () {
-        //             if ($.fn.DataTable) {
-        //                 dataTable.DataTable().row($(this)).remove().draw();
-        //             } else {
-        //                 $(this).remove();
-        //             }
-        //         });
-        //     });
-        // });
-        //**********
+        $('.deleteReturnOrderBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'deleteReturnOrder', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        // **********
 
         //********** ManageContacts Action (inside of viewContact)
         // $('#').on('click', function (e) {

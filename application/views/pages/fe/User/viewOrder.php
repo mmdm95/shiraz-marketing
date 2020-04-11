@@ -303,7 +303,7 @@
                                                         <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
                                                             <?= $order['first_name'] . ' ' . $order['last_name']; ?>
                                                         <?php else: ?>
-                                                            <i class="icon-minus text-danger"
+                                                            <i class="icon-minus2 text-danger"
                                                                aria-hidden="true"></i>
                                                         <?php endif; ?>
                                                     </strong>

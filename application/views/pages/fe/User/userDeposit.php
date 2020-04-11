@@ -144,13 +144,72 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="row">
                             <div class="col-sm-12 col-lg-12">
                                 <div class="panel panel-white">
                                     <div class="panel-heading">
-                                        <h6 class="panel-title">لیست تراکنش‌ها</h6>
+                                        <h6 class="panel-title">لیست برداشت</h6>
+                                        <div class="heading-elements">
+                                            <ul class="icons-list">
+                                                <li><a data-action="collapse"></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-bordered datatable-highlight">
+                                                <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>شماره فاکتور</th>
+                                                    <th>مبلغ برداشت</th>
+                                                    <th>تاریخ برداشت</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php foreach ($user['transactions']['outcome'] as $key => $transaction): ?>
+                                                    <tr>
+                                                        <td width="50px">
+                                                            <?= convertNumbersToPersian($key + 1); ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php if (isset($transaction['order_id'])): ?>
+                                                                <a href="<?= base_url('user/viewOrder/' . $transaction['order_id']); ?>">
+                                                                    <?= $transaction['order_code'] ?>
+                                                                </a>
+                                                            <?php else: ?>
+                                                                <?= $transaction['order_code'] ?>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($transaction['price'], true))) ?>
+                                                            تومان
+                                                        </td>
+                                                        <td>
+                                                            <?= jDateTime::date('j F Y در ساعت H:i', $transaction['payment_date']); ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-12">
+                                <div class="panel panel-white">
+                                    <div class="panel-heading">
+                                        <h6 class="panel-title">لیست واریزی</h6>
                                         <div class="heading-elements">
                                             <ul class="icons-list">
                                                 <li><a data-action="collapse"></a></li>
@@ -170,7 +229,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <?php foreach ($user['transactions'] as $key => $transaction): ?>
+                                                <?php foreach ($user['transactions']['income'] as $key => $transaction): ?>
                                                     <tr>
                                                         <td width="50px">
                                                             <?= convertNumbersToPersian($key + 1); ?>

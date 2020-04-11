@@ -117,8 +117,8 @@
                                             <div class="form-group">
                                                 <select class="select-no-search" name="payment_status">
                                                     <?php foreach (OWN_PAYMENT_STATUSES as $key => $st): ?>
-                                                        <option value="<?= $st; ?>"
-                                                            <?= set_value($order['payment_status'] ?? '', $key, 'selected', '', '=='); ?>>
+                                                        <option value="<?= $key; ?>"
+                                                            <?= ($order['payment_status'] ?? '') == $key ? 'selected' : ''; ?>>
                                                             <?= $st; ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -383,7 +383,7 @@
                                                 <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
                                                     <?= $order['first_name'] . ' ' . $order['last_name']; ?>
                                                 <?php else: ?>
-                                                    <i class="icon-minus text-danger"
+                                                    <i class="icon-minus2 text-danger"
                                                        aria-hidden="true"></i>
                                                 <?php endif; ?>
                                             </strong>

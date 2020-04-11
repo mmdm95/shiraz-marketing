@@ -495,7 +495,7 @@
                                                             <?php if (!empty($subset['first_name']) || !empty($subset['last_name'])): ?>
                                                                 <?= $subset['first_name'] . ' ' . $subset['last_name']; ?>
                                                             <?php else: ?>
-                                                                <i class="icon-minus text-danger"
+                                                                <i class="icon-minus2 text-danger"
                                                                    aria-hidden="true"></i>
                                                             <?php endif; ?>
                                                         </td>
