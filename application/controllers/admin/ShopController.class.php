@@ -975,6 +975,7 @@ class ShopController extends AbstractController
         }
 
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name', 'priority']);
+        $this->data['cancelStatusID'] = $orderModel->getStatusId(SEND_STATUS_CANCELED);
         $this->data['order'] = $model->select_it(null, self::TBL_ORDER, ['order_code', 'mobile', 'payment_status', 'send_status', 'got_reward'], 'id=:id', ['id' => $param[0]])[0];
 
         $this->data['param'] = $param;
@@ -1000,10 +1001,12 @@ class ShopController extends AbstractController
                 $orderModel = new OrderModel();
 
                 $model->transactionBegin();
-
-                $res = $model->update_it(self::TBL_ORDER, [
-                    'send_status' => (int)$values['send_status'],
-                ], 'id=:id', ['id' => $this->data['param'][0]]);
+                $res = true;
+                if ($this->data['cancelStatusID'] != $this->data['order']['send_status']) {
+                    $res = $model->update_it(self::TBL_ORDER, [
+                        'send_status' => (int)$values['send_status'],
+                    ], 'id=:id', ['id' => $this->data['param'][0]]);
+                }
                 $res2 = true;
                 $res3 = true;
                 if ($values['send_status'] == $orderModel->getStatusId(SEND_STATUS_DELIVERED_TO_CUSTOMER) &&
@@ -1031,8 +1034,12 @@ class ShopController extends AbstractController
                         'got_reward' => 1
                     ], 'order_code=:oc', ['oc' => $this->data['order']['order_code']]);
                 }
+                $res4 = true;
+                if ($this->data['cancelStatusID'] != $this->data['order']['send_status'] && $values['send_status'] == $this->data['cancelStatusID']) {
+                    $res4 = $orderModel->returnProductsToStock($this->data['order']['order_code']);
+                }
 
-                if ($res && $res2 && $res3) {
+                if ($res && $res2 && $res3 && $res4) {
                     $model->transactionComplete();
 
                     if ($values['send_status'] != $this->data['order']['send_status']) {

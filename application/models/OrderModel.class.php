@@ -128,6 +128,22 @@ class OrderModel extends HModel
         return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
     }
 
+    public function returnProductsToStock($orderCode)
+    {
+        $model = new Model();
+        $products = $this->getOrderProducts('oi.order_code=:oc', ['oc' => $orderCode]);
+
+        $res = false;
+        foreach ($products as $product) {
+            $res = $model->update_it(AbstractPaymentController::TBL_PRODUCT, [], 'id=:id', ['id' => $product['product_id']], [
+                'stock_count' => 'stock_count-' . (int)$product['product_count'],
+                'sold_count' => 'sold_count+' . (int)$product['product_count'],
+            ]);
+            if ($res == false) break;
+        }
+        return $res;
+    }
+
     public function getReturnOrders($where = '', $bindValues = [], $limit = null, $offset = 0)
     {
         $select = $this->select();

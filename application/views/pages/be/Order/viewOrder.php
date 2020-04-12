@@ -52,45 +52,48 @@
                 <!-- Centered forms -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="panel panel-white">
-                            <div class="panel-heading">
-                                <h6 class="panel-title">تغییر وضعیت سفارش</h6>
-                                <div class="heading-elements">
-                                    <ul class="icons-list">
-                                        <li><a data-action="collapse"></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="col-md-12 p-15">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <?php $this->view("templates/be/alert/error", ['errors' => $status_errors ?? null]); ?>
-                                            <?php $this->view("templates/be/alert/success", ['success' => $status_success ?? null]); ?>
-                                        </div>
+                        <?php if ($order['send_status'] != $cancelStatusID): ?>
+                            <div class="panel panel-white">
+                                <div class="panel-heading">
+                                    <h6 class="panel-title">تغییر وضعیت سفارش</h6>
+                                    <div class="heading-elements">
+                                        <ul class="icons-list">
+                                            <li><a data-action="collapse"></a></li>
+                                        </ul>
                                     </div>
-                                    <form action="<?= base_url('admin/shop/viewOrder/' . $param[0]); ?>" method="post">
-                                        <?= $form_token_status; ?>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-12 p-15">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <?php $this->view("templates/be/alert/error", ['errors' => $status_errors ?? null]); ?>
+                                                <?php $this->view("templates/be/alert/success", ['success' => $status_success ?? null]); ?>
+                                            </div>
+                                        </div>
+                                        <form action="<?= base_url('admin/shop/viewOrder/' . $param[0]); ?>"
+                                              method="post">
+                                            <?= $form_token_status; ?>
 
-                                        <div class="form-group">
-                                            <select class="select-no-search" name="send_status">
-                                                <?php foreach ($status as $key => $st): ?>
-                                                    <option value="<?= $st['id']; ?>"
-                                                        <?= set_value($order['send_status'] ?? '', $st['id'], 'selected', '', '=='); ?>>
-                                                        <?= $st['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="text-right">
-                                            <button type="submit" class="btn btn-primary">
-                                                تغییر وضعیت سفارش
-                                            </button>
-                                        </div>
-                                    </form>
+                                            <div class="form-group">
+                                                <select class="select-no-search" name="send_status">
+                                                    <?php foreach ($status as $key => $st): ?>
+                                                        <option value="<?= $st['id']; ?>"
+                                                            <?= set_value($order['send_status'] ?? '', $st['id'], 'selected', '', '=='); ?>>
+                                                            <?= $st['name']; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-right">
+                                                <button type="submit" class="btn btn-primary">
+                                                    تغییر وضعیت سفارش
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
 
                         <?php if ($order['payment_status'] != OWN_PAYMENT_STATUS_SUCCESSFUL): ?>
                             <div class="panel panel-white">
