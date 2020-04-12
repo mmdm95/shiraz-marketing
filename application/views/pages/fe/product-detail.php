@@ -85,27 +85,33 @@
                     <div class="box-body pt-0">
                         <div class="product-detail-side">
                             <div class="card-info col">
-                                <?php if ($discountPercentage != 0): ?>
-                                    <div class="card-price-off">
-                                        <?php if ($discountPercentage == 100): ?>
-                                            رایگان
-                                        <?php else: ?>
-                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['discount_price'], true))); ?>
-                                            تومان
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="card-price">
-                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['price'], true))); ?>
-                                        تومان
-                                    </div>
-                                <?php else: ?>
-                                    <div class="card-price-off">
-                                        <?php if (convertNumbersToPersian($product['price'], true) == 0): ?>
-                                            رایگان
-                                        <?php else: ?>
+                                <?php if ($product['available'] == 1 && $product['stock_count'] > 0): ?>
+                                    <?php if ($discountPercentage != 0): ?>
+                                        <div class="card-price-off">
+                                            <?php if ($discountPercentage == 100): ?>
+                                                رایگان
+                                            <?php else: ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['discount_price'], true))); ?>
+                                                تومان
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="card-price">
                                             <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['price'], true))); ?>
                                             تومان
-                                        <?php endif; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="card-price-off">
+                                            <?php if (convertNumbersToPersian($product['price'], true) == 0): ?>
+                                                رایگان
+                                            <?php else: ?>
+                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($product['price'], true))); ?>
+                                                تومان
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <div class="unavailable">
+                                        ناموجود
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -301,7 +307,7 @@
                                     ?>
                                     <div class="card-info">
                                         <div>
-                                            <?php if ($discountPercentage != 0): ?>
+                                            <?php if ($discountPercentage != 0 && $related['available'] == 1 && $related['stock_count'] > 0): ?>
                                                 <span class="btn rounded-pill card-off-percentage">
                                                     <?= convertNumbersToPersian($discountPercentage); ?>
                                                     ٪
@@ -309,26 +315,32 @@
                                             <?php endif; ?>
                                         </div>
                                         <div>
-                                            <?php if ($discountPercentage != 0): ?>
-                                                <div class="card-price-off">
-                                                    <?php if ($discountPercentage == 100): ?>
-                                                        رایگان
-                                                    <?php else: ?>
-                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['discount_price'], true))); ?>
-                                                        تومان
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="card-price">
-                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['price'], true))); ?>
-                                                </div>
-                                            <?php else: ?>
-                                                <div class="card-price-off">
-                                                    <?php if (convertNumbersToPersian($related['price'], true) == 0): ?>
-                                                        رایگان
-                                                    <?php else: ?>
+                                            <?php if ($related['available'] == 1 && $related['stock_count'] > 0): ?>
+                                                <?php if ($discountPercentage != 0): ?>
+                                                    <div class="card-price-off">
+                                                        <?php if ($discountPercentage == 100): ?>
+                                                            رایگان
+                                                        <?php else: ?>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['discount_price'], true))); ?>
+                                                            تومان
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div class="card-price">
                                                         <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['price'], true))); ?>
-                                                        تومان
-                                                    <?php endif; ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="card-price-off">
+                                                        <?php if (convertNumbersToPersian($related['price'], true) == 0): ?>
+                                                            رایگان
+                                                        <?php else: ?>
+                                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($related['price'], true))); ?>
+                                                            تومان
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <div class="unavailable">
+                                                    ناموجود
                                                 </div>
                                             <?php endif; ?>
                                         </div>

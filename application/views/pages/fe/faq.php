@@ -27,7 +27,7 @@
                             <?= $aq['question']; ?>
                         </h2>
                     </div>
-                    <div id="collapseOne" class="collapse <?= $k == 0 ? 'show' : ''; ?>"
+                    <div id="collapse<?= ($k + 1); ?>" class="collapse <?= $k == 0 ? 'show' : ''; ?>"
                          aria-labelledby="heading<?= ($k + 1); ?>" data-parent="#faqAccordion">
                         <div class="box-body normal-line-height">
                             <?= $aq['answer']; ?>

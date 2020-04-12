@@ -67,7 +67,7 @@
                                             <div class="alert alert-info alert-styled-left alert-bordered">
                                                 <p>
                                                     <i class="icon-dash"></i>
-                                                    کلمه عبور باید شامل حروف و اعداد انگلیسی و حداقل ۹ کاراکتر باشد.
+                                                    کلمه عبور باید شامل حروف و اعداد انگلیسی و حداقل ۸ کاراکتر باشد.
                                                 </p>
                                             </div>
 

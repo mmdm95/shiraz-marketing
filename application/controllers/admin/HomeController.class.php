@@ -30,14 +30,17 @@ class HomeController extends AbstractController
 
         $this->data['unreadContacts'] = $model->it_count(self::TBL_CONTACT_US, 'status=:status', ['status' => 0]);
         //-----
-        $this->data['userAllCount'] = $userModel->getUsersCount('r.id!=:role', ['role' => AUTH_ROLE_SUPER_USER]);
+        $this->data['staticPageCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+        $this->data['categoryCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+        //-----
+        $this->data['userAllCount'] = $userModel->getUsersCount('r.id NOT IN (:r1,:r2)', ['r1' => AUTH_ROLE_SUPER_USER, 'r2' => AUTH_ROLE_ADMIN]);
         $this->data['userCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_USER]);
         $this->data['marketerCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
         $this->data['userAllDeactiveCount'] = $userModel->getUsersCount('r.id!=:role AND r.id IN (:role1,:role2) AND u.active=:active',
             ['role' => AUTH_ROLE_SUPER_USER, 'role1' => AUTH_ROLE_USER, 'role2' => AUTH_ROLE_MARKETER, 'active' => 0]);
         //-----
-        $this->data['staticPageCount'] = $model->it_count(self::TBL_STATIC_PAGES);
-        $this->data['categoryCount'] = $model->it_count(self::TBL_STATIC_PAGES);
+        $this->data['productCount'] = $model->it_count(self::TBL_PRODUCT, 'product_type=:pt', ['pt' => PRODUCT_TYPE_ITEM]);
+        $this->data['serviceCount'] = $model->it_count(self::TBL_PRODUCT, 'product_type=:pt', ['pt' => PRODUCT_TYPE_SERVICE]);
         //-----
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, [
             'name', 'badge', 'priority'
@@ -58,7 +61,7 @@ class HomeController extends AbstractController
         $this->data['statusCount' . SEND_STATUS_REFERRED] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_REFERRED]);
         $this->data['statusCount' . SEND_STATUS_CANCELED] = $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_CANCELED]);
 
-            // Base configuration
+        // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'داشبورد');
 
         $this->_render_page('pages/be/index');
@@ -870,11 +873,10 @@ class HomeController extends AbstractController
         ])->setMethod('post');
         try {
             $form->beforeCheckCallback(function () use ($form) {
-                $form->validate('numeric', 'cart_priceArea1', 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
-                $form->validate('numeric', 'cart_priceArea2', 'قیمت در مناطق داخل و خارج از شیراز باید از نوع عدد باشد.');
+                $form->validate('numeric', 'cart_priceArea2', 'قیمت در مناطق خارج از شیراز باید از نوع عدد باشد.');
                 $form->validate('numeric', 'cart_priceFree', 'حداقل قیمت رایگان شدن هزینه ارسال باید از نوع عدد باشد.');
             })->afterCheckCallback(function ($values) use ($form) {
-                $this->data['setting']['cart']['shipping_price']['area1'] = abs((int)$values['cart_priceArea1']);
+                $this->data['setting']['cart']['shipping_price']['area1'] = is_numeric($values['cart_priceArea1']) ? abs((int)$values['cart_priceArea1']) : $values['cart_priceArea1'];
                 $this->data['setting']['cart']['shipping_price']['area2'] = abs((int)$values['cart_priceArea2']);
                 $this->data['setting']['cart']['description'] = trim($values['cart_desc']);
                 $this->data['setting']['cart']['shipping_free_price'] = abs((int)$values['cart_priceFree']);

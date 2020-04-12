@@ -18,6 +18,7 @@ use HPayment\PaymentFactory;
 use HSMS\rohamSMS;
 use HSMS\SMSException;
 use Model;
+use UserModel;
 
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
@@ -1040,6 +1041,9 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function shoppingAction()
     {
+        $model = new Model();
+        $userModel = new UserModel();
+
         // reset shopping session
         $this->session->remove('shopping_page_session');
 
@@ -1057,12 +1061,15 @@ abstract class AbstractController extends AbstractPaymentController
         $this->data['updated_items_in_cart'] = $cartItems['deleted'];
         $this->data['items'] = $cartItems['items'];
         $this->data['has_product_type'] = $cartItems['has_product_type'];
+        $this->data['city'] = $this->data['identity']->city ?? '';
         //-----
         if (!count($this->data['items'])) {
             $this->redirect(base_url('cart'));
         }
         //-----
 
+        $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
+        $this->data['cities'] = $userModel->getCitiesAccordingToProvinceName($this->data['identity']->province);
         // Submit form for next step
         $this->data['errors'] = [];
 
@@ -1073,7 +1080,7 @@ abstract class AbstractController extends AbstractPaymentController
             'receiver_name', 'receiver_mobile', 'coupon_code'])
             ->setMethod('post');
         try {
-            $form->beforeCheckCallback(function (&$values) use ($form) {
+            $form->beforeCheckCallback(function (&$values) use ($form, $model) {
                 foreach ($values as &$value) {
                     if (is_string($value)) {
                         $value = trim($value);
@@ -1087,6 +1094,14 @@ abstract class AbstractController extends AbstractPaymentController
                 //-----
                 $form->validatePersianName('receiver_name', 'نام گیرنده باید از حروف فارسی باشد.');
                 $form->validatePersianMobile('receiver_mobile', 'شماره تماس گیرنده نامعتبر است.');
+                if ($model->is_exist(self::TBL_PROVINCE, 'id=:id', ['id' => $values['receiver_province']])) {
+                    if (!$model->is_exist(self::TBL_CITY, 'id=:id AND province_id=:pId', ['id' => $values['receiver_city'], 'pId' => $values['receiver_province']])) {
+                        $form->setError('شهر انتخاب شده نامعتبر است.');
+                    }
+                } else {
+                    $form->setError('استان انتخاب شده نامعتبر است.');
+                }
+                //-----
                 $isValidCoupon = $this->_validate_coupon($values['coupon_code']);
                 if (!empty($values['coupon_code']) && $isValidCoupon['status']) {
                     $this->data['_shopping_arr']['coupon_code']['code'] = $values['coupon_code'];
@@ -1094,11 +1109,11 @@ abstract class AbstractController extends AbstractPaymentController
                 } else {
                     $this->data['_shopping_arr']['coupon_code'] = null;
                 }
-            })->afterCheckCallback(function (&$values) use ($form) {
+            })->afterCheckCallback(function (&$values) use ($form, $model) {
                 $this->data['_shopping_arr']['receiver_name'] = $values['receiver_name'];
                 $this->data['_shopping_arr']['receiver_mobile'] = $values['receiver_mobile'];
-                $this->data['_shopping_arr']['receiver_province'] = $values['receiver_province'];
-                $this->data['_shopping_arr']['receiver_city'] = $values['receiver_city'];
+                $this->data['_shopping_arr']['receiver_province'] = $model->select_it(null, self::TBL_PROVINCE, 'name', 'id=:id', ['id' => $values['receiver_province']])[0]['name'];
+                $this->data['_shopping_arr']['receiver_city'] = $model->select_it(null, self::TBL_CITY, 'name', 'id=:id', ['id' => $values['receiver_city']])[0]['name'];
                 $this->data['_shopping_arr']['receiver_address'] = $values['receiver_address'];
                 $this->data['_shopping_arr']['receiver_postal_code'] = $values['receiver_postal_code'];
 
@@ -1115,6 +1130,7 @@ abstract class AbstractController extends AbstractPaymentController
             } else {
                 $this->data['errors'] = $form->getError();
                 $this->data['values'] = $form->getValues();
+                $this->data['cities'] = $model->select_it(null, self::TBL_CITY, ['id', 'name'], 'province_id=:pId', ['pId' => $this->data['values']['receiver_province']]);
             }
         }
 
@@ -1170,6 +1186,7 @@ abstract class AbstractController extends AbstractPaymentController
         $this->data['updated_items_in_cart'] = $cartItems['deleted'];
         $this->data['items'] = $cartItems['items'];
         $this->data['has_product_type'] = $cartItems['has_product_type'];
+        $this->data['city'] = !empty($prevData['receiver_city']) ? $prevData['receiver_city'] : (isset($this->data['identity']->city) ? $this->data['identity']->city : '');
         //-----
         if (!count($this->data['items'])) {
             $this->redirect(base_url('cart'));
@@ -1366,6 +1383,10 @@ abstract class AbstractController extends AbstractPaymentController
         $cartItems = $this->_fetch_cart_items();
         $data['items'] = $cartItems['items'];
         $data['has_product_type'] = $cartItems['has_product_type'];
+        $data['setting'] = $this->setting;
+        $data['auth'] = $this->auth;
+        $tmpSess = $this->session->get('shopping_page_session');
+        $data['city'] = !empty($tmpSess['receiver_city']) ? $tmpSess['receiver_city'] : (isset($this->data['identity']->city) ? $this->data['identity']->city : '');
         //-----
         //-----
         if (!count($data['items'])) {
@@ -1421,7 +1442,10 @@ abstract class AbstractController extends AbstractPaymentController
         // Check cart and cart items
         $cartItems = $this->_fetch_cart_items();
         $data['items'] = $cartItems['items'];
+        $data['setting'] = $this->setting;
+        $data['auth'] = $this->auth;
         $data['has_product_type'] = $cartItems['has_product_type'];
+        $data['city'] = !empty($tmpSess['receiver_city']) ? $tmpSess['receiver_city'] : (isset($this->data['identity']->city) ? $this->data['identity']->city : '');
         //-----
         //-----
         if (!count($data['items'])) {
@@ -1448,6 +1472,37 @@ abstract class AbstractController extends AbstractPaymentController
         } else {
             message(self::AJAX_TYPE_ERROR, 200, 'قیمت کالا‌ها از حداقل قیمت برای اعمال این کد تخفیف، کمتر است!');
         }
+    }
+
+    public function tmpShoppingSideCardAction()
+    {
+        if (is_ajax() && !$this->auth->isLoggedIn()) {
+            message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
+        }
+        if (!is_ajax() && !$this->auth->isLoggedIn()) {
+            $this->error->access_denied();
+        }
+
+        $model = new Model();
+
+        $code = $_POST['cityCode'] ?? null;
+        if (!isset($code) || !$model->is_exist(self::TBL_CITY, 'id=:id', ['id' => $code])) {
+            message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
+        }
+
+        // Check cart and cart items
+        $cartItems = $this->_fetch_cart_items();
+        $data['items'] = $cartItems['items'];
+        $data['auth'] = $this->auth;
+        $data['setting'] = $this->setting;
+        $data['has_product_type'] = $cartItems['has_product_type'];
+        $data['city'] = $model->select_it(null, self::TBL_CITY, 'name', 'id=:id', ['id' => $code])[0]['name'];
+        //-----
+        $totals = $this->_get_total_amounts($data['items']);
+        $data['totalAmount'] = $totals['total_amount'];
+        $data['totalDiscountedAmount'] = $totals['total_discount'];
+
+        message('success', 200, ['', $this->load->view('templates/fe/cart/side-shopping-card', $data, true)]);
     }
 
     //----->
@@ -1728,19 +1783,19 @@ abstract class AbstractController extends AbstractPaymentController
             if (!isset($this->data['setting']['cart']['shipping_free_price']) ||
                 empty($this->data['setting']['cart']['shipping_free_price']) ||
                 $totalDiscountedAmount < (int)$this->data['setting']['cart']['shipping_free_price']) {
-//                if ($this->data['identity']->city == SHIRAZ_CITY) {
-//                    if (isset($this->data['setting']['cart']['shipping_price']['area1']) &&
-//                        !empty($this->data['setting']['cart']['shipping_price']['area1'])) {
-//                        $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area1'];
-//                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area1'];
-//                    }
-//                } else {
-                if (isset($this->data['setting']['cart']['shipping_price']['area2']) &&
-                    !empty($this->data['setting']['cart']['shipping_price']['area2'])) {
-                    $totalDiscountedAmount += (int)$this->data['setting']['cart']['shipping_price']['area2'];
-                    $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area2'];
+                if ($prev['receiver_city'] == SHIRAZ_CITY) {
+                    if (isset($this->data['setting']['cart']['shipping_price']['area1']) &&
+                        !empty($this->data['setting']['cart']['shipping_price']['area1'])) {
+                        if (is_numeric($this->data['setting']['cart']['shipping_price']['area1'])) {
+                            $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area1'];
+                        }
+                    }
+                } else {
+                    if (isset($this->data['setting']['cart']['shipping_price']['area2']) &&
+                        !empty($this->data['setting']['cart']['shipping_price']['area2'])) {
+                        $shippingPrice = (int)$this->data['setting']['cart']['shipping_price']['area2'];
+                    }
                 }
-//                }
             }
         }
         $totalAmount += $shippingPrice;
@@ -2054,7 +2109,7 @@ abstract class AbstractController extends AbstractPaymentController
                                             $this->load->library('HSMS/rohamSMS');
                                             $sms = new rohamSMS();
                                             try {
-                                                $body = $this->setting['sms']['activationCodeMsg'];
+                                                $body = $this->setting['sms']['productRegistrationMsg'];
                                                 $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
                                                 $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
                                                 $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
@@ -2207,7 +2262,7 @@ abstract class AbstractController extends AbstractPaymentController
                                                 $this->load->library('HSMS/rohamSMS');
                                                 $sms = new rohamSMS();
                                                 try {
-                                                    $body = $this->setting['sms']['activationCodeMsg'];
+                                                    $body = $this->setting['sms']['productRegistrationMsg'];
                                                     $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
                                                     $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
                                                     $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
@@ -2340,6 +2395,21 @@ abstract class AbstractController extends AbstractPaymentController
                                 ], 'order_code=:oc', ['oc' => $curPay['order_code']]);
                                 if ($res1 && $res2) {
                                     $model->transactionComplete();
+
+                                    // Send sms to user if is login
+                                    if ($this->auth->isLoggedIn()) {
+                                        // Send SMS code goes here
+                                        $this->load->library('HSMS/rohamSMS');
+                                        $sms = new rohamSMS();
+                                        try {
+                                            $body = $this->setting['sms']['productRegistrationMsg'];
+                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $curPay['order_code'], $body);
+                                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                        } catch (SMSException $e) {
+                                            die($e->getMessage());
+                                        }
+                                    }
                                 } else {
                                     $model->transactionRollback();
                                     $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
@@ -2437,6 +2507,21 @@ abstract class AbstractController extends AbstractPaymentController
                             $this->removeAllFromCartAction();
                             // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
                             $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+
+                            // Send sms to user if is login
+                            if ($this->auth->isLoggedIn()) {
+                                // Send SMS code goes here
+                                $this->load->library('HSMS/rohamSMS');
+                                $sms = new rohamSMS();
+                                try {
+                                    $body = $this->setting['sms']['productRegistrationMsg'];
+                                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                    $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $orderCode, $body);
+                                    $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                } catch (SMSException $e) {
+                                    die($e->getMessage());
+                                }
+                            }
                         } else {
                             $model->transactionRollback();
                             //-----
@@ -2490,6 +2575,21 @@ abstract class AbstractController extends AbstractPaymentController
                     $this->removeAllFromCartAction();
                     // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
                     $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+
+                    // Send sms to user if is login
+                    if ($this->auth->isLoggedIn()) {
+                        // Send SMS code goes here
+                        $this->load->library('HSMS/rohamSMS');
+                        $sms = new rohamSMS();
+                        try {
+                            $body = $this->setting['sms']['productRegistrationMsg'];
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $orderCode, $body);
+                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                        } catch (SMSException $e) {
+                            die($e->getMessage());
+                        }
+                    }
                 } else {
                     $model->transactionRollback();
                     //-----
@@ -2535,6 +2635,21 @@ abstract class AbstractController extends AbstractPaymentController
                     $this->removeAllFromCartAction();
                     // Delete factor from reserved items if result is success otherwise give some time to user to pay its items
                     $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $orderCode]);
+
+                    // Send sms to user if is login
+                    if ($this->auth->isLoggedIn()) {
+                        // Send SMS code goes here
+                        $this->load->library('HSMS/rohamSMS');
+                        $sms = new rohamSMS();
+                        try {
+                            $body = $this->setting['sms']['productRegistrationMsg'];
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $orderCode, $body);
+                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                        } catch (SMSException $e) {
+                            die($e->getMessage());
+                        }
+                    }
                 } else {
                     $model->transactionRollback();
                     //-----
@@ -2575,7 +2690,7 @@ abstract class AbstractController extends AbstractPaymentController
                     } catch (Exception $e) {
                     }
                 }
-                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_WAIT) {
+                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
                     $model->update_it(self::TBL_ORDER, [
                         'payment_status' => OWN_PAYMENT_STATUS_FAILED,
                         'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),

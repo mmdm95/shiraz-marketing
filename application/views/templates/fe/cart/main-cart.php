@@ -140,8 +140,9 @@
             </div>
 
             <?php if (isset($setting['cart']['description']) && !empty($setting['cart']['description'])): ?>
-                <div class="box">
-                    <div class="box-body">
+                <div class="box border border-info">
+                    <div class="box-body d-flex align-items-start normal-line-height">
+                        <i class="la la-info-circle font-size-48px ml-3 text-info" aria-hidden="true"></i>
                         <?= $setting['cart']['description'] ?>
                     </div>
                 </div>

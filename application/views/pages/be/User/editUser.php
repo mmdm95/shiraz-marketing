@@ -179,7 +179,7 @@
                                             <div class="form-group col-lg-4">
                                                 <label>
                                                     استان:
-                                                    <?php if (isset($uTrueValues['province'])): ?>
+                                                    <?php if (!empty($uTrueValues['province'])): ?>
                                                         <label class="label label-primary">
                                                             <?= $uTrueValues['province']; ?>
                                                         </label>
@@ -199,7 +199,7 @@
                                             <div class="form-group col-lg-4">
                                                 <label>
                                                     شهر:
-                                                    <?php if (isset($uTrueValues['city'])): ?>
+                                                    <?php if (!empty($uTrueValues['city'])): ?>
                                                         <label class="label label-primary">
                                                             <?= $uTrueValues['city']; ?>
                                                         </label>

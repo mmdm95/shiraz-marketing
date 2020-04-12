@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2020 at 04:10 PM
+-- Generation Time: Apr 11, 2020 at 11:46 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.13
 
@@ -1956,9 +1956,11 @@ INSERT INTO `provinces` (`id`, `name`, `delete`) VALUES
 CREATE TABLE `return_order` (
   `id` int(10) UNSIGNED NOT NULL,
   `order_code` varchar(20) NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
   `description` text NOT NULL,
   `respond` text NOT NULL,
   `status` tinyint(1) UNSIGNED NOT NULL,
+  `is_closed` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `respond_at` int(11) UNSIGNED DEFAULT NULL,
   `created_at` int(11) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2111,7 +2113,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `user_code`, `subset_of`, `mobile`, `password`, `first_name`, `last_name`, `n_code`, `province`, `city`, `address`, `postal_code`, `image`, `credit_card_number`, `father_name`, `gender`, `military_status`, `birth_certificate_code`, `birth_certificate_code_place`, `birth_date`, `question1`, `question2`, `question3`, `question4`, `question5`, `question6`, `question7`, `description`, `is_in_team`, `flag_marketer_request`, `flag_info`, `active`, `ip_address`, `activation_code`, `activation_code_time`, `forgotten_password_code`, `forgotten_password_time`, `created_at`) VALUES
 (1, 'U-1000001', NULL, '09139518055', '$2y$10$SJJmXLT3/IlhEi3WBXPB0OBSprsz61BKeioRnPMN62gNQb5ZkIzTq', 'سعید', 'گرامی فر', '4420440392', '', '', '', '', 'public/fe/images/user-default.jpg', '', '', NULL, NULL, '', '', NULL, '', '', '', '', '', '', '', '', 0, 0, 0, 1, '::1', NULL, NULL, NULL, NULL, 1584977257),
-(4, 'U-1000002', NULL, '09179516271', '$2y$10$j7/CmRVsqtSPAcBc/P3goe0JPX9G8EuTjWTnQztOc6Nu9uvls9soG', '', '', '', '', '', '', '', 'public/fe/images/user-default.jpg', '', '', NULL, NULL, '', '', NULL, '', '', '', '', '', '', '', '', 0, 0, 0, 1, '::1', '', 1586533029, NULL, NULL, 1586533029);
+(4, 'U-1000002', '-1', '09179516271', '$2y$10$j7/CmRVsqtSPAcBc/P3goe0JPX9G8EuTjWTnQztOc6Nu9uvls9soG', 'محمد مهدی', 'دهقان', '', 'فارس', 'آباده', '', '', 'public/uploads/users/profileImages/09179516271.jpg', '', '', 0, 0, '', '', 1586621880, '', '', '', '', '', '', '', '', 0, 0, 0, 1, '::1', '', 1586533029, NULL, NULL, 1586533029);
 
 -- --------------------------------------------------------
 

@@ -19,7 +19,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
  *     1.2.5.0 instead of 1.2.5-a
  *     1.2.5.0.1 instead of 1.2.5-a1 (I'm not sure)
  */
-defined('APP_VERSION') OR define('APP_VERSION', '1.0.2');
+defined('APP_VERSION') OR define('APP_VERSION', '1.0.5');
 
 //===============================================
 
@@ -81,6 +81,10 @@ defined('SMS_REPLACEMENT_CHARS') OR define('SMS_REPLACEMENT_CHARS', [
 
 // My custom order code prefix
 defined('ORDER_CODE_PREFIX') OR define('ORDER_CODE_PREFIX', 'SHM-');
+
+// Shiraz city name
+// id => 232
+defined('SHIRAZ_CITY') OR define('SHIRAZ_CITY', 'شیراز');
 
 // My custom send status
 defined('SEND_STATUS_IN_QUEUE') OR define('SEND_STATUS_IN_QUEUE', 1);
@@ -174,7 +178,9 @@ return array(
     //$routes = array(
     //    'hello/*' => 'index'
     //);
-    'routes' => array(//        'blog/(:any)' => 'comingSoon',
+    'routes' => array(
+        'blog' => 'blog/all',
+        'product' => 'product/all',
     ),
 
     //===============================================

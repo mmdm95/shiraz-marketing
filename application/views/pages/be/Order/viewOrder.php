@@ -504,7 +504,7 @@
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
-                                                    <?= $item['product_title'] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                    <?= $item['title'] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                 </td>
                                                 <td>
                                                     <?= convertNumbersToPersian($item['product_count']); ?>

@@ -29,7 +29,7 @@ class ProductController extends AbstractController
         $model = new Model();
         $productModel = new ProductModel();
         //-----
-        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id AND available=:av AND publish=:pub', ['id' => $param[0], 'av' => 1, 'pub' => 1])) {
+        if (!isset($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id AND publish=:pub', ['id' => $param[0], 'pub' => 1])) {
             $this->session->setFlash($this->messageSession, [
                 'type' => self::FLASH_MESSAGE_TYPE_WARNING,
                 'icon' => self::FLASH_MESSAGE_ICON_WARNING,
@@ -52,8 +52,7 @@ class ProductController extends AbstractController
         }
         $extraPlaceholder = trim($extraPlaceholder, ',');
         $this->data['product']['related'] = $extraPlaceholder != ''
-            ? $model->select_it(null, self::TBL_PRODUCT, ['id', 'title', 'slug', 'image', 'place', 'price', 'discount_price'],
-                'publish=:pub AND available=:av AND id IN (' . $extraPlaceholder . ')', array_merge(['pub' => 1, 'av' => 1], $extraParams))
+            ? $productModel->getProducts('p.publish=:pub AND p.id IN (' . $extraPlaceholder . ')', array_merge(['pub' => 1], $extraParams))
             : [];
         // Get cart item with current product item
         $cartItems = $this->_fetch_cart_items();
@@ -440,14 +439,14 @@ class ProductController extends AbstractController
         }
 
         //-----
-        $this->data['pagination']['total'] = $productModel->getProductsCount('p.publish=:pub AND available=:av' . $extraWhere,
-            array_merge(['pub' => 1, 'av' => 1], $extraParams));
+        $this->data['pagination']['total'] = $productModel->getProductsCount('p.publish=:pub' . $extraWhere,
+            array_merge(['pub' => 1], $extraParams));
         $this->data['pagination']['limit'] = isset($this->setting['pages']['product']['itemsEachPage']) && is_numeric($this->setting['pages']['product']['itemsEachPage']) && $this->setting['pages']['product']['itemsEachPage'] > 0 ? $this->setting['pages']['product']['itemsEachPage'] : ITEMS_EACH_PAGE_DEFAULT;
         $this->data['pagination']['offset'] = ($this->data['pagination']['page'] - 1) * $this->data['pagination']['limit'];
         $this->data['pagination']['firstPage'] = 1;
         $this->data['pagination']['lastPage'] = ceil($this->data['pagination']['total'] / $this->data['pagination']['limit']);
         //-----
-        $this->data['products'] = $productModel->getProducts('p.publish=:pub AND available=:av' . $extraWhere,
-            array_merge(['pub' => 1, 'av' => 1], $extraParams), $this->data['pagination']['limit'], $this->data['pagination']['offset'], $orderParams);
+        $this->data['products'] = $productModel->getProducts('p.publish=:pub' . $extraWhere,
+            array_merge(['pub' => 1], $extraParams), $this->data['pagination']['limit'], $this->data['pagination']['offset'], $orderParams);
     }
 }

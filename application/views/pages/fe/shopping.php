@@ -95,15 +95,22 @@
                                     </span>
                                     :
                                 </label>
-                                <div class="main-input__wrapper">
-                                    <input type="text" id="sh-rp" class="form-control" required
-                                           name="receiver_province" placeholder="وارد کنید"
-                                           value="<?= $values['receiver_province'] ?? $identity->province ?? ''; ?>">
+                                <div class="main-input__wrapper no-icon left">
+                                    <?php
+                                    $key = !isset($values['receiver_province']) ? 'name' : 'id';
+                                    ?>
+                                    <select id="sh-rp" name="receiver_province" data-target-for="#sh-rc"
+                                            class="input-select2 form-control cityLoader"
+                                            required>
+                                        <?php foreach ($provinces as $p): ?>
+                                            <option value="<?= $p['id']; ?>"
+                                                <?= $p[$key] == ($values['receiver_province'] ?? $identity->province ?? '') ? 'selected' : ''; ?>>
+                                                <?= convertNumbersToPersian($p['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                     <span class="input-icon right">
                                         <i class="la la-map-marker"></i>
-                                    </span>
-                                    <span class="input-icon left clear-icon">
-                                        <i class="la la-times"></i>
                                     </span>
                                 </div>
                             </div>
@@ -115,15 +122,24 @@
                                     </span>
                                     :
                                 </label>
-                                <div class="main-input__wrapper">
-                                    <input type="text" id="sh-rc" class="form-control" required
-                                           name="receiver_city" placeholder="وارد کنید"
-                                           value="<?= $values['receiver_city'] ?? $identity->city ?? ''; ?>">
+                                <div class="main-input__wrapper no-icon left">
+                                    <?php
+                                    $key = !isset($values['receiver_city']) ? 'name' : 'id';
+                                    ?>
+                                    <select id="sh-rc" name="receiver_city"
+                                            class="input-select2 form-control" required>
+                                        <option value="-1">
+                                            انتخاب کنید
+                                        </option>
+                                        <?php foreach ($cities as $c): ?>
+                                            <option value="<?= $c['id']; ?>" class="removable-city-option"
+                                                <?= $c[$key] == ($values['receiver_city'] ?? $identity->city ?? '') ? 'selected' : ''; ?>>
+                                                <?= convertNumbersToPersian($c['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                     <span class="input-icon right">
                                         <i class="la la-map-marker"></i>
-                                    </span>
-                                    <span class="input-icon left clear-icon">
-                                        <i class="la la-times"></i>
                                     </span>
                                 </div>
                             </div>

@@ -1745,11 +1745,19 @@ a {
     color: var(--secondary-color);
 }
 
-.card .card-info .card-price-off {
+.card .card-info .card-price-off,
+.card .card-info .unavailable {
     display: block;
-    color: var(--success);
     font-size: 1.125rem;
     text-align: center;
+}
+
+.card .card-info .card-price-off {
+    color: var(--success);
+}
+
+.card .card-info .unavailable {
+    color: var(--danger);
 }
 
 .card .card-info .card-price {

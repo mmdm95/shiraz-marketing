@@ -48,25 +48,29 @@
                                 $totalDiscountedAmount > (int)$setting['cart']['shipping_free_price']): ?>
                                 رایگان
                             <?php else: ?>
-                                <!--                                --><?php //if ($identity->city == SHIRAZ_CITY): ?>
-                                <!--                                    --><?php //if (isset($setting['cart']['shipping_price']['area1']) &&
-//                                        !empty($setting['cart']['shipping_price']['area1'])): ?>
-                                <!--                                        --><?php //$totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area1']; ?>
-                                <!--                                        --><? //= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area1']); ?>
-                                <!--                                        تومان-->
-                                <!--                                    --><?php //else: ?>
-                                <!--                                        رایگان-->
-                                <!--                                    --><?php //endif; ?>
-                                <!--                                --><?php //else: ?>
-                                <?php if (isset($setting['cart']['shipping_price']['area2']) &&
-                                    !empty($setting['cart']['shipping_price']['area2'])): ?>
-                                    <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area2']; ?>
-                                    <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area2']); ?>
-                                    تومان
+                                <?php if ($city == SHIRAZ_CITY): ?>
+                                    <?php if (isset($setting['cart']['shipping_price']['area1']) &&
+                                        !empty($setting['cart']['shipping_price']['area1'])): ?>
+                                        <?php if (is_numeric($setting['cart']['shipping_price']['area1'])): ?>
+                                            <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area1']; ?>
+                                            <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area1']); ?>
+                                            تومان
+                                        <?php else: ?>
+                                            <?= $setting['cart']['shipping_price']['area1']; ?>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        رایگان
+                                    <?php endif; ?>
                                 <?php else: ?>
-                                    رایگان
+                                    <?php if (isset($setting['cart']['shipping_price']['area2']) &&
+                                        !empty($setting['cart']['shipping_price']['area2'])): ?>
+                                        <?php $totalDiscountedAmount += (int)$setting['cart']['shipping_price']['area2']; ?>
+                                        <?= convertNumbersToPersian((int)$setting['cart']['shipping_price']['area2']); ?>
+                                        تومان
+                                    <?php else: ?>
+                                        رایگان
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                                <!--                                --><?php //endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -117,8 +121,9 @@
 </div>
 
 <?php if (isset($setting['cart']['description']) && !empty($setting['cart']['description'])): ?>
-    <div class="box">
-        <div class="box-body">
+    <div class="box border border-info">
+        <div class="box-body d-flex align-items-start normal-line-height">
+            <i class="la la-info-circle font-size-48px ml-3 text-info" aria-hidden="true"></i>
             <?= $setting['cart']['description'] ?>
         </div>
     </div>

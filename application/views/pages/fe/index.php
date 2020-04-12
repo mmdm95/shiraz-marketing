@@ -77,7 +77,7 @@
                             ?>
                             <div class="card-info">
                                 <div>
-                                    <?php if ($discountPercentage != 0): ?>
+                                    <?php if ($discountPercentage != 0 && $offer['available'] == 1 && $offer['stock_count'] > 0): ?>
                                         <span class="btn rounded-pill card-off-percentage">
                                             <?= convertNumbersToPersian($discountPercentage); ?>
                                             ٪
@@ -88,26 +88,32 @@
                                     <?php endif; ?>
                                 </div>
                                 <div>
-                                    <?php if ($discountPercentage != 0): ?>
-                                        <div class="card-price-off">
-                                            <?php if ($discountPercentage == 100): ?>
-                                                رایگان
-                                            <?php else: ?>
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($offer['discount_price'], true))); ?>
-                                                تومان
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="card-price">
-                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($offer['price'], true))); ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="card-price-off">
-                                            <?php if (convertNumbersToPersian($offer['price'], true) == 0): ?>
-                                                رایگان
-                                            <?php else: ?>
+                                    <?php if ($offer['available'] == 1 && $offer['stock_count'] > 0): ?>
+                                        <?php if ($discountPercentage != 0): ?>
+                                            <div class="card-price-off">
+                                                <?php if ($discountPercentage == 100): ?>
+                                                    رایگان
+                                                <?php else: ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($offer['discount_price'], true))); ?>
+                                                    تومان
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="card-price">
                                                 <?= convertNumbersToPersian(number_format(convertNumbersToPersian($offer['price'], true))); ?>
-                                                تومان
-                                            <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="card-price-off">
+                                                <?php if (convertNumbersToPersian($offer['price'], true) == 0): ?>
+                                                    رایگان
+                                                <?php else: ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($offer['price'], true))); ?>
+                                                    تومان
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="unavailable">
+                                            ناموجود
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -192,7 +198,7 @@
                             ?>
                             <div class="card-info">
                                 <div>
-                                    <?php if ($discountPercentage != 0): ?>
+                                    <?php if ($discountPercentage != 0 && $item['available'] == 1 && $item['stock_count'] > 0): ?>
                                         <span class="btn rounded-pill card-off-percentage">
                                             <?= convertNumbersToPersian($discountPercentage); ?>
                                             ٪
@@ -203,26 +209,32 @@
                                     <?php endif; ?>
                                 </div>
                                 <div>
-                                    <?php if ($discountPercentage != 0): ?>
-                                        <div class="card-price-off">
-                                            <?php if ($discountPercentage == 100): ?>
-                                                رایگان
-                                            <?php else: ?>
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
-                                                تومان
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="card-price">
-                                            <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="card-price-off">
-                                            <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
-                                                رایگان
-                                            <?php else: ?>
+                                    <?php if ($item['available'] == 1 && $item['stock_count'] > 0): ?>
+                                        <?php if ($discountPercentage != 0): ?>
+                                            <div class="card-price-off">
+                                                <?php if ($discountPercentage == 100): ?>
+                                                    رایگان
+                                                <?php else: ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
+                                                    تومان
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="card-price">
                                                 <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
-                                                تومان
-                                            <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="card-price-off">
+                                                <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
+                                                    رایگان
+                                                <?php else: ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                                    تومان
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="unavailable">
+                                            ناموجود
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -323,11 +335,19 @@
                                         <h1 class="our-team-name">
                                             <?= $team['first_name'] . ' ' . $team['last_name']; ?>
                                         </h1>
-                                        <span class="our-team-geo">
-                                            <?= $team['city']; ?>
-                                            ،
-                                            <?= $team['province']; ?>
-                                        </span>
+                                        <?php if (!empty($team['city']) || !empty($team['province'])): ?>
+                                            <span class="our-team-geo">
+                                                <?php if (empty($team['city'])): ?>
+                                                    <?= $team['province']; ?>
+                                                <?php elseif (empty($team['province'])): ?>
+                                                    <?= $team['city']; ?>
+                                                <?php else: ?>
+                                                    <?= $team['city']; ?>
+                                                    ،
+                                                    <?= $team['province']; ?>
+                                                <?php endif; ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

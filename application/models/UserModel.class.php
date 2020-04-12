@@ -198,4 +198,26 @@ class UserModel extends HModel
         $model->transactionRollback();
         return false;
     }
+
+    public function getCitiesAccordingToProvinceName($province)
+    {
+        $select = $this->select();
+        $select->cols([
+            'c.id', 'c.name',
+        ])->from(AbstractPaymentController::TBL_CITY . ' AS c');
+
+        try {
+            $select->join(
+                'LEFT',
+                AbstractPaymentController::TBL_PROVINCE . ' AS p',
+                'p.id=c.province_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        $select->where('p.name=:name')->bindValues(['name' => $province]);
+
+        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
 }

@@ -143,6 +143,30 @@
                                 </h5>
                             </div>
                             <div class="col-lg-12">
+                                <div class="col-sm-6 col-md-3 col-lg-3">
+                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                                <?= convertNumbersToPersian($staticPageCount); ?>
+                                            </h3>
+                                            نوشته‌ ثابت
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 col-lg-3">
+                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                        <div class="panel-body">
+                                            <h3 class="no-margin">
+                                                <?= convertNumbersToPersian($categoryCount); ?>
+                                            </h3>
+                                            دسته‌بندی
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
                                 <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
                                     in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
                                     <div class="col-sm-6 col-md-3 col-lg-3">
@@ -193,23 +217,23 @@
 
                             <div class="col-lg-12">
                                 <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
+                                    <div class="panel text-teal-400 border-top-lg border-top-teal-400">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($staticPageCount); ?>
+                                                <?= convertNumbersToPersian($serviceCount); ?>
                                             </h3>
-                                            نوشته‌ ثابت
+                                            تعداد خدمات
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                    <div class="panel text-teal-800 border-top-lg border-top-teal-600">
                                         <div class="panel-body">
                                             <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($categoryCount); ?>
+                                                <?= convertNumbersToPersian($productCount); ?>
                                             </h3>
-                                            دسته‌بندی
+                                            تعداد کالا
                                         </div>
                                     </div>
                                 </div>

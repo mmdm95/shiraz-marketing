@@ -458,7 +458,7 @@
             nav: false,
             loop: true,
             autoplay: true,
-            autoplayTimeout: 10000,
+            autoplayTimeout: 5000,
             autoplayHoverPause: true,
             rtl: true,
             margin: 100,

@@ -206,7 +206,7 @@
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
                                                 <label>
                                                     استان:
-                                                    <?php if (isset($uTrueValues['province'])): ?>
+                                                    <?php if (!empty($uTrueValues['province'])): ?>
                                                         <label class="label label-primary">
                                                             <?= $uTrueValues['province']; ?>
                                                         </label>
@@ -228,7 +228,7 @@
                                                 <span class="note-size bg-blue mr-5 mt-5 pull-left"></span>
                                                 <label>
                                                     شهر:
-                                                    <?php if (isset($uTrueValues['city'])): ?>
+                                                    <?php if (!empty($uTrueValues['city'])): ?>
                                                         <label class="label label-primary">
                                                             <?= $uTrueValues['city']; ?>
                                                         </label>
