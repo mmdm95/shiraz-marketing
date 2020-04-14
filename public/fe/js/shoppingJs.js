@@ -16,6 +16,7 @@
             discount_delete_btn,
             //-----
             city_select,
+            city,
             //-----
             shopping_side_card;
 
@@ -41,7 +42,8 @@
                             url: check_off_code_url,
                             method: 'POST',
                             data: {
-                                postedCode: code
+                                postedCode: code,
+                                cityCode: city,
                             }
                         }, function (response) {
                             // console.log(response);
@@ -72,7 +74,7 @@
         }
 
         function citySelectChange() {
-            var $this, city;
+            var $this;
             city_select.on('change.' + namespace, function () {
                 $this = $(this);
                 city = $this.find(':selected');

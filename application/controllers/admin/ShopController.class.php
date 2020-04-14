@@ -1149,10 +1149,13 @@ class ShopController extends AbstractController
             }
         }
 
+        $this->_export_pdf();
+
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), '‌مشاهده سفارش');
 
         $this->_render_page('pages/be/Order/viewOrder');
+//        $this->load->view('pages/test', $this->data);
     }
 
     //-----
@@ -1276,5 +1279,344 @@ class ShopController extends AbstractController
         }
 
         message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
+    }
+
+    //-----
+
+    protected function _export_pdf()
+    {
+        // Spreadsheet name
+        $name = 'factor-' . $this->data['order']['order_code'];
+        // Payment status
+        $this->data['pdf_export_errors'] = [];
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token_pdf'] = $form->csrfToken('pdfExport');
+        $form->setFieldsName(['pdfExporter'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function () use ($form) {
+
+            })->afterCheckCallback(function () use ($form, $name) {
+                try {
+                    $this->load->library('mPDF/vendor/autoload');
+                    $defaultConfig = (new Mpdf\Config\ConfigVariables())->getDefaults();
+                    $fontDirs = $defaultConfig['fontDir'];
+
+                    $defaultFontConfig = (new Mpdf\Config\FontVariables())->getDefaults();
+                    $fontData = $defaultFontConfig['fontdata'];
+                    $mpdf = new \Mpdf\Mpdf([
+                        'mode' => 'utf-8',
+                        'format' => 'A4',
+                        'fontDir' => array_merge($fontDirs, [
+                            ROOT . FONTS_PATH,
+                        ]),
+                        'fontdata' => $fontData + [
+                                'IRS' => [
+                                    'R' => 'IRANSansWeb.ttf',
+                                    'B' => 'IRANSansWeb_Bold.ttf',
+                                ]
+                            ],
+                        'default_font' => 'IRS'
+                    ]);
+                    if (isset($this->setting['main']['title']) && !empty($this->setting['main']['title'])) {
+                        // Show watermark
+                        $mpdf->SetWatermarkText($this->setting['main']['title']);
+                        $mpdf->showWatermarkText = true;
+                        $mpdf->watermarkTextAlpha = 0.1;
+                    }
+
+                    $stylesheet = file_get_contents(PUBLIC_PATH . 'fe/css/pdfExport.css');
+                    $html = "
+<!DOCTYPE html>
+<html lang='fa'>
+<head>
+<title>فاکتور برای سفارش به شماره {$this->data['order']['order_code']}</title>
+</head>
+<body style='font-family: IRS, Arial, sans-serif;'>
+<div class='section'>
+    <div class='section-header'>
+        <strong>
+            وضعیت سفارش
+        </strong>
+    </div>
+    <div class='section-body section-important'>
+        <strong>
+        {$this->data['order']['send_status_name']}
+        </strong>
+    </div>
+</div>
+
+<div class='section'>
+    <div class='section-header'>
+        <strong>
+            مشخصات پرداخت
+        </strong>
+    </div>
+    <div class='section-body'>
+        <div>
+            <div class='section-half'>
+                <small>
+                    کد فاکتور:
+                </small>
+                <strong>
+                    {$this->data['order']['order_code']}
+                </strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    نحوه پرداخت:
+                </small>
+                <strong>";
+                    if (in_array($this->data['order']['payment_method'], array_keys(PAYMENT_METHODS))) {
+                        $html .= PAYMENT_METHODS[$this->data['order']['payment_method']];
+                    } else {
+                        $html .= 'نامشخص';
+                    }
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <div class='section-half'>
+                <small>
+                    تاریخ پرداخت فیش واریزی:
+                </small>
+                <strong>";
+                    if ($this->data['order']['payment_method'] == PAYMENT_METHOD_RECEIPT && !empty($this->data['order']['receipt_date'])) {
+                        $html .= jDateTime::date('j F Y در ساعت H:i', $this->data['order']['receipt_date']);
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    شماره فیش واریزی:
+                </small>
+                <strong>";
+                    if ($this->data['order']['payment_method'] == PAYMENT_METHOD_RECEIPT && !empty($this->data['order']['receipt_code'])) {
+                        $html .= $this->data['order']['receipt_code'];
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <div class='section-half'>
+                <small>
+                    کد رهگیری:
+                </small>
+                <strong>";
+                    if (isset($this->data['order']['payment_info']['payment_code'])) {
+                        $html .= convertNumbersToPersian($this->data['order']['payment_info']['payment_code']);
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div class='section-body bg-gray'>
+            <small>
+                وضعیت پرداخت:
+            </small>
+            <strong>";
+                    if (in_array($this->data['order']['payment_status'], array_keys(OWN_PAYMENT_STATUSES))) {
+                        $html .= OWN_PAYMENT_STATUSES[$this->data['order']['payment_status']];
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+        </div>
+    </div>
+    <div class='section-body'>
+        <div>
+            <div class='section-half'>
+                <small>
+                    مبلغ کل:
+                </small>
+                <strong>";
+                    $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($this->data['order']['amount'], true)));
+                    $html .= "تومان";
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    مبلغ تخفیف:
+                </small>
+                <strong>";
+                    $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($this->data['order']['discount_price'], true)));
+                    $html .= "تومان";
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <div class='section-half'>
+                <small>
+                    عنوان کد تخفیف:
+                </small>
+                <strong>";
+                    if (!empty($this->data['order']['coupon_title'])) {
+                        $html .= $this->data['order']['coupon_title'];
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    مبلغ کد تخفیف:
+                </small>
+                <strong>";
+                    if (!empty($this->data['order']['coupon_amount'])) {
+                        $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($this->data['order']['coupon_amount'], true)));
+                        $html .= "تومان";
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <div class='section-half'>
+                <small>
+                    هزینه ارسال:
+                </small>
+                <strong>";
+                    if ($this->data['order']['shipping_price'] != 0) {
+                        $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($this->data['order']['shipping_price'], true)));
+                        $html .= "تومان";
+                    } else {
+                        $html .= 'رایگان';
+                    }
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div class='section-body bg-gray'>
+            <small>
+                مبلغ قابل پرداخت:
+            </small>
+            <strong>";
+                    $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($this->data['order']['final_price'], true)));
+                    $html .= "تومان";
+                    $html .= "</strong>
+        </div>
+    </div>
+</div>
+
+<div class='section'>
+    <div class='section-header'>
+        <strong>
+            مشخصات ثبت کننده سفارش
+        </strong>
+    </div>
+    <div class='section-body'>
+        <div>
+            <div class='section-half'>
+                <small>
+                    نام و نام خانوادگی:
+                </small>
+                <strong>";
+                    if (!empty($this->data['order']['first_name']) || !empty($this->data['order']['last_name'])) {
+                        $html .= $this->data['order']['first_name'] . ' ' . $this->data['order']['last_name'];
+                    } else {
+                        $html .= '-';
+                    }
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    شماره موبایل:
+                </small>
+                <strong>";
+                    $html .= convertNumbersToPersian($this->data['order']['mobile']);
+                    $html .= "</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='section'>
+    <div class='section-header'>
+        <strong>
+            مشخصات گیرنده سفارش
+        </strong>
+    </div>
+    <div class='section-body'>
+        <div>
+            <div class='section-half'>
+                <small>
+                    شماره تماس:
+                </small>
+                <strong>";
+                    $html .= convertNumbersToPersian($this->data['order']['receiver_phone']);
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    استان:
+                </small>
+                <strong>";
+                    $html .= $this->data['order']['province'];
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <div class='section-half'>
+                <small>
+                    شهر:
+                </small>
+                <strong>";
+                    $html .= $this->data['order']['city'];
+                    $html .= "</strong>
+            </div>
+            <div class='section-half'>
+                <small>
+                    کد پستی:
+                </small>
+                <strong>";
+                    $html .= convertNumbersToPersian($this->data['order']['postal_code']);
+                    $html .= "</strong>
+            </div>
+        </div>
+        <div class='section-sep'></div>
+        <div>
+            <small>
+                آدرس:
+            </small>
+            <strong>";
+                    $html .= $this->data['order']['address'];
+                    $html .= "</strong>
+        </div>
+    </div>
+</div>
+</body>
+</html>";
+
+                    $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+                    $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
+                    $mpdf->Output($name . '.pdf', true);
+                } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
+                    // Process the exception, log, print etc.
+                    echo $e->getMessage();
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                // Do nothing
+            }
+        }
     }
 }

@@ -195,15 +195,12 @@
                                 <label for="sh-cc" class="d-inline-block">
                                     کد تخفیف خود را استفاده کنید :
                                 </label>
-                                <div class="main-input__wrapper">
+                                <div class="main-input__wrapper no-icon left">
                                     <input type="text" id="sh-cc" class="form-control"
                                            name="coupon_code" placeholder="کد تخفیف"
                                            value="<?= $values['coupon_code'] ?? ''; ?>">
                                     <span class="input-icon right">
                                         <i class="la la-dollar-sign"></i>
-                                    </span>
-                                    <span class="input-icon left clear-icon">
-                                        <i class="la la-times"></i>
                                     </span>
                                 </div>
                             </div>

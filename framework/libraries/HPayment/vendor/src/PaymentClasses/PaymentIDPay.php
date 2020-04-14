@@ -90,7 +90,7 @@ class PaymentIDPay extends Payment
         //Set APIKey
         $this->_parameters[$this->APIKeyStr] = $APIKey;
         // Set mode
-        $this->_parameters['mode'] = self::PAYMENT_MODE_PRODUCTION_IDPAY;
+        $this->_parameters['mode'] = $this->urls[self::PAYMENT_MODE_PRODUCTION_IDPAY];
     }
 
     /**
@@ -122,7 +122,7 @@ class PaymentIDPay extends Payment
     public function create_request($data)
     {
         // Set request url
-        $this->_parameters[$this->urlStr] = self::PAYMENT_URL_PAYMENT_IDPAY;
+        $this->_parameters[$this->urlStr] = $this->urls[self::PAYMENT_URL_PAYMENT_IDPAY];
         // Check request
         $this->_request_check($data);
 
@@ -139,7 +139,7 @@ class PaymentIDPay extends Payment
     public function send_advice($data)
     {
         // Set advice url
-        $this->_parameters[$this->urlStr] = self::PAYMENT_URL_VERIFY_IDPAY;
+        $this->_parameters[$this->urlStr] = $this->urls[self::PAYMENT_URL_VERIFY_IDPAY];
         // Check request
         $this->_request_check($data);
 

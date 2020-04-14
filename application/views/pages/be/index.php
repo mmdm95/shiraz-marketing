@@ -53,7 +53,8 @@
                                     <ul class="list-unstyled list-inline row">
                                         <?php if ($auth->isAllow('user', AUTH_ACCESS_READ)): ?>
                                             <li class="col-xs-6 col-sm-4 col-md-3">
-                                                <a href="<?= base_url(); ?>admin/manageUser" style="min-width: 130px;"
+                                                <a href="<?= base_url(); ?>admin/user/manageUser"
+                                                   style="min-width: 130px;"
                                                    class="btn btn-info btn-float btn-float-lg border-left border-grey-300
                                         border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
                                                     <i class="icon-users4" aria-hidden="true"></i>
@@ -64,32 +65,13 @@
                                             </li>
                                         <?php endif; ?>
                                         <li class="col-xs-6 col-sm-4 col-md-3">
-                                            <a href="<?= base_url(); ?>admin/manageFactors" style="min-width: 130px;"
+                                            <a href="<?= base_url(); ?>admin/shop/manageOrders"
+                                               style="min-width: 130px;"
                                                class="btn btn-info btn-float btn-float-lg border-left border-grey-300
                                         border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
                                                 <i class="icon-basket" aria-hidden="true"></i>
                                                 <span>
-                                                    مشاهده فاکتور‌ها
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="col-xs-6 col-sm-4 col-md-3">
-                                            <a href="<?= base_url(); ?>admin/manageFactors" style="min-width: 130px;"
-                                               class="btn btn-info btn-float btn-float-lg border-left border-grey-300
-                                        border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
-                                                <i class="icon-hash" aria-hidden="true"></i>
-                                                <span>
-                                                    مشاهده فاکتور‌ها
-                                                </span>
-                                            </a>
-                                        </li>
-                                        <li class="col-xs-6 col-sm-4 col-md-3">
-                                            <a href="<?= base_url(); ?>admin/manageComment" style="min-width: 130px;"
-                                               class="btn btn-info btn-float btn-float-lg border-left border-grey-300
-                                        border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
-                                                <i class="icon-comment-discussion" aria-hidden="true"></i>
-                                                <span>
-                                                    مدیریت نظرات
+                                                    مشاهده سفارش‌ها
                                                 </span>
                                             </a>
                                         </li>

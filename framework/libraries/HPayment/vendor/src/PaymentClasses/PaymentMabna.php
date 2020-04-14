@@ -114,7 +114,7 @@ class PaymentMabna extends Payment
     {
         if (is_array($data) && count($data)) {
             // Set request url
-            $this->_parameters[$this->urlStr] = self::PAYMENT_URL_PAYMENT_MABNA;
+            $this->_parameters[$this->urlStr] = $this->urls[self::PAYMENT_URL_PAYMENT_MABNA];
             // Check request
             $this->_request_check($data);
         }
@@ -134,7 +134,7 @@ class PaymentMabna extends Payment
     {
         if (is_array($data) && count($data)) {
             // Set token url
-            $this->_parameters[$this->urlStr] = self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA;
+            $this->_parameters[$this->urlStr] = $this->urls[self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA];
             // Check request
             $this->_request_check($data);
         }
@@ -154,7 +154,7 @@ class PaymentMabna extends Payment
         $sendData = array_intersect_key($data, array_flip($this->adviceVarsName));
         if (is_array($sendData) && count($sendData)) {
             // Set advice url
-            $this->_parameters[$this->urlStr] = self::PAYMENT_URL_VERIFY_MABNA;
+            $this->_parameters[$this->urlStr] = $this->urls[self::PAYMENT_URL_VERIFY_MABNA];
             // Check request
             $this->_request_check($sendData);
         }

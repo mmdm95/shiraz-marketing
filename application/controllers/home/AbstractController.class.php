@@ -12,6 +12,7 @@ use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
 use HPayment\Payment;
+use HPayment\PaymentClasses\PaymentIDPay;
 use HPayment\PaymentClasses\PaymentMabna;
 use HPayment\PaymentException;
 use HPayment\PaymentFactory;
@@ -1420,6 +1421,8 @@ abstract class AbstractController extends AbstractPaymentController
         if (!isset($code)) {
             message(self::AJAX_TYPE_ERROR, 200, 'ورودی نامعتبر است.');
         }
+        $city = $_POST['cityCode'] ?? null;
+
         // If coupon is not exists
         if (!$model->is_exist(self::TBL_COUPON, 'coupon_code=:code AND expire_time>=:expire', ['code' => $code, 'expire' => time()])) {
             message(self::AJAX_TYPE_ERROR, 200, 'کد تخفیف وارد شده نامعتبر می‌باشد. دوباره امتحان نمایید.');
@@ -1445,7 +1448,9 @@ abstract class AbstractController extends AbstractPaymentController
         $data['setting'] = $this->setting;
         $data['auth'] = $this->auth;
         $data['has_product_type'] = $cartItems['has_product_type'];
-        $data['city'] = !empty($tmpSess['receiver_city']) ? $tmpSess['receiver_city'] : (isset($this->data['identity']->city) ? $this->data['identity']->city : '');
+        $data['city'] = isset($city) && !empty($city) && $model->is_exist(self::TBL_CITY, 'id=:id', ['id' => $city])
+            ? $model->select_it(null, self::TBL_CITY, 'name', 'id=:id', ['id' => $city])[0]['name']
+            : (!empty($tmpSess['receiver_city']) ? $tmpSess['receiver_city'] : (isset($this->data['identity']->city) ? $this->data['identity']->city : ''));
         //-----
         //-----
         if (!count($data['items'])) {
@@ -1830,7 +1835,7 @@ abstract class AbstractController extends AbstractPaymentController
 
                 // Fill parameters variable to pass between gateway connection functions
                 $parameters = [
-                    'price' => $discountPrice,
+                    'price' => $totalDiscountedAmount,
                     'order_code' => $orderCode,
                     'backUrl' => base_url('payResult/' . array_search($gatewayTable, $this->paymentParamTable)),
                     'exportation' => FACTOR_EXPORTATION_TYPE_BUY,
@@ -1841,9 +1846,10 @@ abstract class AbstractController extends AbstractPaymentController
                 }
 
                 // Call one of the [_*_connection] functions
-                $res = call_user_func_array($this->gatewayFunctions[$gatewayTable], $parameters);
+                $res = call_user_func_array($this->gatewayFunctions[$gatewayTable], [$parameters]);
                 if (!$res) {
                     $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $orderCode]);
+                    $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $orderCode]);
                     return false;
                 }
             } else {
@@ -1893,6 +1899,7 @@ abstract class AbstractController extends AbstractPaymentController
         try {
             $model = new Model();
             $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY, '2b4846e8-5fc3-4ef9-b7e8-905ccbb8c46f');
+//            $idpay->mode = Payment::PAYMENT_MODE_DEVELOPMENT_IDPAY;
             //-----
             $redirectMessage = 'انتقال به درگاه پرداخت ...';
             $wait = 1;
@@ -1940,6 +1947,8 @@ abstract class AbstractController extends AbstractPaymentController
             $this->error->access_denied();
         }
         //-----
+        $model = new Model();
+
         $code = $_POST['paymentCode'] ?? '';
         if (empty($code) || !in_array($code, $this->gatewayTables[self::PAYMENT_TABLE_MABNA])) {
             message(self::AJAX_TYPE_ERROR, 200, 'پارامتر ارسال شده نامعتبر است!');
@@ -1948,12 +1957,13 @@ abstract class AbstractController extends AbstractPaymentController
         $prevData = $this->session->get('shopping_page_session');
         $parameters = $this->_gateway_processor($prevData, $code, true);
         if ($parameters == false) {
+            $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+            $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
             message(self::AJAX_TYPE_ERROR, 200, 'خطا در ثبت سفارش! لطفا مجددا تلاش نمایید.');
         }
         //-----
         $this->load->library('HPayment/vendor/autoload');
         try {
-            $model = new Model();
             $mabna = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_MABNA);
             //-----
             $payRes = $mabna->get_token([
@@ -1983,12 +1993,18 @@ abstract class AbstractController extends AbstractPaymentController
                     // Send user to mabna for transaction
                     message(self::AJAX_TYPE_SUCCESS, 200, ['', $url, $terminal, $token]);
                 } else {
+                    $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+                    $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
                     message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
                 }
             } else {
+                $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+                $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
                 message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
             }
         } catch (PaymentException $e) {
+            $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+            $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
             message(self::AJAX_TYPE_ERROR, 200, 'مشکل در ایجاد ارتباط با درگاه بانک');
         }
     }
@@ -2173,7 +2189,7 @@ abstract class AbstractController extends AbstractPaymentController
                     $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $order['order_code']]);
                 }
             } else {
-                $this->data['error'] = 'تراکنش نامعتبر است!';
+                $this->data['error'] = '';
                 $this->data['is_success'] = false;
                 $this->data['have_ref_id'] = false;
             }
@@ -2335,7 +2351,7 @@ abstract class AbstractController extends AbstractPaymentController
                     $model->delete_it(self::TBL_ORDER_RESERVED, 'order_code=:oc', ['oc' => $order['order_code']]);
                 }
             } else {
-                $this->data['error'] = 'تراکنش نامعتبر است!';
+                $this->data['error'] = '';
                 $this->data['is_success'] = false;
                 $this->data['have_ref_id'] = false;
             }
@@ -2454,7 +2470,7 @@ abstract class AbstractController extends AbstractPaymentController
                     $this->data['have_ref_id'] = false;
                 }
             } else {
-                $this->data['error'] = 'تراکنش نامعتبر است!';
+                $this->data['error'] = '';
                 $this->data['is_success'] = false;
                 $this->data['have_ref_id'] = false;
             }
@@ -2690,15 +2706,17 @@ abstract class AbstractController extends AbstractPaymentController
                     } catch (Exception $e) {
                     }
                 }
-                if (count($orderStatus) && $orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
-                    $model->update_it(self::TBL_ORDER, [
-                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                        'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
-                    ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
-                } else if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
-                    $model->update_it(self::TBL_ORDER, [
-                        'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
-                    ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                if (count($orderStatus)) {
+                    if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
+                        $model->update_it(self::TBL_ORDER, [
+                            'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                            'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
+                        ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                    } else if ($orderStatus[0]['payment_status'] == OWN_PAYMENT_STATUS_FAILED) {
+                        $model->update_it(self::TBL_ORDER, [
+                            'send_status' => $orderModel->getStatusId(SEND_STATUS_CANCELED),
+                        ], 'order_code=:oc', ['oc' => $reserved['order_code']]);
+                    }
                 }
             }
             $model->delete_it(self::TBL_ORDER_RESERVED, 'expire_time<=:et', ['et' => $reservedTime]);

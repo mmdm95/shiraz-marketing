@@ -45,7 +45,7 @@ class UserController extends AbstractController
             $this->error->show_404();
         }
 
-        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image'], 'id=:id', ['id' => $this->data['identity']->id])[0];
+        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image', 'province', 'city'], 'id=:id', ['id' => $this->data['identity']->id])[0];
         $this->data['marketers'] = $userModel->getUsers('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
         $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
 
@@ -111,22 +111,26 @@ class UserController extends AbstractController
 
                 // upload image
                 $res4 = true;
-                $img = isset($values['image']['name']) && !empty($values['image']['name']) ? $values['image']['name'] : $this->data['uTrueValues']['image'];
-                $imageExt = pathinfo($img, PATHINFO_EXTENSION);
-                $imageName = convertNumbersToPersian($values['mobile'], true);
-                $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
+                if (isset($values['image']['name']) && !empty($values['image']['name'])) {
+                    $img = $values['image']['name'];
+                    $imageExt = pathinfo($img, PATHINFO_EXTENSION);
+                    $imageName = convertNumbersToPersian($values['mobile'], true);
+                    $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
+                } else {
+                    $image = $this->data['uTrueValues']['image'];
+                }
 
                 $res2 = true;
                 if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
                     $res2 = unlink(realpath($values['image']));
                 }
                 $this->data['_updatedColumns'] = [
-                    'subset_of' => $values['subset_of'],
+                    'subset_of' => $values['subset_of'] != -1 ? $values['subset_of'] : null,
                     'mobile' => convertNumbersToPersian($values['mobile'], true),
                     'first_name' => $values['first_name'],
                     'last_name' => $values['last_name'],
-                    'province' => $values['province'] != -1 ? $model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name'] : '',
-                    'city' => $values['city'] != -1 && $values['province'] != -1 ? $model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name'] : '',
+                    'province' => $values['province'] != -1 ? $model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name'] : $this->data['uTrueValues']['province'] ?: '',
+                    'city' => $values['city'] != -1 && $values['province'] != -1 ? $model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name'] : $this->data['uTrueValues']['city'] ?: '',
                     'n_code' => convertNumbersToPersian($values['n_code'], true),
                     'address' => $values['address'],
                     'postal_code' => $values['postal_code'],
@@ -200,7 +204,7 @@ class UserController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
 
-        $this->_render_page('pages/fe/User/profile/editUser');
+        $this->_render_page('pages/fe/User/Profile/editUser');
     }
 
     public function changePasswordAction()
@@ -313,7 +317,7 @@ class UserController extends AbstractController
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده اطلاعات کاربر');
 
-        $this->_render_page('pages/fe/User/profile/userProfile');
+        $this->_render_page('pages/fe/User/Profile/userProfile');
     }
 
     //-----

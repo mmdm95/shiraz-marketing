@@ -28,7 +28,7 @@
             var code;
             theForm.submit(function () {
                 $this = $(this);
-                code = $("input[name='payment-radio']:checked").val();
+                code = $("input[name='payment_radio']:checked").val();
                 //-----
                 if ($.trim(code) !== '' && code == 'PAY_342515312') {
                     shop.ajaxRequest({
@@ -39,6 +39,7 @@
                         }
                     }, function (response) {
                         // console.log(response);
+                        // console.log(JSON.parse(response));
 
                         var res = JSON.parse(response);
 
@@ -49,6 +50,8 @@
                                 token_field = _hiddenField('token', content[2] /* token */);
                                 $this.prepend(terminal_field);
                                 $this.prepend(token_field);
+                            } else {
+                                return false;
                             }
                         });
                     });

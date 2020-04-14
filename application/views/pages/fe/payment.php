@@ -48,9 +48,9 @@
                                 <input type="radio" class="custom-control-input" id="payRadio1" name="payment_radio"
                                        checked="checked" required value="PAY_798447359">
                                 <label class="custom-control-label" for="payRadio1">
-                                    <img src="<?= asset_url('fe/images/bank-saman.png'); ?>" alt=""
+                                    <img src="<?= asset_url('fe/images/bank-mellat.png'); ?>" alt=""
                                          class="img-40px-40px">
-                                    درگاه بانک سامان
+                                    درگاه بانک ملت
                                 </label>
                             </div>
                             <div class="custom-control custom-radio mb-4">

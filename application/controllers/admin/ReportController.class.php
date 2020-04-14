@@ -133,7 +133,6 @@ class ReportController extends AbstractController
                 $orderModel = new OrderModel();
                 //-----
                 $info = $this->session->get('order_report_sess');
-                var_dump($info);
                 $orders = $orderModel->getOrders($info['where'], $info['params']);
                 //-----
                 // Create IO for file

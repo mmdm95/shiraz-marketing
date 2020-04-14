@@ -134,8 +134,6 @@
                                                             <?= set_value($uValues['subset_of'] ?? $uTrueValues['subset_of'] ?? '', $marketer['id'], 'selected', '', '=='); ?>>
                                                             <?php if (!empty($marketer['first_name']) || !empty($marketer['last_name'])): ?>
                                                                 <?= $marketer['first_name'] . ' ' . $marketer['last_name']; ?>
-                                                                -
-                                                                <?= $marketer['username']; ?>
                                                             <?php else: ?>
                                                                 ناشناس
                                                             <?php endif; ?>
