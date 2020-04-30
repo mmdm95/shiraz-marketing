@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /framework/
+Disallow: /application/views/pages/be/
+Disallow: /application/views/templates/
+Disallow: /application/log/
+Disallow: /application/models/
+Disallow: /public/be/

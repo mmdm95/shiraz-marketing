@@ -11,8 +11,6 @@
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.js?<?= app_version(); ?>"></script>
 <!-- owl-carousel Js -->
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/owl.carousel.min.js?<?= app_version(); ?>"></script>
-<!-- jquery.sticky Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.sticky.js?<?= app_version(); ?>"></script>
 <!-- countdown Js -->
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/countdown.min.js?<?= app_version(); ?>"></script>
 <!-- main Js -->
