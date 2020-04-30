@@ -4,7 +4,7 @@
     <div class="nav-main">
         <div class="container">
             <div class="row">
-                <nav class="nav nav-items">
+                <nav class="nav nav-items mx-auto">
                     <?php foreach ($menuNavigation as $item): ?>
                         <a class="nav-item" href="<?= base_url('product/all/category/' . $item['slug']); ?>">
                             <?php if ($setting['main']['showMenuIcon'] == 1): ?>

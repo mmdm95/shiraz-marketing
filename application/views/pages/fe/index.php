@@ -28,14 +28,14 @@
 
     <?php if (count($offers)): ?>
         <div class="container card-container">
-            <div class="section-header align-items-center justify-content-between">
+            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
-                        محصولات ویژه
+                        پیشنهادهای شگفت انگیز
                     </h1>
                 </div>
-                <a href="<?= base_url('product/all/offers'); ?>" class="btn btn-secondary rounded-pill">
+                <a href="<?= base_url('product/all/offers'); ?>" class="btn btn-secondary rounded-pill my-2">
                     مشاهده همه
                     <i class="la la-arrow-left float-left font-size-21px mr-3" aria-hidden="true"></i>
                 </a>
@@ -110,11 +110,15 @@
                                                     تومان
                                                 <?php endif; ?>
                                             </div>
+                                            <!-- This div is not empty. have half space in it -->
+                                            <div class="card-price">‌</div>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <div class="unavailable">
                                             ناموجود
                                         </div>
+                                        <!-- This div is not empty. have half space in it -->
+                                        <div class="card-price">‌</div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -148,14 +152,14 @@
 
     <?php if (count($newestProducts)): ?>
         <div class="container card-container">
-            <div class="section-header align-items-center justify-content-between">
+            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
                         جدیدترین تخفیف‌ها
                     </h1>
                 </div>
-                <a href="<?= base_url('product/all'); ?>" class="btn btn-secondary rounded-pill">
+                <a href="<?= base_url('product/all'); ?>" class="btn btn-secondary rounded-pill my-2">
                     مشاهده همه
                     <i class="la la-arrow-left float-left font-size-21px mr-3" aria-hidden="true"></i>
                 </a>
@@ -231,11 +235,15 @@
                                                     تومان
                                                 <?php endif; ?>
                                             </div>
+                                            <!-- This div is not empty. have half space in it -->
+                                            <div class="card-price">‌</div>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <div class="unavailable">
                                             ناموجود
                                         </div>
+                                        <!-- This div is not empty. have half space in it -->
+                                        <div class="card-price">‌</div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -248,14 +256,14 @@
 
     <?php if (count($lastNews)): ?>
         <div class="container card-container">
-            <div class="section-header align-items-center justify-content-between">
+            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
                         آخرین اخبار شیراز مارکتینگ
                     </h1>
                 </div>
-                <a href="<?= base_url('blog/all'); ?>" class="btn btn-secondary rounded-pill">
+                <a href="<?= base_url('blog/all'); ?>" class="btn btn-secondary rounded-pill my-2">
                     مشاهده همه
                     <i class="la la-arrow-left float-left font-size-21px mr-3" aria-hidden="true"></i>
                 </a>

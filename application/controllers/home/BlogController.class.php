@@ -60,6 +60,7 @@ class BlogController extends AbstractController
         $this->_view_count(self::TBL_BLOG, $param[0]);
         //-----
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات بلاگ', @$this->data['blog']['title']);
+        $this->data['extraKeywords'] = explode(',', $this->data['blog']['keywords']);
 
         $this->_render_page([
             'pages/fe/blog-detail',
@@ -370,7 +371,7 @@ class BlogController extends AbstractController
         //-----
         $this->data['pagination']['total'] = $blogModel->getBlogCount('b.publish=:pub' . $extraWhere,
             array_merge(['pub' => 1], $extraParams));
-        $this->data['pagination']['limit'] = isset($this->setting['pages']['product']['itemsEachPage']) && is_numeric($this->setting['pages']['product']['itemsEachPage']) && $this->setting['pages']['product']['itemsEachPage'] > 0 ? $this->setting['pages']['product']['itemsEachPage'] : ITEMS_EACH_PAGE_DEFAULT;
+        $this->data['pagination']['limit'] = isset($this->setting['pages']['blog']['itemsEachPage']) && is_numeric($this->setting['pages']['blog']['itemsEachPage']) && $this->setting['pages']['blog']['itemsEachPage'] > 0 ? $this->setting['pages']['blog']['itemsEachPage'] : ITEMS_EACH_PAGE_DEFAULT;
         $this->data['pagination']['offset'] = ($this->data['pagination']['page'] - 1) * $this->data['pagination']['limit'];
         $this->data['pagination']['firstPage'] = 1;
         $this->data['pagination']['lastPage'] = ceil($this->data['pagination']['total'] / $this->data['pagination']['limit']);

@@ -112,164 +112,177 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-12">
-                            <hr>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <hr>
+                            </div>
                         </div>
 
                         <!-- Quick stats boxes -->
                         <div class="row">
-                            <div class="col-sm-12 mb-10">
+                            <div class="col-lg-12 mb-10">
                                 <h5 class="mb-15 text-grey-400">
                                     <i class="icon-circle-left2"></i>
                                     دید کلی
                                 </h5>
                             </div>
                             <div class="col-lg-12">
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($staticPageCount); ?>
-                                            </h3>
-                                            نوشته‌ ثابت
+                                <div class="row">
+                                    <div class="col-sm-6 col-md-3 col-lg-3">
+                                        <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian($staticPageCount); ?>
+                                                </h3>
+                                                نوشته‌ ثابت
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($categoryCount); ?>
-                                            </h3>
-                                            دسته‌بندی
+                                    <div class="col-sm-6 col-md-3 col-lg-3">
+                                        <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian($categoryCount); ?>
+                                                </h3>
+                                                دسته‌بندی
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-lg-12">
-                                <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
-                                    in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
-                                    <div class="col-sm-6 col-md-3 col-lg-3">
-                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
-                                            <div class="panel-body">
-                                                <h3 class="no-margin">
-                                                    <?= convertNumbersToPersian($userAllCount); ?>
-                                                </h3>
-                                                کاربر
+                                <div class="row">
+                                    <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
+                                        in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
+                                        <div class="col-sm-6 col-md-3 col-lg-3">
+                                            <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                                <div class="panel-body">
+                                                    <h3 class="no-margin">
+                                                        <?= convertNumbersToPersian($userAllCount); ?>
+                                                    </h3>
+                                                    کاربر
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-6 col-md-3 col-lg-3">
-                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
-                                            <div class="panel-body">
-                                                <h3 class="no-margin">
-                                                    <?= convertNumbersToPersian($userCount); ?>
-                                                </h3>
-                                                کاربر عادی
+                                        <div class="col-sm-6 col-md-3 col-lg-3">
+                                            <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                                <div class="panel-body">
+                                                    <h3 class="no-margin">
+                                                        <?= convertNumbersToPersian($userCount); ?>
+                                                    </h3>
+                                                    کاربر عادی
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-6 col-md-3 col-lg-3">
-                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
-                                            <div class="panel-body">
-                                                <h3 class="no-margin">
-                                                    <?= convertNumbersToPersian($marketerCount); ?>
-                                                </h3>
-                                                کاربر بازاریاب
+                                        <div class="col-sm-6 col-md-3 col-lg-3">
+                                            <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                                <div class="panel-body">
+                                                    <h3 class="no-margin">
+                                                        <?= convertNumbersToPersian($marketerCount); ?>
+                                                    </h3>
+                                                    کاربر بازاریاب
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-6 col-md-3 col-lg-3">
-                                        <div class="panel text-pink-400 border-top-lg border-top-pink-400">
-                                            <div class="panel-body">
-                                                <h3 class="no-margin">
-                                                    <?= convertNumbersToPersian($userAllDeactiveCount); ?>
-                                                </h3>
-                                                کاربر غیرفعال
+                                        <div class="col-sm-6 col-md-3 col-lg-3">
+                                            <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                                <div class="panel-body">
+                                                    <h3 class="no-margin">
+                                                        <?= convertNumbersToPersian($userAllDeactiveCount); ?>
+                                                    </h3>
+                                                    کاربر غیرفعال
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-teal-400 border-top-lg border-top-teal-400">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($serviceCount); ?>
-                                            </h3>
-                                            تعداد خدمات
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-teal-800 border-top-lg border-top-teal-600">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian($productCount); ?>
-                                            </h3>
-                                            تعداد کالا
-                                        </div>
-                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="col-lg-12">
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($orderCount, true))); ?>
-                                            </h3>
-                                            کل سفارش‌ها
+                                <div class="row">
+                                    <div class="col-sm-6 col-md-3 col-lg-3">
+                                        <div class="panel text-teal-400 border-top-lg border-top-teal-400">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian($serviceCount); ?>
+                                                </h3>
+                                                تعداد خدمات
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-sm-6 col-md-3 col-lg-3">
-                                    <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($todayOrderCount, true))); ?>
-                                            </h3>
-                                            سفارش‌های امروز
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-6 col-md-3 col-lg-6">
-                                    <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
-                                        <div class="panel-body">
-                                            <h3 class="no-margin">
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian((int)$totalPaid, true))); ?>
-                                                تومان
-                                            </h3>
-                                            پرداختی‌ها تا کنون
+                                    <div class="col-sm-6 col-md-3 col-lg-3">
+                                        <div class="panel text-teal-800 border-top-lg border-top-teal-600">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian($productCount); ?>
+                                                </h3>
+                                                تعداد کالا
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-lg-12">
-                                <?php foreach ($status as $k => $st): ?>
+                                <div class="row">
                                     <div class="col-sm-6 col-md-3 col-lg-3">
-                                        <div class="panel <?= $st[0]['badge']; ?>">
+                                        <div class="panel text-indigo-400 border-top-lg border-top-indigo-400">
                                             <div class="panel-body">
                                                 <h3 class="no-margin">
-                                                    <?= convertNumbersToPersian(${'statusCount' . $k} ?? ''); ?>
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($orderCount, true))); ?>
                                                 </h3>
-                                                <?= $st[0]['name']; ?>
+                                                کل سفارش‌ها
                                             </div>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
+
+                                    <div class="col-sm-6 col-md-3 col-lg-3">
+                                        <div class="panel text-indigo-600 border-top-lg border-top-indigo-600">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($todayOrderCount, true))); ?>
+                                                </h3>
+                                                سفارش‌های امروز
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-6 col-lg-6">
+                                        <div class="panel text-indigo-800 border-top-lg border-top-indigo-800">
+                                            <div class="panel-body">
+                                                <h3 class="no-margin">
+                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian((int)$totalPaid, true))); ?>
+                                                    تومان
+                                                </h3>
+                                                پرداختی‌ها تا کنون
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <?php foreach ($status as $k => $st): ?>
+                                        <div class="col-sm-6 col-md-3 col-lg-3">
+                                            <a href="<?= base_url('admin/report/orderReport/send_status/' . $st[0]['id']); ?>"
+                                               class="panel display-block text-white <?= $st[0]['badge']; ?>">
+                                                <div class="panel-body">
+                                                    <h3 class="no-margin">
+                                                        <?= convertNumbersToPersian(${'statusCount' . $k} ?? ''); ?>
+                                                    </h3>
+                                                    <?= $st[0]['name']; ?>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                         <!-- /quick stats boxes -->

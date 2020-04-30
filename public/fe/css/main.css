@@ -251,6 +251,16 @@ ul.list-persian {
     object-fit: cover;
 }
 
+.img-100px-100px {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.img-white {
+    filter: brightness(0) invert(1);
+}
+
 .huge-icon {
     text-align: center;
 }
@@ -985,6 +995,37 @@ a {
 
 /**********/
 
+.search-container-extra .search-form .search-button {
+    display: none;
+}
+
+.search-container-extra .search-form .search-input {
+}
+
+.search-container-extra .search-form .search-input .search-icon {
+    position: absolute;
+    font-size: 24px;
+    color: var(--icon-disable-color);
+    height: 25px;
+    right: 30px;
+    top: 50%;
+    -webkit-transform: translate(0, -50%);
+    -moz-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    -o-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+}
+
+.search-container-extra .search-form .search-input input {
+    height: 70%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-right: 3rem;
+    border-radius: .325rem;
+}
+
+/**********/
+
 .sms-number-container {
     text-align: left;
 }
@@ -1014,13 +1055,7 @@ a {
 
     /**********/
     .search-container {
-        position: static;
-    }
-
-    .search-container .search-form-close {
-        display: inline-block;
-        padding-top: 1.5rem;
-        padding-left: 1.75rem;
+        display: none;
     }
 
     .search-container .search-form {
@@ -1046,6 +1081,7 @@ a {
     }
 
     .search-container .search-form .search-input .search-icon {
+        position: absolute;
         right: 35px;
         top: calc(50% + 2px);
     }
@@ -1064,11 +1100,6 @@ a {
 
     .basket-container .basket-items-container {
         width: 96%;
-    }
-
-    .basket-container .mobile-search-icon {
-        display: inline-block;
-        margin-right: 0;
     }
 
     /**********/
@@ -1250,6 +1281,10 @@ a {
 +++++++++++++++*/
 
 @media (max-width: 991.98px) {
+    .nav-main {
+        display: none;
+    }
+
     .nav-main .nav-item .nav-item-icon {
         font-size: 1.75rem;
     }
@@ -1337,7 +1372,7 @@ a {
     -ms-transition: all ease-in-out 0.2s;
     -o-transition: all ease-in-out 0.2s;
     transition: all ease-in-out 0.2s;
-    z-index: 1;
+    z-index: 10;
 }
 
 .back-to-top:hover {
@@ -1404,7 +1439,7 @@ a {
 .section-header .section-title-icon::after {
     width: 26px;
     height: 26px;
-    border-color: var(--primary-color-light-opacity);
+    border-color: var(--secondary-color);
     margin-left: 1rem;
     margin-right: -12px;
     margin-top: -3px;

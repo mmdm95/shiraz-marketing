@@ -125,7 +125,6 @@ class ProductModel extends HModel
         if (!empty($bindParams) && is_array($bindParams)) {
             $select->bindValues($bindParams);
         }
-        $select->groupBy(['p.id']);
 
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0]['count'];

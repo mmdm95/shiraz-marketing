@@ -189,7 +189,7 @@
                                                 <input type="hidden" name="discount_expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
-                                                       value="<?= date('Y/m/d H:i', (int)($pValues['discount_expire'] ?? $pTrueValues['discount_until'] ?? time())); ?>">
+                                                       value="<?= date('Y/m/d H:i', (int)(($pValues['discount_expire'] ?? $pTrueValues['discount_until']) ?? time())); ?>">
                                             </div>
                                             <div class="form-group col-lg-4 col-md-4 col-sm-7">
                                                 <label>پاداش خرید:</label>
@@ -261,8 +261,51 @@
                                                 </a>
                                             </div>
 
-
-                                            <?php foreach ($pValues['imageGallery'] ?? $pTrueValues['imageGallery'] as $key => $img): ?>
+                                            <?php if (count(($pValues['imageGallery'] ?? $pTrueValues['imageGallery'] ?? []))): ?>
+                                                <?php foreach (($pValues['imageGallery'] ?? $pTrueValues['imageGallery']) as $key => $img): ?>
+                                                    <div class="col-lg-12 col-md-6 col-sm-12 mb-15 slide-item">
+                                                        <div class="cursor-pointer pick-file border border-lg border-default"
+                                                             data-toggle="modal"
+                                                             data-target="#modal_full"
+                                                             style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                                            <input class="image-file" type="hidden"
+                                                                   name="imageGallery[]"
+                                                                   value="<?= $img ?? ''; ?>">
+                                                            <div class="media stack-media-on-mobile">
+                                                                <div class="media-left">
+                                                                    <div class="thumb">
+                                                                        <a class="display-inline-block"
+                                                                           style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                                            <img
+                                                                                    src="<?= set_value($img ?? '', '', base_url($img ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                                    class="img-rounded" alt=""
+                                                                                    style="width: 100px; height: 100px; object-fit: contain;"
+                                                                                    data-base-url="<?= base_url(); ?>">
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="media-body">
+                                                                    <h6 class="media-heading">
+                                                                        <a class="io-image-lbl text-grey-300">
+                                                                            انتخاب تصویر <?= ($key + 1); ?>
+                                                                        </a>
+                                                                        <a class="io-image-name display-block">
+                                                                            <?= basename($img); ?>
+                                                                        </a>
+                                                                    </h6>
+                                                                    <?php if ($key == 0): ?>
+                                                                        <small class="clear-img-val">&times;</small>
+                                                                    <?php else: ?>
+                                                                        <small class="delete-new-image btn btn-danger">
+                                                                            &times;
+                                                                        </small>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
                                                 <div class="col-lg-12 col-md-6 col-sm-12 mb-15 slide-item">
                                                     <div class="cursor-pointer pick-file border border-lg border-default"
                                                          data-toggle="modal"
@@ -270,14 +313,14 @@
                                                          style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
                                                         <input class="image-file" type="hidden"
                                                                name="imageGallery[]"
-                                                               value="<?= $img ?? ''; ?>">
+                                                               value="<?= $pValues['imageGallery'][0] ?? ''; ?>">
                                                         <div class="media stack-media-on-mobile">
                                                             <div class="media-left">
                                                                 <div class="thumb">
                                                                     <a class="display-inline-block"
                                                                        style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
                                                                         <img
-                                                                                src="<?= set_value($img ?? '', '', base_url($img ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                                src="<?= set_value($pValues['imageGallery'][0] ?? '', '', base_url($pValues['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
                                                                                 class="img-rounded" alt=""
                                                                                 style="width: 100px; height: 100px; object-fit: contain;"
                                                                                 data-base-url="<?= base_url(); ?>">
@@ -287,24 +330,18 @@
                                                             <div class="media-body">
                                                                 <h6 class="media-heading">
                                                                     <a class="io-image-lbl text-grey-300">
-                                                                        انتخاب تصویر <?= ($key + 1); ?>
+                                                                        انتخاب تصویر 1
                                                                     </a>
                                                                     <a class="io-image-name display-block">
-                                                                        <?= basename($img); ?>
+                                                                        <?= basename($pValues['imageGallery'][0] ?? ''); ?>
                                                                     </a>
                                                                 </h6>
-                                                                <?php if ($key == 0): ?>
-                                                                    <small class="clear-img-val">&times;</small>
-                                                                <?php else: ?>
-                                                                    <small class="delete-new-image btn btn-danger">
-                                                                        &times;
-                                                                    </small>
-                                                                <?php endif; ?>
+                                                                <small class="clear-img-val">&times;</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>

@@ -136,8 +136,8 @@ class OrderModel extends HModel
         $res = false;
         foreach ($products as $product) {
             $res = $model->update_it(AbstractPaymentController::TBL_PRODUCT, [], 'id=:id', ['id' => $product['product_id']], [
-                'stock_count' => 'stock_count-' . (int)$product['product_count'],
-                'sold_count' => 'sold_count+' . (int)$product['product_count'],
+                'stock_count' => 'stock_count+' . (int)$product['product_count'],
+                'sold_count' => 'sold_count-' . (int)$product['product_count'],
             ]);
             if ($res == false) break;
         }
@@ -148,7 +148,7 @@ class OrderModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'o.id', 'o.order_code', 'o.first_name', 'o.last_name', 'o.payment_date', 'o.order_date',
+            'o.id', 'o.order_code', 'o.first_name', 'o.last_name', 'o.payment_date', 'o.order_date', 'o.mobile',
             'o.final_price', 'o.payment_status', 'o.payment_method', 'ss.name AS send_status_name', 'ss.badge',
             'ro.description', 'ro.status', 'ro.created_at'
         ])->from($this->table . ' AS o');

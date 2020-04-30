@@ -84,6 +84,14 @@ abstract class Payment
     const PAYMENT_STATUS_FAILED_ZARINPAL = -22;
     const PAYMENT_STATUS_DUPLICATE_ZARINPAL = 101;
 
+    //********************************
+    //**** Beh-Pardakht constants ****
+    //********************************
+    const PAYMENT_STATUS_OK_BEH_PARDAKHT = 0;
+    const PAYMENT_STATUS_DUPLICATE_BEH_PARDAKHT = 51;
+    // url constant(s)
+    const PAYMENT_URL_PAYMENT_BEH_PARDAKHT = 1;
+
     /**
      * Status array for bank success/error or any kind of status.
      * Must store status in this array like ---->   code => message

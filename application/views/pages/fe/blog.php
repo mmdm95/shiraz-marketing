@@ -35,11 +35,16 @@
                 <div class="section-title-icon"></div>
                 <h1 class="section-title">
                     <?= $orderText; ?>
+                    -
+                    <small>
+                        <?= convertNumbersToPersian($pagination['total']); ?>
+                        مورد
+                    </small>
                 </h1>
             </div>
             <div class="d-sm-flex d-block align-items-center mb-4 justify-content-end">
                 <?php if (count($categories)): ?>
-                    <div class="d-sm-flex d-inline-block align-items-center ml-sm-4 ml-0 mb-3">
+                    <div class="d-sm-flex d-block align-items-center ml-sm-4 ml-0 mb-3">
                         <label for="sortByCategorySelect" class="text-nowrap ml-3 mb-0">
                             دسته‌بندی:
                         </label>
@@ -61,7 +66,7 @@
                         </div>
                     </div>
                 <?php endif; ?>
-                <div class="d-sm-flex d-inline-block align-items-center mb-3">
+                <div class="d-sm-flex d-block align-items-center mb-3">
                     <label for="sortBySelect" class="text-nowrap ml-3 mb-0">
                         مرتب سازی:
                     </label>

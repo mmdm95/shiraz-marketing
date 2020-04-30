@@ -269,7 +269,7 @@ class ShopController extends AbstractController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('addCoupon');
-        $form->setFieldsName(['code', 'title', 'price', 'min_price', 'max_price', 'expire', 'publish'])
+        $form->setFieldsName(['code', 'title', 'price', 'min_price', 'max_price', 'use_count', 'expire', 'publish'])
             ->setDefaults('publish', 'off')
             ->setMethod('post', [], ['publish']);
         try {
@@ -283,7 +283,8 @@ class ShopController extends AbstractController
                     ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange('price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
-                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
+                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
+                    ->validate('numeric', 'use_count', 'تعداد استفاده از کوپن باید از نوع عدد باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                         ->isInRange('max_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -307,6 +308,7 @@ class ShopController extends AbstractController
                     'price' => $values['price'],
                     'min_price' => $values['min_price'],
                     'max_price' => $values['max_price'],
+                    'use_count' => abs((int)$values['use_count']),
                     'expire_time' => $values['expire'],
                     'publish' => !$form->isChecked('publish') ? 0 : 1,
                     'created_by' => $this->data['identity']->id,
@@ -361,7 +363,7 @@ class ShopController extends AbstractController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('editCoupon');
-        $form->setFieldsName(['code', 'title', 'price', 'min_price', 'max_price', 'expire', 'publish'])
+        $form->setFieldsName(['code', 'title', 'price', 'min_price', 'max_price', 'use_count', 'expire', 'publish'])
             ->setDefaults('publish', 'off')
             ->setMethod('post', [], ['publish']);
         try {
@@ -375,7 +377,8 @@ class ShopController extends AbstractController
                     ->validate('numeric', 'price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->validate('numeric', 'min_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                     ->isInRange('price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
-                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
+                    ->isInRange('min_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.')
+                    ->validate('numeric', 'use_count', 'تعداد استفاده از کوپن باید از نوع عدد باشند.');
                 if (!empty($values['max_price'])) {
                     $form->validate('numeric', 'max_price', 'تمامی قیمت‌ها باید از نوع عدد باشند.')
                         ->isInRange('max_price', 0, PHP_INT_MAX, 'تمامی قیمت‌ها باید عددی بزرگتر از صفر باشند.');
@@ -400,6 +403,7 @@ class ShopController extends AbstractController
                     'price' => $values['price'],
                     'min_price' => $values['min_price'],
                     'max_price' => $values['max_price'],
+                    'use_count' => abs((int)$values['use_count']),
                     'expire_time' => $values['expire'],
                     'publish' => !$form->isChecked('publish') ? 0 : 1,
                     'updated_by' => $this->data['identity']->id,
@@ -545,6 +549,8 @@ class ShopController extends AbstractController
                 $form->isInRange('discount_price', 0, PHP_INT_MAX, 'قیمت تخفیف باید عددی بزرگتر از صفر باشد.');
 
                 $form->validateDate('discount_expire', date('Y-m-d H:i:s', $values['discount_expire']), 'تاریخ انقضای تخفیف نامعتبر است.', 'Y-m-d H:i:s');
+
+                $form->isInRange('max_basket_count', 1, PHP_INT_MAX, 'حداکثر تعداد در یک خرید باید عددی بزرگتر از ۱ باشد.');
 
                 $form->isInRange('reward', 0, 100, 'پاداش خرید عددی بین ۰ و ۱۰۰ است.');
 
@@ -703,6 +709,8 @@ class ShopController extends AbstractController
                 $form->isInRange('discount_price', 0, PHP_INT_MAX, 'قیمت تخفیف باید عددی بزرگتر از صفر باشد.');
 
                 $form->validateDate('discount_expire', date('Y-m-d H:i:s', $values['discount_expire']), 'تاریخ انقضای تخفیف نامعتبر است.', 'Y-m-d H:i:s');
+
+                $form->isInRange('max_basket_count', 1, PHP_INT_MAX, 'حداکثر تعداد در یک خرید باید عددی بزرگتر از ۱ باشد.');
 
                 $form->isInRange('reward', 0, 100, 'پاداش خرید عددی بین ۰ و ۱۰۰ است.');
 
@@ -890,7 +898,7 @@ class ShopController extends AbstractController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('filterOrders');
-        $form->setFieldsName(['user', 'from_date', 'to_date', 'send_status', 'province', 'city'])
+        $form->setFieldsName(['user', 'from_date', 'to_date', 'send_status', 'payment_status', 'payment_method', 'province', 'city'])
             ->setMethod('post')
             ->clearVariablesOnSuccess(false);
         try {
@@ -916,6 +924,16 @@ class ShopController extends AbstractController
                 if ($values['send_status'] != -1) {
                     $where .= 'send_status=:ss AND ';
                     $params['ss'] = $values['send_status'];
+                }
+                // payment status
+                if($values['payment_status'] != -100) {
+                    $where .= 'payment_status=:ps AND ';
+                    $params['ps'] = $values['payment_status'];
+                }
+                // payment method
+                if($values['payment_method'] != -100) {
+                    $where .= 'payment_method=:pm AND ';
+                    $params['pm'] = $values['payment_method'];
                 }
                 // province and city
                 if (!empty($values['province'])) {

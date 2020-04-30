@@ -22,6 +22,7 @@ class ComposerStaticInit21ba02e5eb8370f9072b0f99550fdc1e
 
     public static $classMap = array (
         'HPayment\\Payment' => __DIR__ . '/..' . '/src/Payment.php',
+        'HPayment\\PaymentClasses\\PaymentBehPardakht' => __DIR__ . '/..' . '/src/PaymentClasses/PaymentBehPardakht.php',
         'HPayment\\PaymentClasses\\PaymentIDPay' => __DIR__ . '/..' . '/src/PaymentClasses/PaymentIDPay.php',
         'HPayment\\PaymentClasses\\PaymentMabna' => __DIR__ . '/..' . '/src/PaymentClasses/PaymentMabna.php',
         'HPayment\\PaymentClasses\\PaymentZarinPal' => __DIR__ . '/..' . '/src/PaymentClasses/PaymentZarinPal.php',

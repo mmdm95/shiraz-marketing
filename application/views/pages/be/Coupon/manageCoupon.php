@@ -65,6 +65,7 @@
                                                     <th>قیمت تخفیف</th>
                                                     <th>قیمت کمینه</th>
                                                     <th>سقف قیمت</th>
+                                                    <th>تعداد کوپن</th>
                                                     <th>تاریخ پایان</th>
                                                     <th>وضعیت فعالسازی</th>
                                                     <th>عملیات</th>
@@ -97,6 +98,9 @@
                                                             <?php else: ?>
                                                                 <i class="icon-dash text-danger" aria-hidden="true"></i>
                                                             <?php endif; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?= convertNumbersToPersian($coupon['use_count']); ?>
                                                         </td>
                                                         <td class="<?= $coupon['expire_time'] > time() ? 'success' : 'danger'; ?>">
                                                             <?= jDateTime::date('Y/m/d', $coupon['expire_time']); ?>

@@ -20,7 +20,7 @@ class UserModel extends HModel
         $select = $this->select();
         $select->cols([
             'u.id', 'u.user_code', 'u.subset_of', 'u.mobile AS username', 'u.first_name', 'u.last_name', 'u.active',
-            'u.created_at', 'u.flag_marketer_request', 'r.name AS role_name', 'r.id AS role_id'
+            'u.created_at', 'u.flag_marketer_request', 'u.is_in_team', 'r.name AS role_name', 'r.id AS role_id'
         ])->from($this->table . ' AS u');
 
         try {

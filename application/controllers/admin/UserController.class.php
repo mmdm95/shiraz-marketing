@@ -6,6 +6,7 @@ use Apfelbox\FileDownload\FileDownload;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use HPayment\PaymentClasses\PaymentZarinPal;
 use HPayment\PaymentFactory;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -743,11 +744,23 @@ class UserController extends AbstractController
         $this->data['user']['balance'] = count($this->data['user']['balance']) ? $this->data['user']['balance'][0]['account_balance'] : 0;
         // Calculate account income
         $idPaySum = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $param[0],
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => \HPayment\PaymentClasses\PaymentIDPay::PAYMENT_STATUS_OK_IDPAY,
+            ])[0]['sum'];
         $mabnaSum = $model->select_it(null, self::PAYMENT_TABLE_MABNA, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $param[0],
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => \HPayment\PaymentClasses\PaymentMabna::PAYMENT_STATUS_OK_MABNA,
+            ])[0]['sum'];
         $zarinpalSum = $model->select_it(null, self::PAYMENT_TABLE_ZARINPAL, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $param[0], 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $param[0],
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => PaymentZarinPal::PAYMENT_STATUS_OK_ZARINPAL,
+            ])[0]['sum'];
         $this->data['user']['total_income'] = $idPaySum + $mabnaSum + $zarinpalSum;
         // Calculate account outcome
         $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],

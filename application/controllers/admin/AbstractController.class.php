@@ -10,6 +10,7 @@ use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
 use Model;
+use UserModel;
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 
@@ -40,7 +41,7 @@ abstract class AbstractController extends AbstractPaymentController
 
         // Read settings once
         $this->setting = read_json(CORE_PATH . 'config.json');
-        if(empty($this->setting)) {
+        if (empty($this->setting)) {
             $this->setting = [];
         }
 
@@ -52,8 +53,19 @@ abstract class AbstractController extends AbstractPaymentController
         $this->data['favIcon'] = !empty($this->setting['main']['favIcon']) ? base_url($this->setting['main']['favIcon']) : '';
         $this->data['logo'] = $this->setting['main']['logo'] ?? '';
 
-        // Extra js
-        $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+        if (!is_ajax()) {
+            // Extra js
+            $this->data['js'][] = $this->asset->script('be/js/admin.main.js');
+
+            // Get some count(s)
+            $model = new Model();
+            $userModel = new UserModel();
+            $this->data['count__promote_request'] = $userModel->getUsersCount('r.id=:rId AND flag_marketer_request=:req',
+                ['rId' => AUTH_ROLE_USER, 'req' => 1]);
+            $this->data['count__return_order'] = $model->it_count(self::TBL_RETURN_ORDER, 'status=:st', ['st' => 0]);
+            $this->data['count__contact'] = $model->it_count(self::TBL_CONTACT_US, 'status=:st', ['st' => 0]);
+            $this->data['count__complaint'] = $model->it_count(self::TBL_COMPLAINT, 'status=:st', ['st' => 0]);
+        }
 
 //        $model = new Model();
 //        $model->insert_it('users', [

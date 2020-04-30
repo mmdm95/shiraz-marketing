@@ -80,7 +80,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                         <td>
-                                                            <?= convertNumbersToPersian($marketer['username']); ?>
+                                                            <?= $marketer['username']; ?>
                                                         </td>
                                                         <td>
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $marketer['created_at']); ?>

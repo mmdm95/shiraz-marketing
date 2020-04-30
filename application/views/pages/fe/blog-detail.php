@@ -48,7 +48,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="box overflow-hidden">
-                    <img src="<?= base_url($blog['image']); ?>" alt="<?= $blog['title']; ?>" class="img-fluid">
+                    <img src="<?= base_url($blog['image']); ?>" alt="<?= $blog['title']; ?>" class="img-fluid w-100">
                 </div>
                 <div class="section-header section-header-low-gap">
                     <h1 class="section-title">
@@ -89,7 +89,7 @@
                                 <?php foreach ($keywords as $keyword): ?>
                                     <li class="list-inline-item">
                                         <a href="<?= base_url('blog/all/tag/' . trim($keyword)); ?>"
-                                           class="btn btn-outline-secondary">
+                                           class="btn btn-outline-secondary m-2">
                                             <?= trim($keyword); ?>
                                         </a>
                                     </li>
@@ -143,7 +143,7 @@
                                             </li>
                                             <li class="list-inline-item">
                                                 <i class="la la-eye"></i>
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['view_count']), true)); ?>
+                                                <?= convertNumbersToPersian(number_format($item['view_count'])); ?>
                                                 بازدید
                                             </li>
                                         </ul>

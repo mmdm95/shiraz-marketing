@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'HPayment\\Payment' => $vendorDir . '/src/Payment.php',
+    'HPayment\\PaymentClasses\\PaymentBehPardakht' => $vendorDir . '/src/PaymentClasses/PaymentBehPardakht.php',
     'HPayment\\PaymentClasses\\PaymentIDPay' => $vendorDir . '/src/PaymentClasses/PaymentIDPay.php',
     'HPayment\\PaymentClasses\\PaymentMabna' => $vendorDir . '/src/PaymentClasses/PaymentMabna.php',
     'HPayment\\PaymentClasses\\PaymentZarinPal' => $vendorDir . '/src/PaymentClasses/PaymentZarinPal.php',

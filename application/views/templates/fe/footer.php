@@ -95,7 +95,8 @@
                                 <?php if (isset($setting['footer']['socials']['telegram']) && !empty($setting['footer']['socials']['telegram'])): ?>
                                     <?php foreach (explode(',', $setting['footer']['socials']['telegram']) as $telegram): ?>
                                         <li class="list-inline-item">
-                                            <a href="<?= trim($telegram); ?>" class="socials social-telegram" target="_blank"
+                                            <a href="<?= trim($telegram); ?>" class="socials social-telegram"
+                                               target="_blank"
                                                data-toggle="tooltip" data-placement="top" title="تلگرام">
                                                 <i class="la la-telegram"></i>
                                             </a>
@@ -106,7 +107,8 @@
                                 <?php if (isset($setting['footer']['socials']['instagram']) && !empty($setting['footer']['socials']['instagram'])): ?>
                                     <?php foreach (explode(',', $setting['footer']['socials']['instagram']) as $instagram): ?>
                                         <li class="list-inline-item">
-                                            <a href="<?= trim($instagram); ?>" class="socials social-instagram" target="_blank"
+                                            <a href="<?= trim($instagram); ?>" class="socials social-instagram"
+                                               target="_blank"
                                                data-toggle="tooltip" data-placement="top" title="اینستاگرام">
                                                 <i class="la la-instagram"></i>
                                             </a>
@@ -117,7 +119,8 @@
                                 <?php if (isset($setting['footer']['socials']['whatsapp']) && !empty($setting['footer']['socials']['whatsapp'])): ?>
                                     <?php foreach (explode(',', $setting['footer']['socials']['whatsapp']) as $whatsapp): ?>
                                         <li class="list-inline-item">
-                                            <a href="<?= trim($whatsapp); ?>" class="socials social-whatsapp" target="_blank"
+                                            <a href="<?= trim($whatsapp); ?>" class="socials social-whatsapp"
+                                               target="_blank"
                                                data-toggle="tooltip" data-placement="top" title="واتس اَپ">
                                                 <i class="la la-whatsapp"></i>
                                             </a>
@@ -137,3 +140,5 @@
         </div>
     </div>
 </footer>
+
+<?= $popup_save_us ?>

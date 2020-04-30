@@ -12,6 +12,7 @@ class PaymentFactory
     const BANK_TYPE_IDPAY = 1;
     const BANK_TYPE_MABNA = 2;
     const BANK_TYPE_ZARINPAL = 3;
+    const BANK_TYPE_BEH_PARDAKHT = 4;
 
     /**
      * Factory array to check if passed constant to constructor of class is valid or not
@@ -20,7 +21,8 @@ class PaymentFactory
     static private $factoryArr = [
         self::BANK_TYPE_IDPAY => 'IDPay',
         self::BANK_TYPE_MABNA => 'Mabna',
-        self::BANK_TYPE_ZARINPAL => 'ZarinPal'
+        self::BANK_TYPE_ZARINPAL => 'ZarinPal',
+        self::BANK_TYPE_BEH_PARDAKHT => 'BehPardakht',
     ];
 
     // Error code(s) for factory

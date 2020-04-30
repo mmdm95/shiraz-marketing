@@ -80,12 +80,7 @@
                                                             <?= $order['order_code']; ?>
                                                         </td>
                                                         <td>
-                                                            <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
-                                                                <?= $order['first_name'] . ' ' . $order['last_name']; ?>
-                                                            <?php else: ?>
-                                                                <i class="icon-minus2 text-danger"
-                                                                   aria-hidden="true"></i>
-                                                            <?php endif; ?>
+                                                            <?= $order['mobile']; ?>
                                                         </td>
                                                         <td>
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $order['created_at']); ?>

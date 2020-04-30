@@ -156,6 +156,19 @@
                             </div>
                         </div>
                         <div class="product-detail-side flex-column">
+                            <?php
+                            $reward = ((int)convertNumbersToPersian($product['reward'], true) * (int)convertNumbersToPersian($discount, true)) / 100;
+                            ?>
+                            <?php if ($reward != 0): ?>
+                                <div class="product-detail-side-item product-detail-side-location alert-primary">
+                                    <i class="la la-dollar-sign" aria-hidden="true"></i>
+                                    <div>
+                                        پاداش خرید
+                                        <?= convertNumbersToPersian(number_format($reward)); ?>
+                                        تومان (به ازای هر محصول)
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                             <div class="product-detail-side-item product-detail-side-location">
                                 <i class="la la-map-marker" aria-hidden="true"></i>
                                 <div>
@@ -337,11 +350,15 @@
                                                             تومان
                                                         <?php endif; ?>
                                                     </div>
+                                                    <!-- This div is not empty. have half space in it -->
+                                                    <div class="card-price">‌</div>
                                                 <?php endif; ?>
                                             <?php else: ?>
                                                 <div class="unavailable">
                                                     ناموجود
                                                 </div>
+                                                <!-- This div is not empty. have half space in it -->
+                                                <div class="card-price">‌</div>
                                             <?php endif; ?>
                                         </div>
                                     </div>

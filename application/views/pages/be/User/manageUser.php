@@ -79,7 +79,7 @@
                                                             <?php endif; ?>
                                                         </td>
                                                         <td>
-                                                            <?= convertNumbersToPersian($user['username']); ?>
+                                                            <?= $user['username']; ?>
                                                         </td>
                                                         <td>
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $user['created_at']); ?>

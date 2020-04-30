@@ -44,48 +44,65 @@
                     </div>
                     <div class="box box-info">
                         <div class="box-body text-secondary">
-                            <div class="custom-control custom-radio mb-4">
-                                <input type="radio" class="custom-control-input" id="payRadio1" name="payment_radio"
-                                       checked="checked" required value="PAY_798447359">
-                                <label class="custom-control-label" for="payRadio1">
-                                    <img src="<?= asset_url('fe/images/bank-mellat.png'); ?>" alt=""
-                                         class="img-40px-40px">
-                                    درگاه بانک ملت
-                                </label>
-                            </div>
-                            <div class="custom-control custom-radio mb-4">
-                                <input type="radio" class="custom-control-input" id="payRadio2" name="payment_radio"
-                                       required value="PAY_342515312">
-                                <label class="custom-control-label" for="payRadio2">
-                                    <img src="<?= asset_url('fe/images/bank-saderat.png'); ?>" alt=""
-                                         class="img-40px-40px">
-                                    درگاه بانک صادرات
-                                </label>
-                            </div>
-                            <div class="custom-control custom-radio mb-4">
-                                <input type="radio" class="custom-control-input" id="payRadio3" name="payment_radio"
-                                       required value="<?= PAYMENT_METHOD_WALLET; ?>">
-                                <label class="custom-control-label" for="payRadio3">
-                                    <img src="<?= asset_url('fe/images/wallet.png'); ?>" alt="" class="img-40px-40px">
-                                    پرداخت از کیف پول
-                                </label>
-                            </div>
-                            <div class="custom-control custom-radio mb-4">
-                                <input type="radio" class="custom-control-input" id="payRadio4" name="payment_radio"
-                                       required value="<?= PAYMENT_METHOD_RECEIPT; ?>">
-                                <label class="custom-control-label" for="payRadio4">
-                                    <img src="<?= asset_url('fe/images/receipt.png'); ?>" alt="" class="img-40px-40px">
-                                    پرداخت از طریق فیش بانکی
-                                </label>
-                            </div>
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="payRadio5" name="payment_radio"
-                                       required value="<?= PAYMENT_METHOD_IN_PLACE; ?>">
-                                <label class="custom-control-label" for="payRadio5">
-                                    <img src="<?= asset_url('fe/images/marker.png'); ?>" alt="" class="img-40px-40px">
-                                    پرداخت درب منزل
-                                </label>
-                            </div>
+                            <?php if ($setting['payment']['bank_1']['enable']): ?>
+                                <div class="custom-control custom-radio mb-4">
+                                    <input type="radio" class="custom-control-input" id="payRadio1" name="payment_radio"
+                                           checked="checked" required value="PAY_798447359">
+                                    <label class="custom-control-label" for="payRadio1">
+                                        <img src="<?= base_url($setting['payment']['bank_1']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['bank_1']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($setting['payment']['bank_2']['enable']): ?>
+                                <div class="custom-control custom-radio mb-4">
+                                    <input type="radio" class="custom-control-input" id="payRadio2" name="payment_radio"
+                                           required value="PAY_342515312">
+                                    <label class="custom-control-label" for="payRadio2">
+                                        <img src="<?= base_url($setting['payment']['bank_2']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['bank_2']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($setting['payment']['wallet']['enable']): ?>
+                                <div class="custom-control custom-radio mb-4">
+                                    <input type="radio" class="custom-control-input" id="payRadio3" name="payment_radio"
+                                           required value="<?= PAYMENT_METHOD_WALLET; ?>">
+                                    <label class="custom-control-label" for="payRadio3">
+                                        <img src="<?= base_url($setting['payment']['wallet']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['wallet']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($setting['payment']['receipt']['enable']): ?>
+                                <div class="custom-control custom-radio mb-4">
+                                    <input type="radio" class="custom-control-input" id="payRadio4" name="payment_radio"
+                                           required value="<?= PAYMENT_METHOD_RECEIPT; ?>">
+                                    <label class="custom-control-label" for="payRadio4">
+                                        <img src="<?= base_url($setting['payment']['receipt']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['receipt']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($setting['payment']['in_place']['enable']): ?>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" id="payRadio5" name="payment_radio"
+                                           required value="<?= PAYMENT_METHOD_IN_PLACE; ?>">
+                                    <label class="custom-control-label" for="payRadio5">
+                                        <img src="<?= base_url($setting['payment']['in_place']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['in_place']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

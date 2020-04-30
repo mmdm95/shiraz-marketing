@@ -20,8 +20,8 @@
                 <div class="page-header-content border-bottom border-bottom-success">
                     <div class="page-title">
                         <h5>
-                            <i class="icon-circle position-left"></i> <span
-                                    class="text-semibold">مدیریت سفارشات</span>
+                            <i class="icon-circle position-left"></i>
+                            <span class="text-semibold">مدیریت سفارشات</span>
                         </h5>
                     </div>
                 </div>
@@ -104,6 +104,32 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-lg-4">
+                                        <label>وضعیت پرداخت:</label>
+                                        <select class="select"
+                                                name="payment_status">
+                                            <option value="-100">انتخاب کنید</option>
+                                            <?php foreach (OWN_PAYMENT_STATUSES as $key => $status): ?>
+                                                <option value="<?= $key; ?>"
+                                                    <?= ($filters['payment_status'] ?? -100) == $key ? 'selected' : ''; ?>>
+                                                    <?= $status; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>نحوه پرداخت:</label>
+                                        <select class="select"
+                                                name="payment_method">
+                                            <option value="-100">انتخاب کنید</option>
+                                            <?php foreach (PAYMENT_METHODS as $key => $method): ?>
+                                                <option value="<?= $key; ?>"
+                                                    <?= ($filters['payment_method'] ?? -100) == $key ? 'selected' : ''; ?>>
+                                                    <?= $method; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
                                         <label>استان:</label>
                                         <input name="province" type="text"
                                                class="form-control"
@@ -177,11 +203,7 @@
                                                     <?= $order['order_code']; ?>
                                                 </td>
                                                 <td>
-                                                    <?php if (!empty($order['first_name']) || !empty($order['last_name'])): ?>
-                                                        <?= $order['first_name'] . ' ' . $order['last_name']; ?>
-                                                    <?php else: ?>
-                                                        <?= $order['mobile']; ?>
-                                                    <?php endif; ?>
+                                                    <?= $order['mobile']; ?>
                                                 </td>
                                                 <td>
                                                     <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>

@@ -37,11 +37,16 @@
                 <div class="section-title-icon"></div>
                 <h1 class="section-title">
                     <?= $orderText; ?>
-                    <?= !empty($specialParam) ? 'ویژه' : ''; ?>
+                    <?= !empty($specialParam) ? 'ویژه‌ها' : ''; ?>
+                    -
+                    <small>
+                        <?= convertNumbersToPersian($pagination['total']); ?>
+                        مورد
+                    </small>
                 </h1>
             </div>
             <div class="d-sm-flex d-block align-items-center mb-4 justify-content-end">
-                <div class="d-sm-flex d-inline-block align-items-center ml-sm-4 ml-0 mb-3">
+                <div class="d-sm-flex d-block align-items-center ml-sm-4 ml-0 mb-3">
                     <label for="sortBySelect" class="text-nowrap ml-3 mb-0">
                         مرتب سازی:
                     </label>
@@ -138,11 +143,15 @@
                                                     تومان
                                                 <?php endif; ?>
                                             </span>
+                                            <!-- This div is not empty. have half space in it -->
+                                            <div class="card-price">‌</div>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <div class="unavailable">
                                             ناموجود
                                         </div>
+                                        <!-- This div is not empty. have half space in it -->
+                                        <div class="card-price">‌</div>
                                     <?php endif; ?>
                                 </div>
                             </div>

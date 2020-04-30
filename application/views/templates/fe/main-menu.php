@@ -3,7 +3,7 @@
 <header class="header-main">
     <div class="header-top-shadow"></div>
     <div class="container">
-        <div class="row">
+        <div class="row justify-content-between">
             <button type="button" id="menuBtn" class="menu-icon menu-btn btn">
                 <i class="la la-bars" aria-hidden="true"></i>
             </button>
@@ -26,9 +26,6 @@
                         </span>
                         <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
                     </div>
-                    <button class="menu-icon search-form-close btn" id="closeMobileSearchForm" type="button">
-                        <i class="la la-times"></i>
-                    </button>
                 </form>
             </div>
             <div class="extra-container">
@@ -51,9 +48,6 @@
                     <?php endif; ?>
                 </div>
                 <div class="basket-container">
-                    <div class="menu-icon mobile-search-icon" id="mobileSearchIcon">
-                        <i class="la la-search" id="cart"></i>
-                    </div>
                     <div class="menu-icon basket-icon dropdown-toggle" id="shoppingCart" data-toggle="dropdown"
                          aria-haspopup="true" aria-expanded="false" data-target="basketDropdown">
                         <i class="la la-shopping-cart" id="cart"></i>
@@ -68,3 +62,22 @@
         </div>
     </div>
 </header>
+
+<div class="nav-main d-block d-lg-none">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="search-container-extra">
+                    <form class="search-form" method="get" action="<?= base_url('product/all'); ?>">
+                        <div class="search-input">
+                            <span class="search-icon">
+                                <i class="la la-search float-right" aria-hidden="true"></i>
+                            </span>
+                            <input type="text" name="q" placeholder="جستجو محصول و خدمات" class="form-control rtl">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

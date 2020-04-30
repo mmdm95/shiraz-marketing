@@ -15,7 +15,7 @@
                              alt="">
                     </a>
                     <div class="media-body">
-                        <a href="<?= base_url() . 'admin/editUser/' . @$identity->id; ?>"
+                        <a href="<?= base_url() . 'admin/user/editUser/' . @$identity->id; ?>"
                            class="media-heading text-semibold">
                             <?= set_value($identity->first_name ?? '', '', null, $identity->mobile); ?>
                         </a>
@@ -84,7 +84,12 @@
                     <li>
                         <a href="<?= base_url(); ?>admin/user/userUpgrade">
                             <i class="icon-user-check"></i>
-                            <span>درخواست ارتقاء کاربران به بازاریاب</span>
+                            <span>
+                                درخواست ارتقاء کاربران به بازاریاب
+                                <?php if ($count__promote_request ?? 0 != 0): ?>
+                                    <span class="label label-rounded bg-danger"><?= convertNumbersToPersian($count__promote_request); ?></span>
+                                <?php endif; ?>
+                            </span>
                         </a>
                     </li>
                     <li class="navigation-header"><span>نوشته‌ها</span> <i class="icon-menu"></i></li>
@@ -255,7 +260,12 @@
                     <li>
                         <a href="<?= base_url(); ?>admin/shop/manageReturnOrders">
                             <i class="icon-cancel-circle2"></i>
-                            <span>درخواست‌های مرجوع سفارش</span>
+                            <span>
+                                درخواست‌های مرجوع سفارش
+                                <?php if ($count__return_order ?? 0 != 0): ?>
+                                    <span class="label label-rounded bg-danger"><?= convertNumbersToPersian($count__return_order); ?></span>
+                                <?php endif; ?>
+                            </span>
                         </a>
                     </li>
                     <!-- /main -->
@@ -325,16 +335,25 @@
                     <li>
                         <a href="<?= base_url(); ?>admin/manageContactUs">
                             <i class="icon-envelop"></i>
-                            <span>تماس با ما</span>
+                            <span>
+                                تماس با ما
+                                <?php if ($count__contact ?? 0 != 0): ?>
+                                    <span class="label label-rounded bg-danger"><?= convertNumbersToPersian($count__contact); ?></span>
+                                <?php endif; ?>
+                            </span>
                         </a>
                     </li>
                     <li>
                         <a href="<?= base_url(); ?>admin/manageComplaints">
                             <i class="icon-balance"></i>
-                            <span>شکایات</span>
+                            <span>
+                                شکایات
+                                <?php if ($count__complaint ?? 0 != 0): ?>
+                                    <span class="label label-rounded bg-danger"><?= convertNumbersToPersian($count__complaint); ?></span>
+                                <?php endif; ?>
+                            </span>
                         </a>
                     </li>
-
                     <li>
                         <a href="<?= base_url(); ?>admin/fileUpload">
                             <i class="icon-stack"></i>
@@ -343,14 +362,22 @@
                             </span>
                         </a>
                     </li>
-                        <li>
-                            <a href="<?= base_url(); ?>admin/setting">
-                                <i class="icon-cogs"></i>
-                                <span>
-                                    تنظیمات سایت
-                                </span>
-                            </a>
-                        </li>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/setting">
+                            <i class="icon-cogs"></i>
+                            <span>
+                                تنظیمات سایت
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= base_url(); ?>admin/guide">
+                            <i class="icon-help"></i>
+                            <span>
+                                راهنمای اندازه تصاویر
+                            </span>
+                        </a>
+                    </li>
                     <li>
                         <a href="<?= base_url(); ?>admin/logout">
                             <i class="icon-switch2"></i>

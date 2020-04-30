@@ -9,7 +9,7 @@ $pageAfter = $pageAfter ?? 4;
 <?php if ($total && ($lastPage - $firstPage) != 0): ?>
     <nav aria-label="صفحه‌بندی آیتم‌ها">
         <ul class="pagination flex-row-reverse justify-content-center">
-            <li class="page-item <?= $firstPage != $pageNo ? 'disabled' : ''; ?>">
+            <li class="page-item <?= $firstPage == $pageNo ? 'disabled' : ''; ?>">
                 <a class="page-link" <?= $firstPage != $pageNo ? 'href="' . $href . '/page/' . $firstPage . '"' : ''; ?> >
                     <i class="la la-angle-double-left" aria-hidden="true"></i>
                 </a>
@@ -17,8 +17,8 @@ $pageAfter = $pageAfter ?? 4;
 
             <?php if (($pageNo - $pageBefore) > $firstPage): ?>
                 <li class="page-item disabled">
-                    <a>
-                        ...
+                    <a class="page-link">
+                        <i class="la la-ellipsis-h" aria-label="true"></i>
                     </a>
                 </li>
             <?php endif; ?>
@@ -39,13 +39,13 @@ $pageAfter = $pageAfter ?? 4;
             <?php endfor; ?>
             <?php if (($pageNo + $pageAfter) < $lastPage): ?>
                 <li class="page-item disabled">
-                    <a>
-                        ...
+                    <a class="page-link">
+                        <i class="la la-ellipsis-h" aria-label="true"></i>
                     </a>
                 </li>
             <?php endif; ?>
 
-            <li class="page-item <?= $lastPage != $pageNo ? 'disabled' : ''; ?>">
+            <li class="page-item <?= $lastPage == $pageNo ? 'disabled' : ''; ?>">
                 <a class="page-link" <?= $lastPage != $pageNo ? 'href="' . $href . '/page/' . $lastPage . '"' : ''; ?> >
                     <i class="la la-angle-double-right" aria-hidden="true"></i>
                 </a>

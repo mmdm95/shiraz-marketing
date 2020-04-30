@@ -61,6 +61,7 @@ class ProductController extends AbstractController
         $this->_view_count(self::TBL_PRODUCT, $param[0]);
         //-----
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'جزئیات محصول', @$this->data['product']['title']);
+        $this->data['extraKeywords'] = explode(',', $this->data['product']['keywords']);
 
         $this->_render_page([
             'pages/fe/product-detail',

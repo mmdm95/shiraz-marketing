@@ -110,6 +110,13 @@
                                                        data-alt-field="#altDateField" data-time="true"
                                                        value="<?= date('Y/m/d H:i', $coValues['expire'] ?? (int)($coTrueValues['expire_time'] ?? time())); ?>">
                                             </div>
+                                            <div class="form-group col-lg-4">
+                                                <span class="text-danger">*</span>
+                                                <label>تعداد استفاده از کوپن(عدد):</label>
+                                                <input name="use_count" type="text" class="form-control"
+                                                       placeholder=""
+                                                       value="<?= $coValues['use_count'] ?? $coTrueValues['use_count'] ?? ''; ?>">
+                                            </div>
                                             <div class="form-group col-lg-12 text-right">
                                                 <label for="coStatus">وضعیت فعالسازی:</label>
                                                 <input type="checkbox" name="publish" id="coStatus"

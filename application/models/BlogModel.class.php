@@ -176,7 +176,6 @@ class BlogModel extends HModel
         if (!empty($bindParams) && is_array($bindParams)) {
             $select->bindValues($bindParams);
         }
-        $select->groupBy(['b.id']);
 
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         if (count($res)) return $res[0]['count'];

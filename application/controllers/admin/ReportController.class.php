@@ -17,7 +17,7 @@ include_once 'AbstractController.class.php';
 
 class ReportController extends AbstractController
 {
-    public function orderReportAction()
+    public function orderReportAction($param)
     {
         $model = new Model();
         $userModel = new UserModel();
@@ -26,6 +26,13 @@ class ReportController extends AbstractController
         $this->data['_where'] = '';
         $this->data['_params'] = [];
 
+        if (isset($param[0]) && $param[0] == 'send_status') {
+            if (isset($param[1]) && is_numeric($param[1])) {
+                $this->data['_where'] .= 'send_status=:ss';
+                $this->data['_params']['ss'] = $param[1];
+            }
+        }
+
         $this->data['users'] = $userModel->getUsers();
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, ['id', 'name'],
             null, [], null, ['priority ASC']);
@@ -33,7 +40,7 @@ class ReportController extends AbstractController
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('exportFilterOrders');
-        $form->setFieldsName(['user', 'from_date', 'to_date', 'send_status', 'province', 'city'])
+        $form->setFieldsName(['user', 'from_date', 'to_date', 'send_status', 'payment_status', 'payment_method', 'province', 'city'])
             ->setMethod('post')
             ->clearVariablesOnSuccess(false);
         try {
@@ -59,6 +66,16 @@ class ReportController extends AbstractController
                 if ($values['send_status'] != -1) {
                     $where .= 'send_status=:ss AND ';
                     $params['ss'] = $values['send_status'];
+                }
+                // payment status
+                if ($values['payment_status'] != -100) {
+                    $where .= 'payment_status=:ps AND ';
+                    $params['ps'] = $values['payment_status'];
+                }
+                // payment method
+                if ($values['payment_method'] != -100) {
+                    $where .= 'payment_method=:pm AND ';
+                    $params['pm'] = $values['payment_method'];
                 }
                 // province and city
                 if (!empty($values['province'])) {

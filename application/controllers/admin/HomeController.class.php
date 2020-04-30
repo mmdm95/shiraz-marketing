@@ -43,9 +43,9 @@ class HomeController extends AbstractController
         $this->data['serviceCount'] = $model->it_count(self::TBL_PRODUCT, 'product_type=:pt', ['pt' => PRODUCT_TYPE_SERVICE]);
         //-----
         $this->data['status'] = $model->select_it(null, self::TBL_SEND_STATUS, [
-            'name', 'badge', 'priority'
+            'id', 'name', 'badge', 'priority'
         ], null, [], null, ['priority DESC']);
-        $this->data['status'] = array_group_by('priority', $this->data['status'], ['name', 'badge']);
+        $this->data['status'] = array_group_by('priority', $this->data['status'], ['id', 'name', 'badge']);
         //-----
         $this->data['orderCount'] = $orderModel->getOrdersCount();
         $this->data['todayOrderCount'] = $orderModel->getOrdersCount('order_date>:od', ['od' => strtotime('today')]);
@@ -902,6 +902,78 @@ class HomeController extends AbstractController
             }
         }
 
+        // Payment panel setting form submit
+        $form = new Form();
+        $this->data['errors_payment'] = [];
+        $this->data['form_token_payment'] = $form->csrfToken('settingPayment');
+        $form->setFieldsName([
+            'bankImg1', 'bankText1', 'bankEnable1',
+            'bankImg2', 'bankText2', 'bankEnable2',
+            'walletImg', 'walletText', 'walletEnable',
+            'receiptImg', 'receiptText', 'receiptEnable',
+            'inPlaceImg', 'inPlaceText', 'inPlaceEnable',
+        ])->setDefaults('bankEnable1', 0)
+            ->setDefaults('bankEnable2', 0)
+            ->setDefaults('walletEnable', 0)
+            ->setDefaults('receiptEnable', 0)
+            ->setDefaults('inPlaceEnable', 0)
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function (&$values) use ($form) {
+                $form->isRequired(['bankText1', 'bankText2', 'walletText', 'receiptText', 'inPlaceText'], 'تمام متون اجباری می‌باشند.');
+                if ($values['bankImg1'] != '' && !file_exists($values['bankImg1'])) {
+                    $values['bankImg1'] = '';
+                }
+                if ($values['bankImg2'] != '' && !file_exists($values['bankImg2'])) {
+                    $values['bankImg2'] = '';
+                }
+                if ($values['walletImg'] != '' && !file_exists($values['walletImg'])) {
+                    $values['walletImg'] = '';
+                }
+                if ($values['receiptImg'] != '' && !file_exists($values['receiptImg'])) {
+                    $values['receiptImg'] = '';
+                }
+                if ($values['inPlaceImg'] != '' && !file_exists($values['inPlaceImg'])) {
+                    $values['inPlaceImg'] = '';
+                }
+            })->afterCheckCallback(function ($values) use ($form) {
+                $this->data['setting']['payment']['bank_1']['text'] = $values['bankText1'];
+                $this->data['setting']['payment']['bank_1']['image'] = $values['bankImg1'];
+                $this->data['setting']['payment']['bank_1']['enable'] = $form->isChecked('bankEnable1') ? 1 : 0;
+                $this->data['setting']['payment']['bank_2']['text'] = $values['bankText2'];
+                $this->data['setting']['payment']['bank_2']['image'] = $values['bankImg2'];
+                $this->data['setting']['payment']['bank_2']['enable'] = $form->isChecked('bankEnable2') ? 1 : 0;
+                $this->data['setting']['payment']['wallet']['text'] = $values['walletText'];
+                $this->data['setting']['payment']['wallet']['image'] = $values['walletImg'];
+                $this->data['setting']['payment']['wallet']['enable'] = $form->isChecked('walletEnable') ? 1 : 0;
+                $this->data['setting']['payment']['receipt']['text'] = $values['receiptText'];
+                $this->data['setting']['payment']['receipt']['image'] = $values['receiptImg'];
+                $this->data['setting']['payment']['receipt']['enable'] = $form->isChecked('receiptEnable') ? 1 : 0;
+                $this->data['setting']['payment']['in_place']['text'] = $values['inPlaceText'];
+                $this->data['setting']['payment']['in_place']['image'] = $values['inPlaceImg'];
+                $this->data['setting']['payment']['in_place']['enable'] = $form->isChecked('inPlaceEnable') ? 1 : 0;
+
+                $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
+                $res = write_json(CORE_PATH . 'config.json', $this->setting);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success_payment'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors_payment'] = $form->getError();
+                $this->data['values_payment'] = $form->getValues();
+            }
+        }
+
         // Contact panel setting form submit
         $form = new Form();
         $this->data['errors_contact'] = [];
@@ -1004,8 +1076,8 @@ class HomeController extends AbstractController
                 $bep = (int)$values['blogEachPage'];
                 $bep = $bep >= 0 || $bep <= 96 ? $bep : 0;
                 //-----
-                $this->data['setting']['product']['itemsEachPage'] = $pep;
-                $this->data['setting']['blog']['itemsEachPage'] = $bep;
+                $this->data['setting']['pages']['product']['itemsEachPage'] = $pep;
+                $this->data['setting']['pages']['blog']['itemsEachPage'] = $bep;
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);
@@ -1054,6 +1126,18 @@ class HomeController extends AbstractController
 //            'templates/be/browser-tiny-func',
             'pages/be/setting',
             'templates/be/efm'
+        ]);
+    }
+
+    //-----
+
+    public function guideAction()
+    {
+        // Extra header information
+        $this->data['title'] = titleMaker(' - ', set_value($this->setting['main']['title'] ?? ''), 'پنل مدیریت', 'راهنمای اندازه تصاویر');
+
+        $this->_render_page([
+            'pages/be/guide',
         ]);
     }
 

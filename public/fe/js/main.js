@@ -268,9 +268,7 @@
                 _this.hasInternetConnection = is_connect;
             }
         };
-        _this.log = function (context, ...parameters) {
-            console.log(context, parameters);
-        };
+        _this.log = console.log;
 
         //------------------------------
         //----------- Events -----------
@@ -555,15 +553,6 @@
         $('#offCanvasMenu').offcanvas({
             modifiers: "right,overlay",
             triggerButton: '#menuBtn',
-        });
-
-        // Show/Hide mobile search aria
-        var searchForm = $('#mobileSearchForm');
-        $('#mobileSearchIcon').on('click.' + namespc, function () {
-            searchForm.addClass('d-flex show in');
-        });
-        $('#closeMobileSearchForm').on('click.' + namespc, function () {
-            searchForm.removeClass('d-flex show in');
         });
 
         // Clear text from form-control

@@ -9,7 +9,7 @@
         var
             theForm,
             //-----
-            get_token_url;
+            get_token_url_beh_pardakht;
 
         var
             namespace = 'shoppingActions',
@@ -18,46 +18,51 @@
             //-----
             ajax_obj = {};
 
-        get_token_url = baseUrl + '_mabna_connection';
+        get_token_url_beh_pardakht = baseUrl + '_beh_pardakht_connection';
 
         //------------------------------
         //---------- Functions ---------
         //------------------------------
         function formSubmission() {
-            var $this, terminal_field, token_field;
+            var $this, refId_field;
             var code;
             theForm.submit(function () {
+                var canSubmit = false;
                 $this = $(this);
                 code = $("input[name='payment_radio']:checked").val();
                 //-----
-                if ($.trim(code) !== '' && code == 'PAY_342515312') {
-                    shop.ajaxRequest({
-                        url: get_token_url,
-                        method: 'POST',
-                        data: {
-                            paymentCode: code,
-                        }
-                    }, function (response) {
-                        // console.log(response);
-                        // console.log(JSON.parse(response));
-
-                        var res = JSON.parse(response);
-
-                        shop.processAjaxData(res, function (content) {
-                            if (res.success) {
-                                $this.attr('action', content[0] /* url */).attr('method', 'post');
-                                terminal_field = _hiddenField('terminalID', content[1] /* terminal */);
-                                token_field = _hiddenField('token', content[2] /* token */);
-                                $this.prepend(terminal_field);
-                                $this.prepend(token_field);
-                            } else {
-                                return false;
+                if ($.trim(code) !== '') {
+                    if (code == 'PAY_342515312') {
+                        shop.ajaxRequest({
+                            url: get_token_url_beh_pardakht,
+                            method: 'POST',
+                            data: {
+                                paymentCode: code,
                             }
+                        }, function (response) {
+                            // console.log(response);
+                            // console.log(JSON.parse(response));
+
+                            var res = JSON.parse(response);
+
+                            shop.processAjaxData(res, function (content) {
+                                if (res.success) {
+                                    $this.attr('action', content[0] /* url */).attr('method', 'post');
+                                    refId_field = _hiddenField('RefId', content[1] /* Reference ID */);
+                                    $this.prepend(refId_field);
+                                    //-----
+                                    canSubmit = true;
+                                } else {
+                                    canSubmit = false;
+                                }
+                            });
                         });
-                    });
+                    }
+                } else {
+                    canSubmit = true;
                 }
                 //-----
-                return true;
+                return canSubmit;
             });
         }
 
@@ -76,4 +81,32 @@
         //------------------------------
         functionsCaller();
     });
+
+    // ----- Mabna connection request -----
+    // shop.ajaxRequest({
+    //     url: get_token_url_beh_pardakht,
+    //     method: 'POST',
+    //     data: {
+    //         paymentCode: code,
+    //     }
+    // }, function (response) {
+    //     // console.log(response);
+    //     // console.log(JSON.parse(response));
+    //
+    //     var res = JSON.parse(response);
+    //
+    //     shop.processAjaxData(res, function (content) {
+    //         if (res.success) {
+    //             $this.attr('action', content[0] /* url */).attr('method', 'post');
+    //             terminal_field = _hiddenField('terminalID', content[1] /* terminal */);
+    //             token_field = _hiddenField('token', content[2] /* token */);
+    //             $this.prepend(terminal_field);
+    //             $this.prepend(token_field);
+    //             //-----
+    //             canSubmit = true;
+    //         } else {
+    //             canSubmit = false;
+    //         }
+    //     });
+    // });
 })(jQuery);

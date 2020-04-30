@@ -18,11 +18,13 @@ abstract class AbstractPaymentController extends HController
     const PAYMENT_TABLE_MABNA = 'gateway_mabna';
     const PAYMENT_TABLE_IDPAY = 'gateway_idpay';
     const PAYMENT_TABLE_ZARINPAL = 'gateway_zarinpal';
+    const PAYMENT_TABLE_BEH_PARDAKHT = 'gateway_beh_pardakht';
     protected $gatewayTables = [
         self::PAYMENT_TABLE_IDPAY => [
             'PAY_798447359',
         ],
-        self::PAYMENT_TABLE_MABNA => [
+        self::PAYMENT_TABLE_MABNA => [],
+        self::PAYMENT_TABLE_BEH_PARDAKHT => [
             'PAY_342515312',
         ],
         self::PAYMENT_TABLE_ZARINPAL => [],
@@ -34,6 +36,7 @@ abstract class AbstractPaymentController extends HController
     //-----
     const PAYMENT_RESULT_PARAM_IDPAY = 'idpay';
     const PAYMENT_RESULT_PARAM_MABNA = 'mabna';
+    const PAYMENT_RESULT_PARAM_BEH_PARDAKHT = 'beh_pardakht';
     const PAYMENT_RESULT_PARAM_ZARINPAL = 'zarinpal';
     const PAYMENT_RESULT_PARAM_WALLET = 'wallet';
     const PAYMENT_RESULT_PARAM_IN_PLACE = 'in_place';
@@ -41,6 +44,7 @@ abstract class AbstractPaymentController extends HController
     protected $paymentResultParam = [
         self::PAYMENT_RESULT_PARAM_IDPAY => [\Home\AbstractController\AbstractController::class, '_idpay_result'],
         self::PAYMENT_RESULT_PARAM_MABNA => [\Home\AbstractController\AbstractController::class, '_mabna_result'],
+        self::PAYMENT_RESULT_PARAM_BEH_PARDAKHT => [\Home\AbstractController\AbstractController::class, '_beh_pardakht_result'],
         self::PAYMENT_RESULT_PARAM_ZARINPAL => [\Home\AbstractController\AbstractController::class, '_zarinpal_result'],
         self::PAYMENT_RESULT_PARAM_WALLET => [\Home\AbstractController\AbstractController::class, '_wallet_result'],
         self::PAYMENT_RESULT_PARAM_IN_PLACE => [\Home\AbstractController\AbstractController::class, '_in_place_result'],
@@ -49,6 +53,7 @@ abstract class AbstractPaymentController extends HController
     protected $paymentParamTable = [
         self::PAYMENT_RESULT_PARAM_IDPAY => self::PAYMENT_TABLE_IDPAY,
         self::PAYMENT_RESULT_PARAM_MABNA => self::PAYMENT_TABLE_MABNA,
+        self::PAYMENT_RESULT_PARAM_BEH_PARDAKHT => self::PAYMENT_TABLE_BEH_PARDAKHT,
         self::PAYMENT_RESULT_PARAM_ZARINPAL => self::PAYMENT_TABLE_ZARINPAL,
     ];
     protected $gatewaySuccessCode;
@@ -92,6 +97,7 @@ abstract class AbstractPaymentController extends HController
         $this->gatewaySuccessCode = [
             self::PAYMENT_TABLE_IDPAY => Payment::PAYMENT_STATUS_OK_IDPAY,
             self::PAYMENT_TABLE_MABNA => Payment::PAYMENT_STATUS_OK_MABNA,
+            self::PAYMENT_TABLE_BEH_PARDAKHT => Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT,
             self::PAYMENT_TABLE_ZARINPAL => Payment::PAYMENT_STATUS_OK_ZARINPAL,
         ];
     }

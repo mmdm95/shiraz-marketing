@@ -543,7 +543,10 @@ class UserController extends AbstractController
                 $form->validate('numeric', 'price', 'قیمت افزایش حساب باید از نوع عدد باشد.')
                     ->isInRange('price', 1000, PHP_INT_MAX, 'قیمت باید عددی بیشتر از ۱۰۰۰ تومان باشد.');
             })->afterCheckCallback(function ($values) use ($model, $form) {
-                $this->_chargeAccountProcess((int)$values['price']);
+                $res = $this->_chargeAccountProcess((int)$values['price']);
+                if (!$res) {
+                    $form->setError('خطا در ارتباط با درگاه بانک! لطفا دوباره سعی کنید.');
+                }
             });
         } catch (Exception $e) {
             die($e->getMessage());
@@ -565,11 +568,23 @@ class UserController extends AbstractController
         $this->data['user']['balance'] = count($this->data['user']['balance']) ? $this->data['user']['balance'][0]['account_balance'] : 0;
         // Calculate account income
         $idPaySum = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $this->data['identity']->id, 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $this->data['identity']->id,
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => \HPayment\PaymentClasses\PaymentIDPay::PAYMENT_STATUS_OK_IDPAY,
+            ])[0]['sum'];
         $mabnaSum = $model->select_it(null, self::PAYMENT_TABLE_MABNA, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $this->data['identity']->id, 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $this->data['identity']->id,
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => \HPayment\PaymentClasses\PaymentMabna::PAYMENT_STATUS_OK_MABNA,
+            ])[0]['sum'];
         $zarinpalSum = $model->select_it(null, self::PAYMENT_TABLE_ZARINPAL, ['SUM(price) AS sum'],
-            'user_id=:uId AND exportation_type=:et', ['uId' => $this->data['identity']->id, 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT])[0]['sum'];
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $this->data['identity']->id,
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => PaymentZarinPal::PAYMENT_STATUS_OK_ZARINPAL,
+            ])[0]['sum'];
         $this->data['user']['total_income'] = $idPaySum + $mabnaSum + $zarinpalSum;
         // Calculate account outcome
         $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],
@@ -596,7 +611,7 @@ class UserController extends AbstractController
 
         try {
             $model = new Model();
-            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY);
+            $idpay = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_IDPAY, '2b4846e8-5fc3-4ef9-b7e8-905ccbb8c46f');
             $postVars = $idpay->handle_request()->get_result();
 
             // Check for factor first and If factor exists
@@ -606,96 +621,101 @@ class UserController extends AbstractController
                 $this->data['order_code'] = $postVars['order_id'];
                 // Select order payment according to gateway id result
                 $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, [
-                    'payment_id', 'status'
+                    'payment_id', 'status', 'price',
                 ], 'order_code=:oc AND payment_id=:pId', ['oc' => $postVars['order_id'], 'pId' => $postVars['id']]);
                 // If there is a record in gateway table(only one record is acceptable)
                 if (count($orderPayment) == 1) {
                     // Select order payment
                     $orderPayment = $orderPayment[0];
-                    // Check for returned amount
-                    if ((intval($orderPayment['price']) * 10) == $postVars['amount']) {
-                        // If all are ok send advice to bank gateway
-                        // This means ready to transfer money to our bank account
-                        $advice = $idpay->send_advice([
-                            'id' => $postVars['id'],
-                            'order_id' => $postVars['order_id']
-                        ]);
+                    // Check if factor was advice before
+                    if (!in_array($orderPayment['status'], [Payment::PAYMENT_STATUS_OK_IDPAY, Payment::PAYMENT_STATUS_DUPLICATE_IDPAY]) &&
+                        $postVars['status'] == Payment::PAYMENT_STATUS_WAIT_IDPAY) {
+                        // Check for returned amount
+                        if ((intval($orderPayment['price']) * 10) == $postVars['amount']) {
+                            // If all are ok send advice to bank gateway
+                            // This means ready to transfer money to our bank account
+                            $advice = $idpay->send_advice([
+                                'id' => $postVars['id'],
+                                'order_id' => $postVars['order_id']
+                            ])->get_result();
 
-                        // Check for error
-                        if (!isset($advice['error_code'])) {
-                            $status = $advice['status'];
+                            // Check for error
+                            if (!isset($advice['error_code'])) {
+                                $status = $advice['status'];
 
-                            // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
-                            if ($status == Payment::PAYMENT_STATUS_OK_IDPAY) {
-                                $model->transactionBegin();
-                                // Store extra info from bank's gateway result
-                                $res1 = $model->update_it(self::PAYMENT_TABLE_IDPAY, [
-                                    'payment_code' => $advice['payment']['track_id'],
-                                    'status' => $status,
-                                ], 'order_code=:oc', ['oc' => $this->data['order_code']]);
-                                $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
-                                    'deposit_code' => $this->data['order_code'],
-                                    'user_id' => $this->data['identity']->id,
-                                    'deposit_price' => $orderPayment['price'],
-                                    'description' => 'شارژ حساب کاربری',
-                                    'deposit_type' => DEPOSIT_TYPE_SELF,
-                                    'deposit_date' => time(),
-                                ]);
-                                $res3 = $model->update_it(self::TBL_USER_ACCOUNT, [],
-                                    'user_id=:uId', ['uId' => $this->data['identity']->id], [
-                                        'account_balance' => 'account_balance+' . (int)$orderPayment['price'],
+                                // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
+                                if ($status == Payment::PAYMENT_STATUS_OK_IDPAY) {
+                                    $model->transactionBegin();
+                                    // Store extra info from bank's gateway result
+                                    $res1 = $model->update_it(self::PAYMENT_TABLE_IDPAY, [
+                                        'payment_code' => $advice['payment']['track_id'],
+                                        'status' => $status,
+                                    ], 'order_code=:oc', ['oc' => $this->data['order_code']]);
+                                    $res2 = $model->insert_it(self::TBL_USER_ACCOUNT_DEPOSIT, [
+                                        'deposit_code' => $this->data['order_code'],
+                                        'user_id' => $this->data['identity']->id,
+                                        'deposit_price' => $orderPayment['price'],
+                                        'description' => 'شارژ حساب کاربری',
+                                        'deposit_type' => DEPOSIT_TYPE_SELF,
+                                        'deposit_date' => time(),
                                     ]);
-                                $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
-                                $traceNumber = $advice['payment']['track_id'];
+                                    $res3 = $model->update_it(self::TBL_USER_ACCOUNT, [],
+                                        'user_id=:uId', ['uId' => $this->data['identity']->id], [
+                                            'account_balance' => 'account_balance+' . (int)$orderPayment['price'],
+                                        ]);
+                                    $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
+                                    $traceNumber = $advice['payment']['track_id'];
 
-                                $this->data['ref_id'] = $traceNumber;
-                                $this->data['have_ref_id'] = true;
+                                    $this->data['ref_id'] = $traceNumber;
+                                    $this->data['have_ref_id'] = true;
 
-                                if ($res1 && $res2 && $res3) {
-                                    $model->transactionComplete();
-                                    // Set success parameters
-                                    $this->data['success'] = $success;
-                                    $this->data['is_success'] = true;
+                                    if ($res1 && $res2 && $res3) {
+                                        $model->transactionComplete();
+                                        // Set success parameters
+                                        $this->data['success'] = $success;
+                                        $this->data['is_success'] = true;
 
-                                    // Send sms to user if is login
-                                    if ($this->auth->isLoggedIn()) {
-                                        // Send SMS code goes here
-                                        $this->load->library('HSMS/rohamSMS');
-                                        $sms = new rohamSMS();
-                                        try {
-                                            $balance = $model->select_it(null, self::TBL_USER_ACCOUNT, 'account_balance',
-                                                'user_id=:uId', ['uId' => $this->data['identity']->id])[0]['account_balance'];
-                                            $body = $this->setting['sms']['chargeAccountBalanceMsg'];
-                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
-                                            $body = str_replace(SMS_REPLACEMENT_CHARS['balance'], convertNumbersToPersian(number_format($balance)), $body);
-                                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
-                                        } catch (SMSException $e) {
-                                            die($e->getMessage());
+                                        // Send sms to user if is login
+                                        if ($this->auth->isLoggedIn()) {
+                                            // Send SMS code goes here
+                                            $this->load->library('HSMS/rohamSMS');
+                                            $sms = new rohamSMS();
+                                            try {
+                                                $balance = $model->select_it(null, self::TBL_USER_ACCOUNT, 'account_balance',
+                                                    'user_id=:uId', ['uId' => $this->data['identity']->id])[0]['account_balance'];
+                                                $body = $this->setting['sms']['chargeAccountBalanceMsg'];
+                                                $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                                $body = str_replace(SMS_REPLACEMENT_CHARS['balance'], convertNumbersToPersian(number_format($balance)), $body);
+                                                $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                            } catch (SMSException $e) {
+                                                die($e->getMessage());
+                                            }
                                         }
+                                    } else {
+                                        $model->transactionRollback();
+                                        $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                        $this->data['is_success'] = false;
                                     }
-                                } else {
-                                    $model->transactionRollback();
-                                    $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
-                                    $this->data['is_success'] = false;
                                 }
+                            } else {
+                                $this->data['error'] = $idpay->get_message($advice['error_code'], Payment::PAYMENT_STATUS_VERIFY_IDPAY);
+                                $this->data['is_success'] = false;
+                                $this->data['have_ref_id'] = false;
                             }
                         } else {
-                            $this->data['error'] = $idpay->get_message($advice['error_code'], Payment::PAYMENT_STATUS_VERIFY_IDPAY);
+                            $this->data['error'] = 'فاکتور نامعتبر است!';
                             $this->data['is_success'] = false;
-                            $this->data['ref_id'] = $postVars['track_id'];
-                            $this->data['have_ref_id'] = true;
+                            $this->data['have_ref_id'] = false;
                         }
                     } else {
-                        $this->data['error'] = 'فاکتور نامعتبر است!';
+                        $this->data['error'] = $idpay->get_message($postVars['status'], Payment::PAYMENT_STATUS_REQUEST_IDPAY);
                         $this->data['is_success'] = false;
-                        $this->data['ref_id'] = $postVars['track_id'];
-                        $this->data['have_ref_id'] = true;
+                        $this->data['have_ref_id'] = false;
                     }
                 } else {
                     $this->data['error'] = 'فاکتور نامعتبر است!';
                     $this->data['is_success'] = false;
-                    $this->data['ref_id'] = $postVars['track_id'];
-                    $this->data['have_ref_id'] = true;
+                    $this->data['have_ref_id'] = false;
                 }
 
                 // Store current result from bank gateway
@@ -738,7 +758,7 @@ class UserController extends AbstractController
 
         // Call one of the [_*_connection] functions
         // Here we call IDPay
-        $res = call_user_func_array($this->gatewayFunctions[self::PAYMENT_TABLE_IDPAY], $parameters);
+        $res = call_user_func_array($this->gatewayFunctions[self::PAYMENT_TABLE_IDPAY], [$parameters]);
         return $res;
     }
 

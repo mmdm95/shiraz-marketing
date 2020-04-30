@@ -1,6 +1,19 @@
 <!-- Main navbar -->
 <?php $this->view("templates/fe/user/mainnavbar", $data); ?>
 <!-- /main navbar -->
+
+<script>
+    (function ($) {
+        'use strict';
+
+        $(function() {
+            setTimeout(function () {
+                window.location.href = baseUrl + "user/userDeposit";
+            }, 5000);
+        });
+    })(jQuery);
+</script>
+
 <!-- Page container -->
 <div class="page-container">
     <!-- Page content -->
@@ -53,6 +66,7 @@
                             <div class="panel-body">
                                 <?php
                                 $alertType = isset($is_success) && $is_success === true ? 'bg-success' : 'bg-danger';
+                                $alertTextType = isset($is_success) && $is_success === true ? 'text-success' : 'text-danger';
                                 ?>
                                 <div class="alert <?= $alertType; ?> alert-styled-left">
                                     <?php if (isset($is_success) && $is_success === true): ?>
@@ -62,12 +76,16 @@
                                         <?php if (isset($have_ref_id) && $have_ref_id === true): ?>
                                             -
                                             شماره پیگیری
-                                            <?= $ref_id ?? ''; ?>
+                                            <?= $ref_id ?: '<i class="icon-minus2" aria-hidden="true"></i>'; ?>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
-                                <p class="h6 text-danger">
-                                    <?= $error ?? ''; ?>
+                                <p class="h6 text-center <?= $alertTextType; ?>">
+                                    <?php if (isset($is_success) && $is_success === true): ?>
+                                        کیف پول شما شارژ شد.
+                                    <?php else: ?>
+                                        <?= $error ?? ''; ?>
+                                    <?php endif; ?>
                                 </p>
                                 <p class="h6 text-center mt-20">
                                     در صورت کسر شدن مبلغ از حساب شما و عدم بازگشت تا ۷۲ ساعت، به بانک خود مراجعه کنید.

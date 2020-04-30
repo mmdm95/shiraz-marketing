@@ -65,7 +65,7 @@
                             <div class="mb-2">
                                 کد رهگیری :
                                 <span class="iransans-bold">
-                                <?= $ref_id; ?>
+                                <?= $ref_id ?: '<i class="la la-minus text-danger" aria-hidden="true"></i>'; ?>
                             </span>
                             </div>
                         <?php endif; ?>

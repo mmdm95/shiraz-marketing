@@ -75,10 +75,9 @@ class PaymentZarinPal extends Payment
     /**
      * PaymentZarinPal constructor.
      * @param string $MerchantID - Set MerchantID here to have it on all pages
-     * Exp. eb361068-16f6-11e8-8e09-000c295eb8fc
      * @param null $soapUrl
      */
-    public function __construct($MerchantID = 'eb361068-16f6-11e8-8e09-000c295eb8fc', $soapUrl = null)
+    public function __construct($MerchantID = '', $soapUrl = null)
     {
         if (is_null($soapUrl)) {
             $this->_parameters[$this->soapStr] = $this->urls[self::PAYMENT_URL_SOAP_ZARINPAL];
