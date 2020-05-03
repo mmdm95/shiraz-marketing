@@ -57,6 +57,8 @@
                                 }
                             });
                         });
+                    } else {
+                        canSubmit = true;
                     }
                 } else {
                     canSubmit = true;

@@ -35,6 +35,11 @@ class UserController extends AbstractController
 
     public function addUserAction()
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $userModel = new UserModel();
 
@@ -171,6 +176,11 @@ class UserController extends AbstractController
 
     public function editUserAction($param)
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE) && (isset($param[0]) && $param[0] != $this->data['identity']->id)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $userModel = new UserModel();
 
@@ -433,6 +443,11 @@ class UserController extends AbstractController
 
     public function manageMarketerAction()
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $userModel = new UserModel();
         $this->data['marketers'] = $userModel->getUsers('r.id=:rId', ['rId' => AUTH_ROLE_MARKETER]);
 
@@ -608,6 +623,11 @@ class UserController extends AbstractController
 
     public function userProfileAction($param)
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ) && (isset($param[0]) && $param[0] != $this->data['identity']->id)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $userModel = new UserModel();
         $orderModel = new OrderModel();
@@ -672,6 +692,11 @@ class UserController extends AbstractController
 
     public function userDepositAction($param)
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ) && (isset($param[0]) && $param[0] != $this->data['identity']->id)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $orderModel = new OrderModel();
 
@@ -781,6 +806,11 @@ class UserController extends AbstractController
 
     public function changePasswordAction($param)
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE) && (isset($param[0]) && $param[0] != $this->data['identity']->id)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_USER, 'id=:id', ['id' => $param[0]])) {
@@ -840,6 +870,11 @@ class UserController extends AbstractController
 
     public function userUpgradeAction()
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $userModel = new UserModel();
         $this->data['requests'] = $userModel->getUsers('r.id=:rId AND flag_marketer_request=:req',
             ['rId' => AUTH_ROLE_USER, 'req' => 1]);
@@ -853,5 +888,124 @@ class UserController extends AbstractController
 
         $this->_render_page('pages/be/User/userUpgrade');
 
+    }
+
+    //-----
+
+    public function addUserRoleAction($param)
+    {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
+        $model = new Model();
+        $userModel = new UserModel();
+
+        if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_USER, 'id=:id', ['id' => $param[0]])) {
+            $this->redirect(base_url('admin/user/manageUser'));
+        }
+
+        $this->data['roles'] = $model->select_it(null, self::TBL_ROLE, '*',
+            'id IN (:id1, :id2)', ['id1' => AUTH_ROLE_WRITER, 'id2' => AUTH_ROLE_PRODUCT_ADMIN]);
+
+        $this->data['param'] = $param;
+
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('addRoleToUser');
+        $form->setFieldsName(['role'])
+            ->setMethod('post');
+        try {
+            $form->beforeCheckCallback(function ($values) use ($model, $form) {
+                if (!in_array($values['role'], array_column($this->data['roles'], 'id'))) {
+                    $form->setError('نقش انتخاب شده نامعتبر است.');
+                    return;
+                }
+                if ($model->is_exist(self::TBL_USER_ROLE, 'user_id=:uId AND role_id=:rId',
+                    ['uId' => $this->data['param'][0], 'rId' => AUTH_ROLE_USER])) {
+                    $form->setError('کاربر دارای این نقش می‌باشد.');
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $res = $model->insert_it(self::TBL_USER_ROLE, [
+                    'user_id' => $this->data['param'][0],
+                    'role_id' => $values['role'],
+                ]);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'نقش مورد نظر به کاربر داده شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+            }
+        }
+
+        $this->data['userRoles'] = $userModel->getUserRoles('ur.user_id=:uId AND r.id!=:rId', ['uId' => $param[0], 'rId' => AUTH_ROLE_SUPER_USER]);
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'افزودن نقش به کاربر');
+
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/addUserRole');
+    }
+
+    public function deleteUserRoleAction()
+    {
+        if (!$this->auth->isLoggedIn() || !is_ajax()) {
+            $this->error->access_denied();
+        }
+
+        try {
+            if (!$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
+                message(self::AJAX_TYPE_ERROR, 403, 'دسترسی غیر مجاز');
+            }
+        } catch (HAException $e) {
+            echo $e;
+        }
+
+        $model = new Model();
+
+        $posted = @$_POST['postedId'];
+        $table = self::TBL_USER;
+        //-----
+        $posted = explode('-', $posted);
+        if (count($posted) != 2) {
+            message(self::AJAX_TYPE_ERROR, 200, 'پارامترهای ورودی نامعتبر است.');
+        }
+        //-----
+        $id = $posted[0];
+        $role = $posted[1];
+        //-----
+        try {
+            if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
+            }
+            if ($this->auth->hasUserRole($role, $id)) {
+                message(self::AJAX_TYPE_ERROR, 200, 'نقش انتخاب شده نامعتبر است.');
+            }
+            //-----
+            $res = $this->auth->removeUserRole($role, $id);;
+            if ($res) {
+                message(self::AJAX_TYPE_SUCCESS, 200, 'نقش کاربر با موفقیت حذف شد.');
+            }
+            //-----
+            message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
+        } catch (Exception $e) {
+            message(self::AJAX_TYPE_ERROR, 200, 'امکان حذف نقش کاربر وجود ندارد.');
+        }
     }
 }

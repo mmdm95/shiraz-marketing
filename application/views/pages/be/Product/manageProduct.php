@@ -67,7 +67,10 @@
                                                     <th>تعداد فروخته شده</th>
                                                     <th>وضعیت نمایش</th>
                                                     <th>وضعیت موجودی</th>
-                                                    <th>ثبت کننده</th>
+                                                    <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
+                                                        in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
+                                                        <th>ثبت کننده</th>
+                                                    <?php endif; ?>
                                                     <th>عملیات</th>
                                                 </tr>
                                                 </thead>
@@ -119,18 +122,21 @@
                                                                    class="switchery productAvailability"
                                                                 <?= set_value($product['available'] ?? '', 1, 'checked', '', '=='); ?> />
                                                         </td>
-                                                        <td>
-                                                            <?php if (!empty($product['username'])): ?>
-                                                                <?php if (!empty($product['user_first_name']) || !empty($product['user_last_name'])): ?>
-                                                                    <?= $product['user_first_name'] . ' ' . $product['user_last_name']; ?>
+                                                        <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
+                                                            in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
+                                                            <td>
+                                                                <?php if (!empty($product['username'])): ?>
+                                                                    <?php if (!empty($product['user_first_name']) || !empty($product['user_last_name'])): ?>
+                                                                        <?= $product['user_first_name'] . ' ' . $product['user_last_name']; ?>
+                                                                    <?php else: ?>
+                                                                        <?= $product['username']; ?>
+                                                                    <?php endif; ?>
                                                                 <?php else: ?>
-                                                                    <?= $product['username']; ?>
+                                                                    <i class="icon-minus2 text-danger"
+                                                                       aria-hidden="true"></i>
                                                                 <?php endif; ?>
-                                                            <?php else: ?>
-                                                                <i class="icon-minus2 text-danger"
-                                                                   aria-hidden="true"></i>
-                                                            <?php endif; ?>
-                                                        </td>
+                                                            </td>
+                                                        <?php endif; ?>
                                                         <td style="width: 115px;" class="text-center">
                                                             <ul class="icons-list">
                                                                 <li class="text-primary-600">

@@ -21,6 +21,11 @@ class ShopController extends AbstractController
 {
     public function manageCategoryAction()
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $categoryModel = new CategoryModel();
         $this->data['catValues'] = $categoryModel->getCategories();
 
@@ -37,6 +42,11 @@ class ShopController extends AbstractController
 
     public function addCategoryAction()
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['icons'] = $model->select_it(null, self::TBL_ICON);
@@ -123,6 +133,11 @@ class ShopController extends AbstractController
 
     public function editCategoryAction($param)
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_CATEGORY, 'id=:id', ['id' => $param[0]])) {
@@ -222,6 +237,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_CREATE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('product', AUTH_ACCESS_CREATE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -246,6 +270,11 @@ class ShopController extends AbstractController
 
     public function manageCouponAction()
     {
+        if (!$this->auth->isAllow('coupon', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['copValues'] = $model->select_it(null, self::TBL_COUPON, '*',
             null, null, null, ['id DESC']);
@@ -262,6 +291,11 @@ class ShopController extends AbstractController
 
     public function addCouponAction()
     {
+        if (!$this->auth->isAllow('coupon', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['errors'] = [];
@@ -348,6 +382,11 @@ class ShopController extends AbstractController
 
     public function editCouponAction($param)
     {
+        if (!$this->auth->isAllow('coupon', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_COUPON, 'id=:id', ['id' => $param[0]])) {
@@ -448,6 +487,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('coupon', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('coupon', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -472,6 +520,11 @@ class ShopController extends AbstractController
 
     public function manageProductAction()
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $productModel = new ProductModel();
         $where = '';
         $params = [];
@@ -498,6 +551,11 @@ class ShopController extends AbstractController
 
     public function addProductAction()
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['categories'] = $model->select_it(null, self::TBL_CATEGORY, ['id', 'name']);
@@ -650,6 +708,11 @@ class ShopController extends AbstractController
 
     public function editProductAction($param)
     {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_PRODUCT, 'id=:id', ['id' => $param[0]])) {
@@ -819,6 +882,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('product', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -854,6 +926,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_UPDATE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('product', AUTH_ACCESS_UPDATE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -884,6 +965,11 @@ class ShopController extends AbstractController
 
     public function manageOrdersAction()
     {
+        if (!$this->auth->isAllow('order', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $userModel = new UserModel();
         $orderModel = new OrderModel();
@@ -985,6 +1071,11 @@ class ShopController extends AbstractController
 
     public function viewOrderAction($param)
     {
+        if (!$this->auth->isAllow('order', AUTH_ACCESS_READ) || !$this->auth->isAllow('order', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $orderModel = new OrderModel();
 
@@ -1180,6 +1271,11 @@ class ShopController extends AbstractController
 
     public function manageReturnOrdersAction()
     {
+        if (!$this->auth->isAllow('return_order', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $orderModel = new OrderModel();
         $this->data['orders'] = $orderModel->getReturnOrders();
 
@@ -1196,6 +1292,11 @@ class ShopController extends AbstractController
 
     public function viewReturnOrderAction($param)
     {
+        if (!$this->auth->isAllow('return_order', AUTH_ACCESS_READ) || !$this->auth->isAllow('return_order', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $orderModel = new OrderModel();
 
@@ -1253,6 +1354,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('return_order', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('return_order', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -1278,6 +1388,15 @@ class ShopController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('return_order', AUTH_ACCESS_UPDATE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('return_order', AUTH_ACCESS_UPDATE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -1303,6 +1422,11 @@ class ShopController extends AbstractController
 
     protected function _export_pdf()
     {
+        if (!$this->auth->isAllow('order', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         // Spreadsheet name
         $name = 'factor-' . $this->data['order']['order_code'];
         // Payment status

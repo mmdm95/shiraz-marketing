@@ -19,6 +19,11 @@ class BlogController extends AbstractController
 {
     public function manageCategoryAction()
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['categories'] = $model->select_it(null, self::TBL_BLOG_CATEGORY, '*',
             null, null, null, ['id DESC']);
@@ -35,6 +40,11 @@ class BlogController extends AbstractController
 
     public function addCategoryAction()
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['errors'] = [];
@@ -98,6 +108,11 @@ class BlogController extends AbstractController
 
     public function editCategoryAction($param)
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_BLOG_CATEGORY, 'id=:id', ['id' => $param[0]])) {
@@ -174,6 +189,15 @@ class BlogController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -199,6 +223,15 @@ class BlogController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -229,6 +262,11 @@ class BlogController extends AbstractController
 
     public function manageBlogAction()
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $blogModel = new BlogModel();
         $this->data['blog'] = $blogModel->getAllBlog();
 
@@ -245,6 +283,11 @@ class BlogController extends AbstractController
 
     public function addBlogAction()
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['categories'] = $model->select_it(null, self::TBL_BLOG_CATEGORY, ['id', 'name']);
@@ -338,6 +381,11 @@ class BlogController extends AbstractController
 
     public function editBlogAction($param)
     {
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_BLOG, 'id=:id', ['id' => $param[0]])) {
@@ -444,6 +492,15 @@ class BlogController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('blog', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('blog', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 

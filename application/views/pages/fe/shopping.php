@@ -209,17 +209,23 @@
                                     با کلیک بر روی حذف کد تخفیف، محاسبه قیمت در مرحله بعد انجام می‌شود.
                                 </p>
                             </div>
-                            <div class="text-left">
-                                <button type="button" class="btn btn-light" id="couponDelete">
-                                    <i class="la la-trash-alt float-right ml-3 font-size-21px"
-                                       aria-hidden="true"></i>
-                                    حذف کد اعمال شده
-                                </button>
-                                <button type="button" class="btn btn-info" id="couponChecker">
-                                    <i class="la la-undo la-rotate-180 float-right ml-3 font-size-21px"
-                                       aria-hidden="true"></i>
-                                    بررسی کد تخفیف
-                                </button>
+                            <div class="text-left d-inline-block d-sm-flex flex-row-reverse w-100">
+                                <div class="mx-2">
+                                    <button type="button" class="btn btn-info my-2 d-block d-sm-inline-block btn-block"
+                                            id="couponChecker">
+                                        <i class="la la-undo la-rotate-180 float-right ml-3 font-size-21px"
+                                           aria-hidden="true"></i>
+                                        بررسی کد تخفیف
+                                    </button>
+                                </div>
+                                <div class="mx-2">
+                                    <button type="button" class="btn btn-light my-2 d-block d-sm-inline-block btn-block"
+                                            id="couponDelete">
+                                        <i class="la la-trash-alt float-right ml-3 font-size-21px"
+                                           aria-hidden="true"></i>
+                                        حذف کد اعمال شده
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

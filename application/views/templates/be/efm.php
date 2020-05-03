@@ -376,6 +376,7 @@
         $('#dirsearch').on('input', function () {
             var filter = $.trim($(this).val());
             if (filter != "") {
+                filter = filter.split(' ').join('-');
                 $('#table').find('td.first > a.name').each(function (i) {
                     if ($(this).text().search(new RegExp(filter, "i")) < 0) {
                         $(this).closest('tr').stop().fadeOut(150);

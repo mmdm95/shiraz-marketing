@@ -736,24 +736,26 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             }
         }
 
-        $role = $this->getDataFromDB($this->authData->tables->user_role, '*',
+        $roles = $this->getDataFromDB($this->authData->tables->user_role, '*',
             "{$this->authData->columns->user_role->user_id->column}=:user", [
                 'user' => $uId
             ]);
-        if (!count($role)) {
+        if (!count($roles)) {
 //            return ['err' => 'نقشی برای این کاربر در نظر گرفته نشده است.'];
             return false;
         }
-        $role = $role[0][$this->authData->columns->user_role->role_id->column];
+        $roles = array_column($roles, $this->authData->columns->user_role->role_id->column);
 
-        $RoPaPe = $this->getDataFromDB($this->authData->tables->role_page_perm, '*',
-            "{$this->authData->columns->role_page_perm->role_id->column}=:rId AND {$this->authData->columns->role_page_perm->page_id->column}=:paId AND {$this->authData->columns->role_page_perm->perm_id->column}=:peId", [
-                'rId' => $role,
-                'paId' => $resId,
-                'peId' => $priId
-            ]);
-        if (count($RoPaPe)) {
-            return true;
+        foreach ($roles as $role) {
+            $RoPaPe = $this->getDataFromDB($this->authData->tables->role_page_perm, '*',
+                "{$this->authData->columns->role_page_perm->role_id->column}=:rId AND {$this->authData->columns->role_page_perm->page_id->column}=:paId AND {$this->authData->columns->role_page_perm->perm_id->column}=:peId", [
+                    'rId' => $role,
+                    'paId' => $resId,
+                    'peId' => $priId
+                ]);
+            if (count($RoPaPe)) {
+                return true;
+            }
         }
         return false;
     }
@@ -1008,16 +1010,16 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     }
 
     /**
-     * Get current/loggedIn user's role
+     * Get user's role(s)
      *
+     * @param int|string|null $username
      * @return array | array of string
      *
      * @throws HAException
-     *
      */
-    public function getCurrentUserRole()
+    public function getUserRole($username = null)
     {
-        $roleId = $this->getCurrentUserRoleID();
+        $roleId = $this->getUserRoleID($username);
 
         $where = '';
         $params = [];
@@ -1040,16 +1042,20 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     }
 
     /**
-     * Get current/loggedIn user's role's id
+     * Get user's role(s) id
      *
+     * @param int|string|null $username
      * @return array | array of int
      *
      * @throws HAException
-     *
      */
-    public function getCurrentUserRoleID()
+    public function getUserRoleID($username = null)
     {
-        $uId = $this->_getCurrentUserID();
+        if (is_null($username)) {
+            $username = $this->_getCurrentUserID();
+        }
+        $result = $this->_checkUserParams($username);
+        $uId = $result[0];
         $roleId = $this->getDataFromDB($this->authData->tables->user_role, $this->authData->columns->user_role->role_id->column,
             "{$this->authData->columns->user_role->user_id->column}=:uId", ['uId' => $uId]);
         if (!count($roleId)) {
@@ -1058,6 +1064,30 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
         $roleId = array_column($roleId, $this->authData->columns->user_role->role_id->column);
 
         return $roleId;
+    }
+
+    /**
+     * Get user's role(s)
+     *
+     * @return array | array of string
+     *
+     * @throws HAException
+     */
+    public function getCurrentUserRole()
+    {
+        return $this->getUserRole();
+    }
+
+    /**
+     * Get user's role(s) id
+     *
+     * @return array | array of int
+     *
+     * @throws HAException
+     */
+    public function getCurrentUserRoleID()
+    {
+        return $this->getUserRoleID();
     }
 
     /**

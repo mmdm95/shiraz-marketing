@@ -262,6 +262,23 @@
         });
         //**********
 
+        //********** ManageUser Action
+        $('.deleteUserRoleBtn').on('click', function (e) {
+            e.preventDefault();
+            var del_btn = $(this);
+
+            delete_something_action(this, 'user/deleteUserRole', function () {
+                $(del_btn).closest('tr').fadeOut(800, function () {
+                    if ($.fn.DataTable) {
+                        dataTable.DataTable().row($(this)).remove().draw();
+                    } else {
+                        $(this).remove();
+                    }
+                });
+            });
+        });
+        //**********
+
         //********** ManageMarketer Action
         $('.deleteMarketerBtn').on('click', function (e) {
             e.preventDefault();

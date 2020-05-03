@@ -19,6 +19,11 @@ class ReportController extends AbstractController
 {
     public function orderReportAction($param)
     {
+        if (!$this->auth->isAllow('report', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $userModel = new UserModel();
         $orderModel = new OrderModel();
@@ -134,6 +139,11 @@ class ReportController extends AbstractController
 
     private function _export_excel()
     {
+        if (!$this->auth->isAllow('report', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         // Spreadsheet name
         $name = 'report-' . time();
         $this->load->library('HForm/Form');

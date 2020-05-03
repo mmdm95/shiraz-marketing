@@ -94,6 +94,33 @@ class UserModel extends HModel
         return [];
     }
 
+    public function getUserRoles($where = '', $bindParams = [])
+    {
+        $select = $this->select();
+        $select->cols([
+            'ur.user_id AS id', 'r.name AS role_name', 'r.description', 'r.id AS role_id',
+        ])->from(AbstractPaymentController::TBL_USER_ROLE . ' AS ur');
+
+        try {
+            $select->join(
+                'INNER',
+                AbstractPaymentController::TBL_ROLE . ' AS r',
+                'r.id=ur.role_id'
+            );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            die('unexpected error: ' . $e->getMessage());
+        }
+
+        if (!empty($where) && is_string($where)) {
+            $select->where($where);
+        }
+        if (!empty($bindParams) && is_array($bindParams)) {
+            $select->bindValues($bindParams);
+        }
+
+        return $this->db->fetchAll($select->getStatement(), $select->getBindValues());
+    }
+
     public function getUsersCount($where = '', $bindParams = [])
     {
         $select = $this->select();

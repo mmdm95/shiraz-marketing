@@ -80,6 +80,42 @@ abstract class AbstractController extends AbstractPaymentController
 //            'image' => 'user-default.png',
 //            'n_code' => '4420440392',
 //        ]);
+        // SuperUse and Admin role_page_perm
+//        foreach ([1, 2] as $r) {
+//            for ($pg = 1; $pg <= 14; ++$pg) {
+//                for ($pr = 1; $pr <= 4; ++$pr) {
+//                    $model->insert_it('roles_pages_perms', [
+//                        'role_id' => $r,
+//                        'page_id' => $pg,
+//                        'perm_id' => $pr,
+//                    ]);
+//                }
+//            }
+//        }
+        // Writer role_page_perm
+//        foreach ([3] as $r) {
+//            foreach ([4, 5, 14] as $pg) {
+//                for ($pr = 1; $pr <= 4; ++$pr) {
+//                    $model->insert_it('roles_pages_perms', [
+//                        'role_id' => $r,
+//                        'page_id' => $pg,
+//                        'perm_id' => $pr,
+//                    ]);
+//                }
+//            }
+//        }
+        // ProductManager role_page_perm
+//        foreach ([7] as $r) {
+//            foreach ([3, 14] as $pg) {
+//                for ($pr = 1; $pr <= 4; ++$pr) {
+//                    $model->insert_it('roles_pages_perms', [
+//                        'role_id' => $r,
+//                        'page_id' => $pg,
+//                        'perm_id' => $pr,
+//                    ]);
+//                }
+//            }
+//        }
     }
 
     public function loginAction()

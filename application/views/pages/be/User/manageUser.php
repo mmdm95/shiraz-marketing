@@ -104,6 +104,15 @@
                                                                         <i class="icon-key"></i>
                                                                     </a>
                                                                 </li>
+                                                            </ul>
+                                                            <ul class="icons-list mt-10">
+                                                                <li class="text-purple-600">
+                                                                    <a href="<?= base_url('admin/user/addUserRole/' . $user['id']); ?>"
+                                                                       title="مدیریت نقش‌های کاربر"
+                                                                       data-popup="tooltip">
+                                                                        <i class="icon-user-lock"></i>
+                                                                    </a>
+                                                                </li>
                                                                 <li class="text-warning-800">
                                                                     <a href="<?= base_url('admin/user/userDeposit/' . $user['id']); ?>"
                                                                        title="کیف پول" data-popup="tooltip">

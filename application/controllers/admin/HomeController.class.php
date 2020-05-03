@@ -71,6 +71,11 @@ class HomeController extends AbstractController
 
     public function manageStaticPageAction()
     {
+        if (!$this->auth->isAllow('static_page', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['pages'] = $model->select_it(null, 'static_pages');
 
@@ -86,6 +91,11 @@ class HomeController extends AbstractController
 
     public function addStaticPageAction()
     {
+        if (!$this->auth->isAllow('static_page', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['errors'] = [];
@@ -144,6 +154,11 @@ class HomeController extends AbstractController
 
     public function editStaticPageAction($param)
     {
+        if (!$this->auth->isAllow('static_page', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_STATIC_PAGES, 'id=:id', ['id' => $param[0]])) {
@@ -216,6 +231,15 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('static_page', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('static_page', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -240,6 +264,11 @@ class HomeController extends AbstractController
 
     public function manageFAQAction()
     {
+        if (!$this->auth->isAllow('faq', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['faqValues'] = $model->select_it(null, self::TBL_FAQ, '*',
             null, null, null, ['id DESC']);
@@ -256,6 +285,11 @@ class HomeController extends AbstractController
 
     public function addFAQAction()
     {
+        if (!$this->auth->isAllow('faq', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['errors'] = [];
@@ -300,6 +334,11 @@ class HomeController extends AbstractController
 
     public function editFAQAction($param)
     {
+        if (!$this->auth->isAllow('faq', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_FAQ, 'id=:id', ['id' => $param[0]])) {
@@ -354,6 +393,15 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('faq', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('faq', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -378,6 +426,11 @@ class HomeController extends AbstractController
 
     public function manageSliderAction()
     {
+        if (!$this->auth->isAllow('slider', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['slideValues'] = $model->select_it(null, self::TBL_MAIN_SLIDER, '*',
             null, null, null, ['id DESC']);
@@ -395,6 +448,11 @@ class HomeController extends AbstractController
 
     public function addSlideAction()
     {
+        if (!$this->auth->isAllow('slider', AUTH_ACCESS_CREATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         $this->data['errors'] = [];
@@ -460,6 +518,11 @@ class HomeController extends AbstractController
 
     public function editSlideAction($param)
     {
+        if (!$this->auth->isAllow('slider', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_MAIN_SLIDER, 'id=:id', ['id' => $param[0]])) {
@@ -536,6 +599,15 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('slider', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('slider', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -560,6 +632,11 @@ class HomeController extends AbstractController
 
     public function manageContactUsAction()
     {
+        if (!$this->auth->isAllow('contact', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['cuValues'] = $model->select_it(null, self::TBL_CONTACT_US, [
             'id', 'user_code', 'first_name', 'last_name', 'title', 'status', 'created_at',
@@ -577,6 +654,11 @@ class HomeController extends AbstractController
 
     public function viewContactAction($param)
     {
+        if (!$this->auth->isAllow('contact', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_CONTACT_US, 'id=:id', ['id' => $param[0]])) {
@@ -599,6 +681,15 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('contact', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('contact', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -623,6 +714,11 @@ class HomeController extends AbstractController
 
     public function manageComplaintsAction()
     {
+        if (!$this->auth->isAllow('complaint', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
         $this->data['comValues'] = $model->select_it(null, self::TBL_COMPLAINT, [
             'id', 'first_name', 'last_name', 'title', 'status', 'created_at',
@@ -640,6 +736,11 @@ class HomeController extends AbstractController
 
     public function viewComplaintAction($param)
     {
+        if (!$this->auth->isAllow('complaint', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $model = new Model();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_COMPLAINT, 'id=:id', ['id' => $param[0]])) {
@@ -662,6 +763,15 @@ class HomeController extends AbstractController
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->error->access_denied();
         }
+        //-----
+        if (!$this->auth->isAllow('complaint', AUTH_ACCESS_DELETE) && !is_ajax()) {
+            $this->error->access_denied();
+            die();
+        } elseif (!$this->auth->isAllow('complaint', AUTH_ACCESS_DELETE) && is_ajax()) {
+            message(self::AJAX_TYPE_ERROR, 200, 'دسترسی غیر مجاز');
+            die();
+        }
+        //-----
 
         $model = new Model();
 
@@ -1145,6 +1255,11 @@ class HomeController extends AbstractController
 
     public function fileUploadAction($params)
     {
+        if (!$this->auth->isAllow('file', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         if (!$this->auth->isLoggedIn()) {
             $this->redirect(base_url('admin/login'));
         }
@@ -1194,6 +1309,11 @@ class HomeController extends AbstractController
 
     public function easyFileManagerAction()
     {
+        if (!$this->auth->isAllow('file', AUTH_ACCESS_READ)) {
+            err(403, "Forbidden");
+            die();
+        }
+        //-----
         if (!$this->auth->isLoggedIn()) {
             err(403, "Forbidden");
         }
@@ -1341,6 +1461,11 @@ class HomeController extends AbstractController
 
     public function foldersTreeAction()
     {
+        if (!$this->auth->isAllow('file', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         if (!$this->auth->isLoggedIn() || !is_ajax()) {
             $this->redirect(base_url('admin/login'));
         }
@@ -1401,6 +1526,11 @@ class HomeController extends AbstractController
 
     public function browserAction()
     {
+        if (!$this->auth->isAllow('file', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         if (!$this->auth->isLoggedIn()) {
             $this->error->access_denied();
         }

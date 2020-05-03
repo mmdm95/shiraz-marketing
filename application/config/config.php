@@ -19,7 +19,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
  *     1.2.5.0 instead of 1.2.5-a
  *     1.2.5.0.1 instead of 1.2.5-a1 (I'm not sure)
  */
-defined('APP_VERSION') OR define('APP_VERSION', '1.1.7');
+defined('APP_VERSION') OR define('APP_VERSION', '1.1.8');
 
 //===============================================
 

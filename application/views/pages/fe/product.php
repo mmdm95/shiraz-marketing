@@ -61,7 +61,7 @@
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_discount' ? 'active' : ''; ?>"
                            href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_discount">
-                            پرتخفیفترین
+                            پرتخفیف ترین
                         </a>
                         <a class="dropdown-item <?= $orderParam == 'most_view' ? 'active' : ''; ?>"
                            href="<?= base_url('product/all'); ?><?= !empty($categoryParam) ? '/category/' . $categoryParam : ''; ?><?= !empty($tagParam) ? '/tag/' . $tagParam : ''; ?><?= !empty($specialParam) ? '/offers' : ''; ?>/order/most_view">
