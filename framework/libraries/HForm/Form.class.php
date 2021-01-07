@@ -112,6 +112,11 @@ class Form implements HIForm
     protected $useCsrf = true;
 
     /**
+     * @var string
+     */
+    protected $defaultCsrfInputName = 'csrftoken';
+
+    /**
      * The xss object
      *
      * @var \XSS\AntiXSS|null
@@ -252,6 +257,7 @@ class Form implements HIForm
         if ($useXss) {
             $this->xss = new AntiXSS();
         }
+        $this->csrfFieldNames['inputName'] = $this->defaultCsrfInputName;
     }
 
     /**
@@ -414,26 +420,39 @@ class Form implements HIForm
      * <p>Return somthing like this: <b><input type="hidden" value="..." name="$inputName"></b></p>
      *
      * @param string $csfrName
-     * @param string $inputName
+     * @param null|string $inputName
      *
      * @uses https://packagist.org/packages/maer/csrf for prevent csrf
      *
      * @return string
      *
      */
-    public function csrfToken($csfrName, $inputName = 'csrftoken')
+    public function csrfToken($csfrName, $inputName = null)
     {
         if ($this->useCsrf) {
             $this->csrfFieldNames['csrfName'] = $csfrName;
-            $this->csrfFieldNames['inputName'] = $inputName;
+            $this->csrfFieldNames['inputName'] = $this->defaultCsrfInputName;
+            if (!empty($inputName)) {
+                $this->csrfFieldNames['inputName'] = $inputName;
+            }
             if ($this->csrfRegenerate) {
                 $this->csrfRegenerate = false;
-                return "<input type='hidden' value='" . $this->csrf->regenerateToken($csfrName) . "' name='" . $inputName . "'>";
+                return "<input type='hidden' value='" . $this->csrf->regenerateToken($csfrName) . "' name='" . $this->csrfFieldNames['inputName'] . "'>";
             } else {
-                return "<input type='hidden' value='" . $this->csrf->getToken($csfrName) . "' name='" . $inputName . "'>";
+                return "<input type='hidden' value='" . $this->csrf->getToken($csfrName) . "' name='" . $this->csrfFieldNames['inputName'] . "'>";
             }
         }
         return '';
+    }
+
+    /**
+     * @param $csrfName
+     * @return Form
+     */
+    public function csrfTokenName($csrfName)
+    {
+        $this->csrfFieldNames['csrfName'] = $csrfName;
+        return $this;
     }
 
     /**

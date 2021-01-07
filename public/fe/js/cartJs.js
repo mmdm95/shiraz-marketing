@@ -215,17 +215,97 @@
         var
             namespace = 'product_detail_action',
             //-----
-            selectInp;
+            minusBtn,
+            plusBtn,
+            //-----
+            minCartCount,
+            maxCartCount,
+            //-----
+            interval,
+            internalTime = 70,
+            timeout,
+            timeoutTime = 150,
+            //-----
+            inp;
+        var $this, qnt, dist;
 
-        selectInp = $('[data-cart-quantity-for]');
-        selectInp.off('change.' + namespace).on('change.' + namespace, function () {
-            var $this, qnt, dist;
+        inp = $('[data-cart-quantity-for]');
+        dist = inp.data('cart-quantity-for');
+        dist = dist && $(dist) && $(dist).length ? $(dist) : false;
+        //-----
+        minusBtn = $('.product-detail-cart-count-btn-minus');
+        plusBtn = $('.product-detail-cart-count-btn-plus');
+        //-----
+        minCartCount = inp.attr('min');
+        maxCartCount = inp.attr('max');
+        //-----
+        minusBtn.off('touchstart.' + namespace + ' mousedown.' + namespace).on('touchstart.' + namespace + ' mousedown.' + namespace, function () {
+            timeout = setTimeout(function () {
+                interval = setInterval(function () {
+                    qnt = inp.val();
+                    qnt = isNaN(parseInt(qnt, 10)) ? 0 : parseInt(qnt, 10);
+                    if (qnt > minCartCount) {
+                        inp.val((qnt - 1));
+                        dist.attr('data-item-quantity', inp.val());
+                    }
+                }, internalTime);
+            }, timeoutTime);
+        }).off('mouseup.' + namespace).on('mouseup.' + namespace, function () {
+            clearTimeout(timeout);
+            clearInterval(interval);
+        }).off('mouseleave.' + namespace).on('mouseleave.' + namespace, function () {
+            clearTimeout(timeout);
+            clearInterval(interval);
+        }).off('click.' + namespace).on('click.' + namespace, function () {
+            qnt = inp.val();
+            qnt = isNaN(parseInt(qnt, 10)) ? 0 : parseInt(qnt, 10);
+            if (qnt > minCartCount) {
+                inp.val((qnt - 1));
+                if (dist) {
+                    dist.attr('data-item-quantity', inp.val());
+                }
+            }
+        });
+        plusBtn.off('touchstart.' + namespace + ' mousedown.' + namespace).on('touchstart.' + namespace + ' mousedown.' + namespace, function () {
+            timeout = setTimeout(function () {
+                interval = setInterval(function () {
+                    qnt = inp.val();
+                    qnt = isNaN(parseInt(qnt, 10)) ? 0 : parseInt(qnt, 10);
+                    if (qnt < maxCartCount) {
+                        inp.val((qnt + 1));
+                        if (dist) {
+                            dist.attr('data-item-quantity', inp.val());
+                        }
+                    }
+                }, internalTime);
+            }, timeoutTime);
+        }).off('mouseup.' + namespace).on('mouseup.' + namespace, function () {
+            clearTimeout(timeout);
+            clearInterval(interval);
+        }).off('mouseleave.' + namespace).on('mouseleave.' + namespace, function () {
+            clearTimeout(timeout);
+            clearInterval(interval);
+        }).off('click.' + namespace).on('click.' + namespace, function () {
+            qnt = inp.val();
+            qnt = isNaN(parseInt(qnt, 10)) ? 0 : parseInt(qnt, 10);
+            if (qnt < maxCartCount) {
+                inp.val((qnt + 1));
+                if (dist) {
+                    dist.attr('data-item-quantity', inp.val());
+                }
+            }
+        });
+        //-----
+        inp.off('input.' + namespace).on('input.' + namespace, function () {
             $this = $(this);
-            dist = $this.data('cart-quantity-for');
-            dist = dist && $(dist) && $(dist).length ? $(dist) : false;
-            qnt = $this.find(':selected');
-            qnt = qnt ? qnt.val() : $this.find('option').first().val();
-
+            qnt = $this.val();
+            //-----
+            qnt = isNaN(parseInt(qnt, 10)) ? 0 : parseInt(qnt, 10);
+            qnt = qnt < minCartCount ? minCartCount : qnt;
+            qnt = qnt > maxCartCount ? maxCartCount : qnt;
+            //-----
+            inp.val(qnt);
+            //-----
             if (qnt && dist) {
                 dist.attr('data-item-quantity', qnt);
             }

@@ -56,11 +56,11 @@ interface HIForm
      * <p>Return somthing like this: <b><input type="hidden" value="..." name="$inputName"></b></p>
      *
      * @param string$csfrName
-     * @param string $inputName
+     * @param null|string $inputName
      * @return string
      *
      */
-    public function csrfToken($csfrName, $inputName = 'csrftoken');
+    public function csrfToken($csfrName, $inputName = null);
 
     /**
      * Validate $name field with error message $msg with type of $type

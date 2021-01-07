@@ -56,8 +56,10 @@ class BlogModel extends HModel
     {
         if (!isset($blog['id'])) return [];
         //-----
-        $relatedWhere = 'b.id!=:bId';
-        $relatedParams = ['bId' => $blog['id']];
+        $relatedWhere = 'b.id!=:bId AND b.publish=:bPub';
+        $relatedParams = [];
+        $relatedParams['bId'] = $blog['id'];
+        $relatedParams['bPub'] = 1;
         $where = '';
         $params = [];
         //-----

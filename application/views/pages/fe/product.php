@@ -82,6 +82,13 @@
                                     ویژه
                                 </div>
                             <?php endif; ?>
+                            <div class="card-side-top-right">
+                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn"
+                                        data-item-id="<?= $item['id']; ?>"
+                                        data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
+                                    <i class="la la-cart-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <div class="card-img">
                                 <div class="img-placeholder">
                                     <i class="la la-image" aria-hidden="true"></i>
@@ -107,7 +114,7 @@
                             <div class="card-info">
                                 <div>
                                     <?php
-                                    $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
+                                    $discount = (is_null($item['discount_until']) || $item['discount_until'] > time()) ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
                                     $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
                                     ?>
                                     <?php if ($discountPercentage != 0 && $item['available'] == 1 && $item['stock_count'] > 0): ?>

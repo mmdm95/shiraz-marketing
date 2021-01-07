@@ -2,9 +2,12 @@
 
 namespace HPayment\PaymentClasses;
 
+require_once(LIB_PATH . 'econea/vendor/autoload.php');
+
 use HPayment\Payment;
 use HPayment\PaymentException;
-use SoapClient;
+use nusoap_client;
+use function PHPSTORM_META\type;
 
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
@@ -36,6 +39,7 @@ class PaymentBehPardakht extends Payment
      * @var array
      */
     protected $_statusArr = [
+        -1000 => 'خطا در ارتباط با درگاه پرداخت',
         self::PAYMENT_STATUS_OK_BEH_PARDAKHT => 'تراکنش با موفقيت انجام شد',
         11 => 'شماره کارت نامعتبر است',
         12 => 'موجودی کافي نيست',
@@ -84,6 +88,8 @@ class PaymentBehPardakht extends Payment
         98 => 'سقف استفاده از رمز ايستا به پايان رسيده است',
     ];
 
+    protected $namespace = 'http://interfaces.core.sw.bps.com/';
+
     /**
      * @var array
      */
@@ -102,11 +108,13 @@ class PaymentBehPardakht extends Payment
     public function __construct($terminalId = '', $username = '', $password = '')
     {
         // Set credential info
-        $this->_parameters['terminalId'] = $terminalId;
+        $this->_parameters['terminalId'] = (int)$terminalId;
         $this->_parameters['userName'] = $username;
         $this->_parameters['userPassword'] = $password;
         // Start a SOAP connection for required methods
-        $this->_client = new SoapClient('https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl');
+        $this->_client = new nusoap_client('https://bpm.shaparak.ir/pgwchannel/services/pgw?wsdl', true);
+        $this->_client->soap_defencoding = 'UTF-8';
+        $this->_client->decode_utf8 = true;
     }
 
     /**
@@ -137,12 +145,21 @@ class PaymentBehPardakht extends Payment
     public function create_request($data)
     {
         $data = array_merge($this->_parameters, $data);
-        $res = $this->_client->bpPayRequest($data);
-        $res = explode(',', $res);
-        $this->_result = [
-            'ResCode' => $res[0],
-            'RefId' => $res[1] ?? '',
-        ];
+        $res = $this->_client->call('bpPayRequest', $data, $this->namespace);
+        if ($this->_client->fault) {
+            $this->_result = $res;
+        } else {
+            $res = explode(',', $res['return']);
+            if(2 == count($res)) {
+                $this->_result = [
+                    'ResCode' => $res[0],
+                    'RefId' => $res[1] ?? '',
+                ];
+            } else {
+                $this->_result = -1000;
+            }
+        }
+
         return $this;
     }
 
@@ -156,7 +173,7 @@ class PaymentBehPardakht extends Payment
     {
         $data = array_merge($this->_parameters, $data);
         // Check request
-        $this->_result = $this->_client->bpVerifyRequest($data);
+        $this->_result = $this->_client->call('bpVerifyRequest', $data, $this->namespace);
 
         return $this;
     }
@@ -171,7 +188,7 @@ class PaymentBehPardakht extends Payment
     {
         $data = array_merge($this->_parameters, $data);
         // Settle request
-        $this->_result = $this->_client->bpSettleRequest($data);
+        $this->_result = $this->_client->call('bpSettleRequest', $data, $this->namespace);
 
         return $this;
     }
@@ -198,65 +215,5 @@ class PaymentBehPardakht extends Payment
             return $this->_statusArr[$code];
         }
         return false;
-    }
-
-    /**
-     * Check request $data before send it to _send_request method
-     *
-     * @param $data
-     * @throws PaymentException
-     */
-    protected function _request_check($data)
-    {
-        if (is_array($data) && count($data)) {
-            // Send request to gateway
-            $this->_result = json_decode($this->_send_request($data), true);
-        }
-    }
-
-    /**
-     * Send request/advice to bank gateway
-     *
-     * @param $data
-     * @return array|bool|string
-     * @throws PaymentException
-     */
-    protected function _send_request($data)
-    {
-        // Reset global result array
-        $this->_result = [];
-
-        // Handle error for API Key existence
-        if (!isset($this->_parameters[$this->APIKeyStr])) {
-            throw new PaymentException('API KEY برای درگاه بانک تعریف نشده است.', self::BANK_ERROR_BAD_API_KEY);
-        }
-        //  Handle error for request url existence
-        if (!isset($this->_parameters[$this->urlStr])) {
-            throw new PaymentException('آدرس URL برای ارسال درخواست تعریف نشده است.', self::BANK_ERROR_UNDEFINED_URL);
-        }
-
-        $headers = [
-            'Content-Type: application/json',
-        ];
-
-        $handle = curl_init();
-
-        curl_setopt_array($handle, [
-            CURLOPT_URL => $this->_parameters[$this->urlStr],
-            CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => $headers
-        ]);
-
-        $tmpResult = curl_exec($handle);
-
-        if (curl_errno($handle)) {
-            // TODO: store handle error in a variable
-//            return ['errReq' => curl_error($handle)];
-        }
-
-        curl_close($handle);
-
-        return $tmpResult;
     }
 }

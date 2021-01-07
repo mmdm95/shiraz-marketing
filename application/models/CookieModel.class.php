@@ -17,9 +17,10 @@ class CookieModel
      * @param null $secure
      * @param null $httpOnly
      * @param int $cryptType
+     * @param null $sameSite
      * @return bool
      */
-    public function set_cookie($name, $value = null, $expire = null, $path = null, $domain = null, $secure = null, $httpOnly = null, $cryptType = self::COOKIE_ENCRYPT_DECRYPT)
+    public function set_cookie($name, $value = null, $expire = null, $path = null, $domain = null, $secure = null, $httpOnly = null, $cryptType = self::COOKIE_ENCRYPT_DECRYPT, $sameSite = null)
     {
         $crypt = '';
 
@@ -32,7 +33,28 @@ class CookieModel
                 break;
         }
 
-        return setcookie($name, $crypt, $expire, $path, $domain, $secure, $httpOnly);
+        /**
+         * @see https://github.com/GoogleChromeLabs/samesite-examples/blob/master/php.md and https://stackoverflow.com/a/46971326/2308553
+         * @see https://stackoverflow.com/a/59654832/12154893
+         */
+        if (PHP_VERSION_ID < 70300) {
+            if (!is_null($sameSite)) {
+                $path = "$path; samesite=$sameSite";
+            }
+            return setcookie($name, $crypt, $expire, $path, $domain, $secure, $httpOnly);
+        } else {
+            $arr = [
+                'expires' => $expire,
+                'path' => $path,
+                'domain' => $domain,
+                'secure' => $secure,
+                'httponly' => $httpOnly,
+            ];
+            if (!is_null($sameSite)) {
+                $arr['samesite'] = $sameSite;
+            }
+            return setcookie($name, $crypt, $arr);
+        }
     }
 
     /**

@@ -113,7 +113,7 @@
                                                     <?php endif; ?>
                                                     <i class="icon-minus2 text-danger" aria-hidden="true"></i>
                                                     با کد
-                                                    <?= $user['subset_of'] ?? '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
+                                                    <?= $user['superset_code'] ?? '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                 </span>
                                     </div>
                                 </div>
@@ -386,7 +386,7 @@
                                                 <tbody>
                                                 <?php foreach ($user['orders'] as $key => $order): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
@@ -488,7 +488,7 @@
                                                 <tbody>
                                                 <?php foreach ($user['subsets'] as $key => $subset): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>

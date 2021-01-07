@@ -7,6 +7,8 @@ defined('AUTH_ROLE_WRITER') OR define('AUTH_ROLE_WRITER', 3);
 defined('AUTH_ROLE_MARKETER') OR define('AUTH_ROLE_MARKETER', 4);
 defined('AUTH_ROLE_USER') OR define('AUTH_ROLE_USER', 5);
 defined('AUTH_ROLE_PRODUCT_ADMIN') OR define('AUTH_ROLE_PRODUCT_ADMIN', 7);
+defined('AUTH_ROLE_USER_ADMIN') OR define('AUTH_ROLE_USER_ADMIN', 8);
+defined('AUTH_ROLE_ORDER_ADMIN') OR define('AUTH_ROLE_ORDER_ADMIN', 9);
 defined('AUTH_ROLE_GUEST') OR define('AUTH_ROLE_GUEST', 6);
 
 // Accessibility constants
@@ -206,7 +208,7 @@ return array(
     'pages' => [
     ],
     'roles' => [
-        'superUser', 'admin', 'product_manger', 'writer', 'marketer', 'user', 'guest'
+        'superUser', 'admin', 'writer', 'product_manger', 'user_manager', 'order_manager', 'marketer', 'user', 'guest'
     ],
     'permissions' => [
         'create', 'read', 'update', 'delete'
@@ -215,5 +217,5 @@ return array(
     // For advanced usage.
 
     // Use sub array from roles option
-    'admin_roles' => ['superUser', 'admin', 'product_manger', 'writer'],
+    'admin_roles' => ['superUser', 'admin', 'writer', 'product_manger', 'user_manager', 'order_manager'],
 );

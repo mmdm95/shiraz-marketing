@@ -110,7 +110,6 @@ class UserController extends AbstractController
                 $model->transactionBegin();
 
                 // upload image
-                $res4 = true;
                 if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                     $img = $values['image']['name'];
                     $imageExt = pathinfo($img, PATHINFO_EXTENSION);
@@ -118,19 +117,20 @@ class UserController extends AbstractController
                     $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
                 } else {
                     $image = $this->data['uTrueValues']['image'];
+                    if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
+                        $newImageExt = pathinfo($this->data['uTrueValues']['image'], PATHINFO_EXTENSION);
+                        $newImgName = convertNumbersToPersian($values['mobile'], true);
+                        $image = PROFILE_IMAGE_DIR . $newImgName . '.' . $newImageExt;
+                    }
                 }
 
-                $res2 = true;
-                if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
-                    $res2 = unlink(realpath($values['image']));
-                }
                 $this->data['_updatedColumns'] = [
                     'subset_of' => $values['subset_of'] != -1 ? $values['subset_of'] : null,
                     'mobile' => convertNumbersToPersian($values['mobile'], true),
                     'first_name' => $values['first_name'],
                     'last_name' => $values['last_name'],
-                    'province' => $values['province'] != -1 ? $model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name'] : $this->data['uTrueValues']['province'] ?: '',
-                    'city' => $values['city'] != -1 && $values['province'] != -1 ? $model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name'] : $this->data['uTrueValues']['city'] ?: '',
+                    'province' => $values['province'] != -1 ? ($model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name']) : ($this->data['uTrueValues']['province'] ?: ''),
+                    'city' => $values['city'] != -1 && $values['province'] != -1 ? ($model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name']) : ($this->data['uTrueValues']['city'] ?: ''),
                     'n_code' => convertNumbersToPersian($values['n_code'], true),
                     'address' => $values['address'],
                     'postal_code' => $values['postal_code'],
@@ -152,12 +152,18 @@ class UserController extends AbstractController
                     'description' => $values['description'],
                 ];
                 $res = $model->update_it(self::TBL_USER, $this->data['_updatedColumns'], 'id=:id', ['id' => $this->data['identity']->id]);
-                if ((!isset($values['image']['name']) || !empty($values['image']['name'])) && $res &&
-                    convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
-                    $res4 = copy($values['image'], $image);
+                //-----
+                $res4 = true;
+                if ($res) {
+                    if (!isset($img) && convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
+                        $res4 = copy($this->data['uTrueValues']['image'], $image);
+                    }
+                    // Remove previous image file(s)
+                    $mask = PROFILE_IMAGE_DIR . $this->data['uTrueValues']['mobile'] . '.*';
+                    array_map('unlink', glob($mask));
                 }
 
-                if ($res && $res2 && $res4) {
+                if ($res && $res4) {
                     if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $this->data['identity']->id);
                         if ($res5) {
@@ -758,7 +764,7 @@ class UserController extends AbstractController
 
         // Call one of the [_*_connection] functions
         // Here we call IDPay
-        $res = call_user_func_array($this->gatewayFunctions[self::PAYMENT_TABLE_IDPAY], [$parameters]);
+        $res = call_user_func_array($this->gatewayFunctions[self::PAYMENT_TABLE_IDPAY], [$parameters, false]);
         return $res;
     }
 

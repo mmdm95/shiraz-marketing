@@ -36,6 +36,7 @@ class HomeController extends AbstractController
         $this->data['userAllCount'] = $userModel->getUsersCount('r.id NOT IN (:r1,:r2)', ['r1' => AUTH_ROLE_SUPER_USER, 'r2' => AUTH_ROLE_ADMIN]);
         $this->data['userCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_USER]);
         $this->data['marketerCount'] = $userModel->getUsersCount('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
+        $this->data['adminUserCount'] = $userModel->getUsersCount('r.id IN (:r1, :r2, :r3, :r4)', ['r1' => AUTH_ROLE_WRITER, 'r2' => AUTH_ROLE_PRODUCT_ADMIN, 'r3' => AUTH_ROLE_USER_ADMIN, 'r4' => AUTH_ROLE_ORDER_ADMIN]);
         $this->data['userAllDeactiveCount'] = $userModel->getUsersCount('r.id!=:role AND r.id IN (:role1,:role2) AND u.active=:active',
             ['role' => AUTH_ROLE_SUPER_USER, 'role1' => AUTH_ROLE_USER, 'role2' => AUTH_ROLE_MARKETER, 'active' => 0]);
         //-----
@@ -1019,23 +1020,28 @@ class HomeController extends AbstractController
         $form->setFieldsName([
             'bankImg1', 'bankText1', 'bankEnable1',
             'bankImg2', 'bankText2', 'bankEnable2',
+            'bankImg3', 'bankText3', 'bankEnable3',
             'walletImg', 'walletText', 'walletEnable',
             'receiptImg', 'receiptText', 'receiptEnable',
             'inPlaceImg', 'inPlaceText', 'inPlaceEnable',
         ])->setDefaults('bankEnable1', 0)
             ->setDefaults('bankEnable2', 0)
+            ->setDefaults('bankEnable3', 0)
             ->setDefaults('walletEnable', 0)
             ->setDefaults('receiptEnable', 0)
             ->setDefaults('inPlaceEnable', 0)
             ->setMethod('post');
         try {
             $form->beforeCheckCallback(function (&$values) use ($form) {
-                $form->isRequired(['bankText1', 'bankText2', 'walletText', 'receiptText', 'inPlaceText'], 'تمام متون اجباری می‌باشند.');
+                $form->isRequired(['bankText1', 'bankText2', 'bankText3', 'walletText', 'receiptText', 'inPlaceText'], 'تمام متون اجباری می‌باشند.');
                 if ($values['bankImg1'] != '' && !file_exists($values['bankImg1'])) {
                     $values['bankImg1'] = '';
                 }
                 if ($values['bankImg2'] != '' && !file_exists($values['bankImg2'])) {
                     $values['bankImg2'] = '';
+                }
+                if ($values['bankImg3'] != '' && !file_exists($values['bankImg3'])) {
+                    $values['bankImg3'] = '';
                 }
                 if ($values['walletImg'] != '' && !file_exists($values['walletImg'])) {
                     $values['walletImg'] = '';
@@ -1053,6 +1059,9 @@ class HomeController extends AbstractController
                 $this->data['setting']['payment']['bank_2']['text'] = $values['bankText2'];
                 $this->data['setting']['payment']['bank_2']['image'] = $values['bankImg2'];
                 $this->data['setting']['payment']['bank_2']['enable'] = $form->isChecked('bankEnable2') ? 1 : 0;
+                $this->data['setting']['payment']['bank_3']['text'] = $values['bankText3'];
+                $this->data['setting']['payment']['bank_3']['image'] = $values['bankImg3'];
+                $this->data['setting']['payment']['bank_3']['enable'] = $form->isChecked('bankEnable3') ? 1 : 0;
                 $this->data['setting']['payment']['wallet']['text'] = $values['walletText'];
                 $this->data['setting']['payment']['wallet']['image'] = $values['walletImg'];
                 $this->data['setting']['payment']['wallet']['enable'] = $form->isChecked('walletEnable') ? 1 : 0;
@@ -1392,13 +1401,57 @@ class HomeController extends AbstractController
                 rmrf($file);
             }
             exit;
+        } elseif (isset($_POST['do']) && $_POST['do'] == 'rename') {
+            $newName = $_POST['newName'] ?? '';
+            if (empty($newName)) {
+                err(200, "Invalid file name.");
+            }
+            $this->load->library('XSS/vendor/autoload');
+            $xss = new AntiXSS();
+            $filename = $xss->xss_clean(str_replace(' ', '-', $newName));
+
+            $this->load->library('HConvert/vendor/autoload');
+            $converter = \HConvert\Converter\NumberConverter::getInstance();
+            $filename = $converter->toPersian($filename);
+            $filename = $converter->toEnglish($filename);
+
+            if (!file_exists($file)) {
+                err(412, "File doesn't exists!");
+            }
+
+            if (strpos(str_replace('\\', '/', $file), str_replace('\\', '/', UPLOAD_PATH)) === false) {
+                err(412, "Invalid folder selected");
+            }
+            // don't allow actions outside root. we also filter out slashes to catch args like './../outside'
+            $dir = str_replace('/', '', $filename);
+            if (substr($dir, 0, 2) === '..')
+                exit;
+
+            $bName = get_base_name($file);
+
+            if ($bName == $filename)
+                exit;
+
+            $pos = mb_strrpos($file, $bName);
+            if ($pos !== false) {
+                $newFile = substr_replace($file, $filename, $pos, strlen($file));
+            } else {
+                err(412, "Something went wrong!");
+            }
+
+            if (file_exists($newFile)) {
+                err(412, 'File with this name is currently exists!');
+            }
+
+            rename($file, $newFile);
+            exit;
         } elseif (isset($_POST['do']) && $_POST['do'] == 'mkdir' && $allow_create_folder) {
             // don't allow actions outside root. we also filter out slashes to catch args like './../outside'
             $dir = $_POST['name'];
             $dir = str_replace('/', '', $dir);
 
             if (check_file_uploaded_length($dir)) {
-                err(403, "Invalid name size.");
+                err(412, "Invalid name size.");
             }
             if (substr($dir, 0, 2) === '..')
                 exit;
@@ -1408,7 +1461,7 @@ class HomeController extends AbstractController
         } elseif (isset($_POST['do']) && $_POST['do'] == 'upload' && $allow_upload) {
             foreach ($disallowed_extensions as $ext) {
                 if (preg_match(sprintf('/\.%s$/', preg_quote($ext)), $_FILES['file_data']['name'])) {
-                    err(403, "Files of this type are not allowed.");
+                    err(412, "Files of this type are not allowed.");
                 }
             }
 
@@ -1421,8 +1474,14 @@ class HomeController extends AbstractController
             $filename = $xss->xss_clean(str_replace(' ', '-', $_FILES['file_data']['name']));
             $filename = str_replace('@', '', $filename);
 
+            $this->load->library('HConvert/vendor/autoload');
+
+            $converter = \HConvert\Converter\NumberConverter::getInstance();
+            $filename = $converter->toPersian($filename);
+            $filename = $converter->toEnglish($filename);
+
             if (check_file_uploaded_length($filename)) {
-                err(403, "Invalid name size.");
+                err(412, "Invalid name size.");
             }
 
             var_dump(move_uploaded_file($_FILES['file_data']['tmp_name'], $file . '/' . $filename));
@@ -1434,13 +1493,13 @@ class HomeController extends AbstractController
                 $newDir = $_POST['newPath'];
 
                 if (!file_exists($file)) {
-                    err(403, "File doesn't exists!");
+                    err(412, "File doesn't exists!");
                 }
 
                 if (strpos(str_replace('\\', '/', $file), str_replace('\\', '/', UPLOAD_PATH)) === false
                     || strpos(str_replace('\\', '/', $newDir), str_replace('\\', '/', UPLOAD_PATH)) === false
                 ) {
-                    err(403, "Invalid folder selected");
+                    err(412, "Invalid folder selected");
                 }
                 // don't allow actions outside root. we also filter out slashes to catch args like './../outside'
                 $dir = str_replace('/', '', $newDir);

@@ -124,7 +124,7 @@ class UserModel extends HModel
     public function getUsersCount($where = '', $bindParams = [])
     {
         $select = $this->select();
-        $select->cols(['COUNT(*) AS count'])->from($this->table . ' AS u');
+        $select->cols(['COUNT(DISTINCT(u.id)) AS count'])->from($this->table . ' AS u');
 
         try {
             $select->join(

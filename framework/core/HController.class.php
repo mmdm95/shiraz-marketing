@@ -1,17 +1,20 @@
 <?php
 
-use HSession\Session\Session;
-
 defined('BASE_PATH') OR exit('No direct script access allowed');
+
+use HSession\Session\Session;
 
 class HController
 {
-    private static $instance;
+    private static $instance = null;
 
     // Base Controller has a property called $loader, it is an instance of Loader class(introduced later)
 
     public $config;
     public $load;
+    /**
+     * @var Session $session
+     */
     protected $session;
     protected $asset;
     protected $error;
@@ -58,6 +61,9 @@ class HController
      */
     public static function &get_instance()
     {
+        if(is_null(self::$instance)) {
+            self::$instance = new self();
+        }
         return self::$instance;
     }
 }

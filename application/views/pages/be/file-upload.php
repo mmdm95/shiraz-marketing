@@ -114,7 +114,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-6 mt-20">
-                                <label for="dirname" class="display-block">
+                                <label for="dirsearch" class="display-block">
                                     جستجو در پوشه فعلی:
                                 </label>
                                 <div class="form-group has-feedback has-feedback-left">
@@ -122,7 +122,7 @@
                                         <input id="dirsearch" class="form-control" type="text"
                                                value="" placeholder="جستجو">
                                     </div>
-                                    <div class=" form-control-feedback">
+                                    <div class="form-control-feedback">
                                         <i class="icon-search4 text-muted"></i>
                                     </div>
                                 </div>
@@ -196,6 +196,42 @@
                                 </button>
                                 <button id="mvdir" type="button" class="btn btn-primary" data-dismiss="modal">
                                     جابجایی
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /standard width modal -->
+
+                <!-- Standard width modal -->
+                <div id="modal_rename" class="modal fade">
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h5 class="modal-title">
+                                    تغییر نام
+                                </h5>
+                            </div>
+
+                            <div id="rename-body" class="modal-body">
+                                <div class="form-group has-feedback has-feedback-right">
+                                    <div class="form-control-feedback">
+                                        <i class="icon-pencil7 text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <input id="renameInput" class="form-control text-right ltr" type="text"
+                                               value="" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal">
+                                    لغو
+                                </button>
+                                <button id="renameFile" type="button" class="btn btn-primary" data-dismiss="modal">
+                                    تغییر نام
                                 </button>
                             </div>
                         </div>

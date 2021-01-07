@@ -407,7 +407,7 @@
                                                 <tbody>
                                                 <?php foreach ($order['products'] as $key => $item): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td width="120px">

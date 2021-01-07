@@ -12,7 +12,7 @@ trait InstantiatorTrait
 
     /**
      * @param mixed ...$_
-     * @return InstantiatorTrait
+     * @return static
      */
     static public function &getInstance(...$_)
     {
@@ -33,7 +33,7 @@ trait InstantiatorTrait
     /**
      * Invoke magic method
      *
-     * @return InstantiatorTrait
+     * @return static
      */
     public function __invoke(...$_)
     {

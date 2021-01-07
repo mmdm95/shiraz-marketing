@@ -68,7 +68,7 @@
                                                 <tbody>
                                                 <?php foreach ($marketers as $key => $marketer): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
@@ -82,7 +82,7 @@
                                                         <td>
                                                             <?= $marketer['username']; ?>
                                                         </td>
-                                                        <td>
+                                                        <td data-order="<?= $marketer['created_at']; ?>">
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $marketer['created_at']); ?>
                                                         </td>
                                                         <td>

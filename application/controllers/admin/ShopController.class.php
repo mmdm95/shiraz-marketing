@@ -545,6 +545,9 @@ class ShopController extends AbstractController
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
         $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
         $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+        //-----
+        $this->data['js'][] = $this->asset->script('be/js/plugins/ui/fab.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/extra_fab.js');
 
         $this->_render_page('pages/be/Product/manageProduct');
     }
@@ -568,10 +571,11 @@ class ShopController extends AbstractController
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('addProduct');
         $form->setFieldsName(['image', 'title', 'category', 'product_type', 'city', 'place', 'price',
-            'discount_price', 'discount_expire', 'reward', 'stock_count', 'max_basket_count', 'keywords',
-            'publish', 'is_special', 'imageGallery', 'related', 'description'])
+            'discount_price', 'no_expire', 'discount_expire', 'reward', 'stock_count', 'max_basket_count',
+            'keywords', 'publish', 'is_special', 'imageGallery', 'related', 'description'])
             ->setDefaults('publish', 'off')
             ->setDefaults('is_special', 'off')
+            ->setDefaults('no_expire', 'off')
             ->setDefaults('related', [0 => 0])
             ->setMethod('post', [], ['publish', 'is_special']);
         try {
@@ -635,7 +639,7 @@ class ShopController extends AbstractController
                     'category_id' => $values['category'],
                     'price' => convertNumbersToPersian($values['price'], true),
                     'discount_price' => convertNumbersToPersian($values['discount_price'], true),
-                    'discount_until' => $values['discount_expire'],
+                    'discount_until' => $form->isChecked('no_expire') ? null : $values['discount_expire'],
                     'reward' => $values['reward'],
                     'product_type' => $values['product_type'],
                     'description' => $values['description'],
@@ -733,10 +737,11 @@ class ShopController extends AbstractController
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('editProduct');
         $form->setFieldsName(['image', 'title', 'category', 'product_type', 'city', 'place', 'price',
-            'discount_price', 'discount_expire', 'reward', 'stock_count', 'max_basket_count', 'keywords',
-            'publish', 'is_special', 'imageGallery', 'related', 'description'])
+            'discount_price', 'no_expire', 'discount_expire', 'reward', 'stock_count', 'max_basket_count',
+            'keywords', 'publish', 'is_special', 'imageGallery', 'related', 'description'])
             ->setDefaults('publish', 0)
             ->setDefaults('is_special', 0)
+            ->setDefaults('no_expire', 0)
             ->setDefaults('related', [0 => 0])
             ->setMethod('post', [], ['publish', 'is_special']);
         try {
@@ -800,7 +805,7 @@ class ShopController extends AbstractController
                     'category_id' => $values['category'],
                     'price' => convertNumbersToPersian($values['price'], true),
                     'discount_price' => convertNumbersToPersian($values['discount_price'], true),
-                    'discount_until' => $values['discount_expire'],
+                    'discount_until' => $form->isChecked('no_expire') ? null : $values['discount_expire'],
                     'reward' => $values['reward'],
                     'product_type' => $values['product_type'],
                     'description' => $values['description'],
@@ -810,8 +815,8 @@ class ShopController extends AbstractController
                     'max_cart_count' => $values['max_basket_count'],
                     'is_special' => $form->isChecked('is_special') ? 1 : 0,
                     'publish' => !$form->isChecked('publish') ? 0 : 1,
-                    'created_by' => $this->data['identity']->id,
-                    'created_at' => time(),
+                    'updated_by' => $this->data['identity']->id,
+                    'updated_at' => time(),
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
 
                 $res2 = $model->delete_it(self::TBL_PRODUCT_GALLERY, 'product_id=:id', ['id' => $this->data['param'][0]]);
@@ -961,6 +966,157 @@ class ShopController extends AbstractController
         message(self::AJAX_TYPE_ERROR, 200, 'عملیات با خطا مواجه شد.');
     }
 
+    public function multiEditProductAction($param)
+    {
+        if (!$this->auth->isAllow('product', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
+        if (!count($param)) {
+            $this->redirect(base_url('admin/shop/manageProduct'));
+        }
+        //-----
+        $model = new Model();
+
+        $this->data['categories'] = $model->select_it(null, self::TBL_CATEGORY, ['id', 'name']);
+        $this->data['cities'] = $model->select_it(null, self::TBL_CITY, ['id', 'name']);
+
+        $this->data['param'] = $param;
+
+        $this->data['errors'] = [];
+
+        $this->load->library('HForm/Form');
+        $form = new Form();
+        $this->data['form_token'] = $form->csrfToken('editMultiProduct');
+        $form->setFieldsName(['category', 'product_type', 'city', 'place', 'price', 'discount_price',
+            'no_expire', 'discount_expire', 'reward', 'stock_count', 'max_basket_count',
+            'no_publish_change', 'publish', 'no_special_change', 'is_special'])
+            ->setDefaults('publish', 0)
+            ->setDefaults('is_special', 0)
+            ->setDefaults('no_expire', 0)
+            ->setDefaults('no_publish_change', 0)
+            ->setDefaults('no_special_change', 0)
+            ->setMethod('post', [], ['publish', 'is_special']);
+        try {
+            $form->beforeCheckCallback(function (&$values) use ($model, $form) {
+                foreach ($values as &$value) {
+                    if (is_string($value)) {
+                        $value = trim($value);
+                    }
+                }
+                $form->isRequired(['product_type'], 'انتخاب نوع محصول اجباری است.');
+
+                if (!in_array($values['category'], array_merge([-1], array_column($this->data['categories'], 'id')))) {
+                    $form->setError('دسته‌بندی انتخاب شده نامعتبر است.');
+                }
+                if (!in_array($values['city'], array_merge([-1], array_column($this->data['cities'], 'id')))) {
+                    $form->setError('شهر انتخاب شده نامعتبر است.');
+                }
+
+                $form->isIn('product_type', [-1, PRODUCT_TYPE_SERVICE, PRODUCT_TYPE_ITEM], 'نوع محصول نامعتبر است.');
+
+                if (!empty($values['price'])) {
+                    $form->isInRange('price', 0, PHP_INT_MAX, 'قیمت باید عددی بزرگتر از صفر باشد.');
+                }
+                if (!empty($values['discount_price'])) {
+                    $form->isInRange('discount_price', 0, PHP_INT_MAX, 'قیمت تخفیف باید عددی بزرگتر از صفر باشد.');
+                }
+
+                if (!$form->isChecked('no_expire')) {
+                    $form->validateDate('discount_expire', date('Y-m-d H:i:s', $values['discount_expire']), 'تاریخ انقضای تخفیف نامعتبر است.', 'Y-m-d H:i:s');
+                }
+
+                if (!empty($values['max_basket_count'])) {
+                    $form->isInRange('max_basket_count', 1, PHP_INT_MAX, 'حداکثر تعداد در یک خرید باید عددی بزرگتر از ۱ باشد.');
+                }
+
+                if (!empty($values['reward'])) {
+                    $form->isInRange('reward', 0, 100, 'پاداش خرید عددی بین ۰ و ۱۰۰ است.');
+                }
+            })->afterCheckCallback(function ($values) use ($model, $form) {
+                $updateColumns = [];
+                if ($values['category'] != -1) {
+                    $updateColumns['category_id'] = $values['category'];
+                }
+                if ($values['city'] != -1) {
+                    $updateColumns['city_id'] = $values['city'];
+                }
+                if (!empty($values['place'])) {
+                    $updateColumns['place'] = $values['place'];
+                }
+                if (!empty($values['price'])) {
+                    $updateColumns['price'] = $values['price'];
+                }
+                if (!empty($values['discount_price'])) {
+                    $updateColumns['discount_price'] = $values['discount_price'];
+                }
+                if (!empty($values['reward'])) {
+                    $updateColumns['reward'] = $values['reward'];
+                }
+                if (!empty($values['stock_count'])) {
+                    $updateColumns['stock_count'] = $values['stock_count'];
+                }
+                if (!empty($values['max_basket_count'])) {
+                    $updateColumns['max_cart_count'] = $values['max_basket_count'];
+                }
+                if ($values['product_type'] != -1) {
+                    $updateColumns['product_type'] = $values['product_type'];
+                }
+                if (!$form->isChecked('no_expire')) {
+                    $updateColumns['discount_until'] = $values['discount_expire'];
+                }
+                if (!$form->isChecked('no_special_change')) {
+                    $updateColumns['is_special'] = $form->isChecked('is_special') ? 1 : 0;
+                }
+                if (!$form->isChecked('no_publish_change')) {
+                    $updateColumns['publish'] = !$form->isChecked('publish') ? 0 : 1;
+                }
+                $updateColumns['updated_by'] = $this->data['identity']->id;
+                $updateColumns['updated_at'] = time();
+                //-----
+                $inWhere = '';
+                $extraParams = [];
+                foreach ($this->data['param'] as $k => $id) {
+                    $inWhere .= ':id' . ($k + 1) . ',';
+                    $extraParams['id' . ($k + 1)] = $id;
+                }
+                $inWhere = trim($inWhere, ',');
+                $res = $model->update_it(self::TBL_PRODUCT, $updateColumns, 'id IN (' . $inWhere . ')', $extraParams);
+
+                if (!$res) {
+                    $form->setError('خطا در انجام عملیات!');
+                }
+            });
+        } catch (Exception $e) {
+            die($e->getMessage());
+        }
+
+        $res = $form->checkForm()->isSuccess();
+        if ($form->isSubmit()) {
+            if ($res) {
+                $this->data['success'] = 'عملیات با موفقیت انجام شد.';
+            } else {
+                $this->data['errors'] = $form->getError();
+                $this->data['pValues'] = $form->getValues();
+            }
+        }
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'ویرایش محصولات');
+
+        // Extra css
+        $this->data['css'][] = $this->asset->css('be/css/persian-datepicker-custom.css');
+
+        // Extra js
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-date.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/pickers/persian-datepicker.min.js');
+
+        $this->_render_page([
+            'pages/be/Product/multiEditProduct',
+        ]);
+    }
+
     //-----
 
     public function manageOrdersAction()
@@ -1012,12 +1168,12 @@ class ShopController extends AbstractController
                     $params['ss'] = $values['send_status'];
                 }
                 // payment status
-                if($values['payment_status'] != -100) {
+                if ($values['payment_status'] != -100) {
                     $where .= 'payment_status=:ps AND ';
                     $params['ps'] = $values['payment_status'];
                 }
                 // payment method
-                if($values['payment_method'] != -100) {
+                if ($values['payment_method'] != -100) {
                     $where .= 'payment_method=:pm AND ';
                     $params['pm'] = $values['payment_method'];
                 }

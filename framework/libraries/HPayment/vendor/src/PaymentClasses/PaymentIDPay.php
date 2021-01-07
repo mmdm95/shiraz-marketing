@@ -65,6 +65,8 @@ class PaymentIDPay extends Payment
             4 => 'بلوکه شده',
             5 => 'برگشت به پرداخت کننده',
             6 => 'برگشت خورده سیستمی',
+            7 => 'انصراف از پرداخت',
+            8 => 'به درگاه پرداخت منتقل شد',
             self::PAYMENT_STATUS_WAIT_IDPAY => 'در انتظار تایید پرداخت',
             self::PAYMENT_STATUS_OK_IDPAY => 'پرداخت موفق',
             self::PAYMENT_STATUS_DUPLICATE_IDPAY => 'پرداخت قبلا انجام شده',
@@ -90,7 +92,7 @@ class PaymentIDPay extends Payment
         //Set APIKey
         $this->_parameters[$this->APIKeyStr] = $APIKey;
         // Set mode
-        $this->_parameters['mode'] = $this->urls[self::PAYMENT_MODE_PRODUCTION_IDPAY];
+        $this->_parameters['mode'] = self::PAYMENT_MODE_PRODUCTION_IDPAY;
     }
 
     /**

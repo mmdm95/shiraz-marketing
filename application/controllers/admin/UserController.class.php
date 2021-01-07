@@ -6,6 +6,9 @@ use Apfelbox\FileDownload\FileDownload;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
+use HPayment\PaymentClasses\PaymentBehPardakht;
+use HPayment\PaymentClasses\PaymentIDPay;
+use HPayment\PaymentClasses\PaymentMabna;
 use HPayment\PaymentClasses\PaymentZarinPal;
 use HPayment\PaymentFactory;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -20,6 +23,11 @@ class UserController extends AbstractController
 {
     public function manageUserAction()
     {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
         $userModel = new UserModel();
         $this->data['users'] = $userModel->getUsers('r.id=:rId', ['rId' => AUTH_ROLE_USER]);
 
@@ -45,13 +53,16 @@ class UserController extends AbstractController
 
         $this->data['marketers'] = $userModel->getUsers('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
 
+        $this->data['roles'] = $model->select_it(null, self::TBL_ROLE, '*', 'id IN (:id1, :id2, :id3, :id4, :id5)',
+            ['id1' => AUTH_ROLE_WRITER, 'id2' => AUTH_ROLE_PRODUCT_ADMIN, 'id3' => AUTH_ROLE_USER, 'id4' => AUTH_ROLE_USER_ADMIN, 'id5' => AUTH_ROLE_ORDER_ADMIN]);
+
         $this->data['errors'] = [];
 
         $this->load->library('HForm/Form');
         $form = new Form();
         $this->data['form_token'] = $form->csrfToken('addUser');
         $form->setFieldsName([
-            'image', 'mobile', 'subset_of', 'password', 're_password', 'first_name', 'last_name', 'n_code'])
+            'image', 'mobile', 'subset_of', 'password', 're_password', 'role', 'first_name', 'last_name', 'n_code'])
             ->setMethod('post', [
                 'image' => 'file'
             ], ['image']);
@@ -68,6 +79,11 @@ class UserController extends AbstractController
                     ->validatePersianName('last_name', 'نام خانوادگی باید از حروف فارسی باشند.')
                     ->isLengthInRange('password', 8, PHP_INT_MAX, 'تعداد کلمه عبور باید حداقل ۸ کاراکتر باشد.')
                     ->validatePassword('password', 2, 'کلمه عبور باید شامل حروف و اعداد باشد.');
+
+                $values['role'] = array_intersect($values['role'], array_column($this->data['roles'], 'id'));
+                if (!count($values['role'])) {
+                    $form->setError('هیچ نقشی برای این کاربر انتخاب نشده است!');
+                }
 
                 if ($values['password'] != $values['re_password']) {
                     $form->setError('کلمه عبور با تکرار آن مغایرت دارد.');
@@ -115,10 +131,12 @@ class UserController extends AbstractController
                     'active' => 1,
                     'created_at' => time(),
                 ], [], true);
-                $res3 = $model->insert_it(self::TBL_USER_ROLE, [
-                    'user_id' => $res,
-                    'role_id' => AUTH_ROLE_USER,
-                ]);
+                foreach ($values['role'] as $role) {
+                    $res3 = $model->insert_it(self::TBL_USER_ROLE, [
+                        'user_id' => $res,
+                        'role_id' => $role,
+                    ]);
+                }
                 $res2 = $model->insert_it(self::TBL_USER_ACCOUNT, [
                     'user_id' => $res,
                     'account_balance' => 0,
@@ -188,7 +206,7 @@ class UserController extends AbstractController
             $this->redirect(base_url('admin/user/manageUser'));
         }
 
-        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image'], 'id=:id', ['id' => $param[0]])[0];
+        $this->data['uTrueValues'] = $model->select_it(null, self::TBL_USER, ['mobile', 'image', 'province', 'city'], 'id=:id', ['id' => $param[0]])[0];
         $this->data['marketers'] = $userModel->getUsers('r.id=:role', ['role' => AUTH_ROLE_MARKETER]);
         $this->data['provinces'] = $model->select_it(null, self::TBL_PROVINCE, ['id', 'name']);
 
@@ -267,7 +285,6 @@ class UserController extends AbstractController
                 $model->transactionBegin();
 
                 // upload image
-                $res4 = true;
                 if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                     $img = $values['image']['name'];
                     $imageExt = pathinfo($img, PATHINFO_EXTENSION);
@@ -275,19 +292,20 @@ class UserController extends AbstractController
                     $image = PROFILE_IMAGE_DIR . $imageName . '.' . $imageExt;
                 } else {
                     $image = $this->data['uTrueValues']['image'];
+                    if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
+                        $newImageExt = pathinfo($this->data['uTrueValues']['image'], PATHINFO_EXTENSION);
+                        $newImgName = convertNumbersToPersian($values['mobile'], true);
+                        $image = PROFILE_IMAGE_DIR . $newImgName . '.' . $newImageExt;
+                    }
                 }
 
-                $res2 = true;
-                if (convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
-                    $res2 = unlink(realpath($values['image']));
-                }
                 $res = $model->update_it(self::TBL_USER, [
                     'subset_of' => $values['subset_of'] != -1 ? $values['subset_of'] : null,
                     'mobile' => convertNumbersToPersian($values['mobile'], true),
                     'first_name' => $values['first_name'],
                     'last_name' => $values['last_name'],
-                    'province' => $values['province'] != -1 ? $model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name'] : $this->data['uTrueValues']['province'] ?: '',
-                    'city' => $values['city'] != -1 && $values['province'] != -1 ? $model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name'] : $this->data['uTrueValues']['city'] ?: '',
+                    'province' => $values['province'] != -1 ? ($model->select_it(null, self::TBL_PROVINCE, ['name'], 'id=:id', ['id' => $values['province']])[0]['name']) : ($this->data['uTrueValues']['province'] ?: ''),
+                    'city' => $values['city'] != -1 && $values['province'] != -1 ? ($model->select_it(null, self::TBL_CITY, ['name'], 'id=:id AND province_id=:pId', ['id' => $values['city'], 'pId' => $values['province']])[0]['name']) : ($this->data['uTrueValues']['city'] ?: ''),
                     'n_code' => convertNumbersToPersian($values['n_code'], true),
                     'address' => $values['address'],
                     'postal_code' => $values['postal_code'],
@@ -308,12 +326,18 @@ class UserController extends AbstractController
                     'question7' => $values['question7'],
                     'description' => $values['description'],
                 ], 'id=:id', ['id' => $this->data['param'][0]]);
-                if ((!isset($values['image']['name']) || empty($values['image']['name'])) && $res &&
-                    convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
-                    $res4 = copy($values['image'], $image);
+                //-----
+                $res4 = true;
+                if ($res) {
+                    if (!isset($img) && convertNumbersToPersian($values['mobile'], true) != $this->data['uTrueValues']['mobile']) {
+                        $res4 = copy($this->data['uTrueValues']['image'], $image);
+                    }
+                    // Remove previous image file(s)
+                    $mask = PROFILE_IMAGE_DIR . $this->data['uTrueValues']['mobile'] . '.*';
+                    array_map('unlink', glob($mask));
                 }
 
-                if ($res && $res2 && $res4) {
+                if ($res && $res4) {
                     if (isset($values['image']['name']) && !empty($values['image']['name'])) {
                         $res5 = $this->_uploadUserImage('image', $image, $imageName, $this->data['param'][0]);
                         if ($res5) {
@@ -772,13 +796,13 @@ class UserController extends AbstractController
             'user_id=:uId AND exportation_type=:et AND status=:st', [
                 'uId' => $param[0],
                 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
-                'st' => \HPayment\PaymentClasses\PaymentIDPay::PAYMENT_STATUS_OK_IDPAY,
+                'st' => PaymentIDPay::PAYMENT_STATUS_OK_IDPAY,
             ])[0]['sum'];
         $mabnaSum = $model->select_it(null, self::PAYMENT_TABLE_MABNA, ['SUM(price) AS sum'],
             'user_id=:uId AND exportation_type=:et AND status=:st', [
                 'uId' => $param[0],
                 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
-                'st' => \HPayment\PaymentClasses\PaymentMabna::PAYMENT_STATUS_OK_MABNA,
+                'st' => PaymentMabna::PAYMENT_STATUS_OK_MABNA,
             ])[0]['sum'];
         $zarinpalSum = $model->select_it(null, self::PAYMENT_TABLE_ZARINPAL, ['SUM(price) AS sum'],
             'user_id=:uId AND exportation_type=:et AND status=:st', [
@@ -786,7 +810,13 @@ class UserController extends AbstractController
                 'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
                 'st' => PaymentZarinPal::PAYMENT_STATUS_OK_ZARINPAL,
             ])[0]['sum'];
-        $this->data['user']['total_income'] = $idPaySum + $mabnaSum + $zarinpalSum;
+        $behPardakhtSum = $model->select_it(null, self::PAYMENT_TABLE_BEH_PARDAKHT, ['SUM(price) AS sum'],
+            'user_id=:uId AND exportation_type=:et AND status=:st', [
+                'uId' => $param[0],
+                'et' => FACTOR_EXPORTATION_TYPE_DEPOSIT,
+                'st' => PaymentBehPardakht::PAYMENT_STATUS_OK_BEH_PARDAKHT,
+            ])[0]['sum'];
+        $this->data['user']['total_income'] = $idPaySum + $mabnaSum + $zarinpalSum + $behPardakhtSum;
         // Calculate account outcome
         $this->data['user']['total_outcome'] = $model->select_it(null, self::TBL_USER_ACCOUNT_BUY, ['SUM(price) AS sum'],
             'user_id=:uId', ['uId' => $param[0]])[0]['sum'];
@@ -892,9 +922,30 @@ class UserController extends AbstractController
 
     //-----
 
+    public function manageAdminUserAction()
+    {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ) || !$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
+            $this->error->access_denied();
+            die();
+        }
+        //-----
+        $userModel = new UserModel();
+        $this->data['users'] = $userModel->getUsers('r.id IN (:r1, :r2, :r3)',
+            ['r1' => AUTH_ROLE_WRITER, 'r2' => AUTH_ROLE_PRODUCT_ADMIN, 'r3' => AUTH_ROLE_USER_ADMIN]);
+
+        // Base configuration
+        $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده کاربران ادمین');
+
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/datatables.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/plugins/tables/datatables/numeric-comma.min.js');
+        $this->data['js'][] = $this->asset->script('be/js/pages/datatables_advanced.js');
+
+        $this->_render_page('pages/be/User/manageAdminUser');
+    }
+
     public function addUserRoleAction($param)
     {
-        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ)) {
+        if (!$this->auth->isAllow('user', AUTH_ACCESS_READ) || !$this->auth->isAllow('user', AUTH_ACCESS_UPDATE)) {
             $this->error->access_denied();
             die();
         }
@@ -903,11 +954,17 @@ class UserController extends AbstractController
         $userModel = new UserModel();
 
         if (!isset($param[0]) || !is_numeric($param[0]) || !$model->is_exist(self::TBL_USER, 'id=:id', ['id' => $param[0]])) {
-            $this->redirect(base_url('admin/user/manageUser'));
+            $this->redirect(base_url('admin/user/manageAdminUser'));
         }
 
+        $this->data['user'] = $userModel->getUsers('u.id=:id AND r.id IN (:r1, :r2, :r3, :r4)', ['id' => $param[0], 'r1' => AUTH_ROLE_WRITER, 'r2' => AUTH_ROLE_PRODUCT_ADMIN, 'r3' => AUTH_ROLE_USER_ADMIN, 'r4' => AUTH_ROLE_ORDER_ADMIN], 1);
+        if (!count($this->data['user'])) {
+            $this->redirect(base_url('admin/user/manageAdminUser'));
+        }
+        $this->data['user'] = $this->data['user'][0];
         $this->data['roles'] = $model->select_it(null, self::TBL_ROLE, '*',
-            'id IN (:id1, :id2)', ['id1' => AUTH_ROLE_WRITER, 'id2' => AUTH_ROLE_PRODUCT_ADMIN]);
+            'id IN (:id1, :id2, :id3, :id4, :id5)',
+            ['id1' => AUTH_ROLE_WRITER, 'id2' => AUTH_ROLE_PRODUCT_ADMIN, 'id3' => AUTH_ROLE_USER, 'id4' => AUTH_ROLE_USER_ADMIN, 'id5' => AUTH_ROLE_ORDER_ADMIN]);
 
         $this->data['param'] = $param;
 
@@ -925,7 +982,7 @@ class UserController extends AbstractController
                     return;
                 }
                 if ($model->is_exist(self::TBL_USER_ROLE, 'user_id=:uId AND role_id=:rId',
-                    ['uId' => $this->data['param'][0], 'rId' => AUTH_ROLE_USER])) {
+                    ['uId' => $this->data['param'][0], 'rId' => $values['role']])) {
                     $form->setError('کاربر دارای این نقش می‌باشد.');
                 }
             })->afterCheckCallback(function ($values) use ($model, $form) {
@@ -994,11 +1051,12 @@ class UserController extends AbstractController
             if (!$model->is_exist($table, 'id=:id', ['id' => $id])) {
                 message(self::AJAX_TYPE_ERROR, 200, 'کاربر وجود ندارد.');
             }
-            if ($this->auth->hasUserRole($role, $id)) {
+            $hasRole = $this->auth->hasUserRole($role, $id);
+            if (is_array($hasRole) || !((bool)$hasRole)) {
                 message(self::AJAX_TYPE_ERROR, 200, 'نقش انتخاب شده نامعتبر است.');
             }
             //-----
-            $res = $this->auth->removeUserRole($role, $id);;
+            $res = $this->auth->removeUserRole($role, $id);
             if ($res) {
                 message(self::AJAX_TYPE_SUCCESS, 200, 'نقش کاربر با موفقیت حذف شد.');
             }

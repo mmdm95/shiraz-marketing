@@ -30,17 +30,17 @@ $(function() {
     // -------------------------
 
     // Left alignment
-    $('#fab-menu-affixed-demo-left').affix({
-        offset: {
-            top: $('#fab-menu-affixed-demo-left').offset().top - 20
-        }
-    });
-
-    // Right alignment
-    $('#fab-menu-affixed-demo-right').affix({
-        offset: {
-            top: $('#fab-menu-affixed-demo-right').offset().top - 20
-        }
-    });
+    // $('#fab-menu-affixed-demo-left').affix({
+    //     offset: {
+    //         top: $('#fab-menu-affixed-demo-left').offset().top - 20
+    //     }
+    // });
+    //
+    // // Right alignment
+    // $('#fab-menu-affixed-demo-right').affix({
+    //     offset: {
+    //         top: $('#fab-menu-affixed-demo-right').offset().top - 20
+    //     }
+    // });
 
 });

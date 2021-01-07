@@ -70,13 +70,13 @@
                                                 <tbody>
                                                 <?php foreach ($orders as $key => $order): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
                                                             <?= $order['order_code']; ?>
                                                         </td>
-                                                        <td>
+                                                        <td data-order="<?= $order['created_at']; ?>">
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $order['created_at']); ?>
                                                         </td>
                                                         <td>

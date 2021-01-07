@@ -70,6 +70,14 @@
 
                                 <?php if ($auth->isAllow('user', AUTH_ACCESS_READ)): ?>
                                     <li>
+                                        <a href="<?= base_url(); ?>admin/user/manageAdminUser">
+                                            <i class="icon-user-tie" style="font-size: 13px;"></i>
+                                            <small>
+                                                کاربران ادمین
+                                            </small>
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a href="<?= base_url(); ?>admin/user/manageUser">
                                             <i class="icon-users" style="font-size: 13px;"></i>
                                             <small>
@@ -345,7 +353,13 @@
                         <li>
                             <a href="<?= base_url(); ?>admin/report/orderReport">
                                 <i class="icon-file-excel"></i>
-                                <span>چاپ گزارش</span>
+                                <span>گزارش سفارشات</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= base_url(); ?>admin/report/walletReport">
+                                <i class="icon-file-excel"></i>
+                                <span>گزارش کیف پول</span>
                             </a>
                         </li>
                         <!-- Report -->

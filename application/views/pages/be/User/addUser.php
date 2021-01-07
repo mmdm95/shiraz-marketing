@@ -117,6 +117,20 @@
 
                                     <div class="col-lg-12"></div>
 
+                                    <div class="form-group col-lg-12">
+                                        <span class="text-danger">*</span>
+                                        <label>انتخاب نقش:</label>
+                                        <select class="select-no-search" name="role[]" multiple>
+                                            <?php foreach ($roles as $role): ?>
+                                                <option value="<?= $role['id']; ?>">
+                                                    <?= $role['description']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-12"></div>
+
                                     <div class="form-group col-lg-4">
                                         <label>نام:</label>
                                         <input name="first_name" type="text"

@@ -172,7 +172,7 @@
                                                 <tbody>
                                                 <?php foreach ($user['transactions']['outcome'] as $key => $transaction): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
@@ -188,7 +188,7 @@
                                                             <?= convertNumbersToPersian(number_format(convertNumbersToPersian($transaction['price'], true))) ?>
                                                             تومان
                                                         </td>
-                                                        <td>
+                                                        <td data-order="<?= $transaction['payment_date']; ?>">
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $transaction['payment_date']); ?>
                                                         </td>
                                                     </tr>
@@ -231,7 +231,7 @@
                                                 <tbody>
                                                 <?php foreach ($user['transactions']['income'] as $key => $transaction): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
@@ -255,7 +255,7 @@
                                                         <td>
                                                             <?= $transaction['description'] ?: '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                         </td>
-                                                        <td>
+                                                        <td data-order="<?= $transaction['deposit_date']; ?>">
                                                             <?= jDateTime::date('j F Y در ساعت H:i', $transaction['deposit_date']); ?>
                                                         </td>
                                                     </tr>

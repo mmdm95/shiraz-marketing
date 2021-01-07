@@ -43,129 +43,127 @@
             <div class="content">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <form action="<?= base_url('admin/report/orderReport'); ?>" method="post">
-                                <?= $form_token; ?>
+                        <form action="<?= base_url('admin/report/orderReport'); ?>" method="post">
+                            <?= $form_token; ?>
 
-                                <div class="panel panel-white">
-                                    <div class="panel-heading">
-                                        <h6 class="panel-title">جست و جو بر اساس:</h6>
-                                        <div class="heading-elements">
-                                            <ul class="icons-list">
-                                                <li><a data-action="collapse"></a></li>
-                                            </ul>
-                                        </div>
+                            <div class="panel panel-white">
+                                <div class="panel-heading">
+                                    <h6 class="panel-title">جست و جو بر اساس:</h6>
+                                    <div class="heading-elements">
+                                        <ul class="icons-list">
+                                            <li><a data-action="collapse"></a></li>
+                                        </ul>
                                     </div>
-                                    <div class="panel-body">
-                                        <div class="form-group col-lg-4">
-                                            <label>کاربر:</label>
-                                            <select class="select"
-                                                    name="user">
-                                                <option value="-1">انتخاب کنید</option>
-                                                <?php foreach ($users as $user): ?>
-                                                    <option value="<?= $user['id']; ?>"
-                                                        <?= set_value($filters['user'] ?? '', $user['id'], 'selected', '', '=='); ?>>
-                                                        <?php if (!empty($user['first_name']) || !empty($user['last_name'])): ?>
-                                                            <?= $user['username']; ?>
-                                                            -
-                                                            <?= $user['first_name'] . ' ' . $user['last_name']; ?>
-                                                        <?php else: ?>
-                                                            <?= $user['username']; ?>
-                                                        <?php endif; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>از تاریخ:</label>
-                                            <input type="hidden" name="from_date" id="altDateField">
-                                            <input type="text" class="form-control range-from"
-                                                   placeholder="" readonly data-alt-field="#altDateField"
-                                                   value="<?= date('Y/m/d H:i', (int)($filters['from_date'] ?? time())); ?>">
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>تا تاریخ:</label>
-                                            <input type="hidden" name="to_date" id="altDateField2">
-                                            <input type="text" class="form-control range-to"
-                                                   placeholder="تاریخ انقضا" readonly
-                                                   data-alt-field="#altDateField2"
-                                                   value="<?= date('Y/m/d H:i', (int)($filters['to_date'] ?? time())); ?>">
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>وضعیت سفارش:</label>
-                                            <select class="select"
-                                                    name="send_status">
-                                                <option value="-1">انتخاب کنید</option>
-                                                <?php foreach ($status as $st): ?>
-                                                    <option value="<?= $st['id']; ?>"
-                                                        <?= set_value($filters['send_status'] ?? '', $st['id'], 'selected', '', '=='); ?>>
-                                                        <?= $st['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>وضعیت پرداخت:</label>
-                                            <select class="select"
-                                                    name="payment_status">
-                                                <option value="-100">انتخاب کنید</option>
-                                                <?php foreach (OWN_PAYMENT_STATUSES as $key => $status): ?>
-                                                    <option value="<?= $key; ?>"
-                                                        <?= ($filters['payment_status'] ?? -100) == $key ? 'selected' : ''; ?>>
-                                                        <?= $status; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>نحوه پرداخت:</label>
-                                            <select class="select"
-                                                    name="payment_method">
-                                                <option value="-100">انتخاب کنید</option>
-                                                <?php foreach (PAYMENT_METHODS as $key => $method): ?>
-                                                    <option value="<?= $key; ?>"
-                                                        <?= ($filters['payment_method'] ?? -100) == $key ? 'selected' : ''; ?>>
-                                                        <?= $method; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>استان:</label>
-                                            <input name="province" type="text"
-                                                   class="form-control"
-                                                   placeholder="نام استان"
-                                                   value="<?= $filters['province'] ?? '' ?>">
-                                        </div>
-                                        <div class="form-group col-lg-4">
-                                            <label>شهر:</label>
-                                            <input name="city" type="text"
-                                                   class="form-control"
-                                                   placeholder="نام شهر"
-                                                   value="<?= $filters['city'] ?? '' ?>">
-                                        </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group col-lg-4">
+                                        <label>کاربر:</label>
+                                        <select class="select"
+                                                name="user">
+                                            <option value="-1">انتخاب کنید</option>
+                                            <?php foreach ($users as $user): ?>
+                                                <option value="<?= $user['id']; ?>"
+                                                    <?= set_value($filters['user'] ?? '', $user['id'], 'selected', '', '=='); ?>>
+                                                    <?php if (!empty($user['first_name']) || !empty($user['last_name'])): ?>
+                                                        <?= $user['username']; ?>
+                                                        -
+                                                        <?= $user['first_name'] . ' ' . $user['last_name']; ?>
+                                                    <?php else: ?>
+                                                        <?= $user['username']; ?>
+                                                    <?php endif; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>از تاریخ:</label>
+                                        <input type="hidden" name="from_date" id="altDateField">
+                                        <input type="text" class="form-control range-from"
+                                               placeholder="" readonly data-alt-field="#altDateField"
+                                               value="<?= date('Y/m/d H:i', (int)($filters['from_date'] ?? time())); ?>">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>تا تاریخ:</label>
+                                        <input type="hidden" name="to_date" id="altDateField2">
+                                        <input type="text" class="form-control range-to"
+                                               placeholder="تاریخ انقضا" readonly
+                                               data-alt-field="#altDateField2"
+                                               value="<?= date('Y/m/d H:i', (int)($filters['to_date'] ?? time())); ?>">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>وضعیت سفارش:</label>
+                                        <select class="select"
+                                                name="send_status">
+                                            <option value="-1">انتخاب کنید</option>
+                                            <?php foreach ($status as $st): ?>
+                                                <option value="<?= $st['id']; ?>"
+                                                    <?= set_value($filters['send_status'] ?? '', $st['id'], 'selected', '', '=='); ?>>
+                                                    <?= $st['name']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>وضعیت پرداخت:</label>
+                                        <select class="select"
+                                                name="payment_status">
+                                            <option value="-100">انتخاب کنید</option>
+                                            <?php foreach (OWN_PAYMENT_STATUSES as $key => $status): ?>
+                                                <option value="<?= $key; ?>"
+                                                    <?= ($filters['payment_status'] ?? -100) == $key ? 'selected' : ''; ?>>
+                                                    <?= $status; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>نحوه پرداخت:</label>
+                                        <select class="select"
+                                                name="payment_method">
+                                            <option value="-100">انتخاب کنید</option>
+                                            <?php foreach (PAYMENT_METHODS as $key => $method): ?>
+                                                <option value="<?= $key; ?>"
+                                                    <?= ($filters['payment_method'] ?? -100) == $key ? 'selected' : ''; ?>>
+                                                    <?= $method; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>استان:</label>
+                                        <input name="province" type="text"
+                                               class="form-control"
+                                               placeholder="نام استان"
+                                               value="<?= $filters['province'] ?? '' ?>">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>شهر:</label>
+                                        <input name="city" type="text"
+                                               class="form-control"
+                                               placeholder="نام شهر"
+                                               value="<?= $filters['city'] ?? '' ?>">
+                                    </div>
 
-                                        <div class="form-group col-lg-12">
-                                            <div class="modal-footer mt-20">
-                                                <?php if (($hasFilter ?? false) === true): ?>
-                                                    <a href="<?= base_url('admin/shop/manageOrders'); ?>"
-                                                       class="btn btn-warning">
-                                                        <i class="icon-close2 position-left"
-                                                           aria-hidden="true"></i>
-                                                        حذف فیلتر
-                                                    </a>
-                                                <?php endif; ?>
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="icon-search4 position-left"
+                                    <div class="form-group col-lg-12">
+                                        <div class="modal-footer mt-20">
+                                            <?php if (($hasFilter ?? false) === true): ?>
+                                                <a href="<?= base_url('admin/shop/manageOrders'); ?>"
+                                                   class="btn btn-warning">
+                                                    <i class="icon-close2 position-left"
                                                        aria-hidden="true"></i>
-                                                    فیلتر کُن
-                                                </button>
-                                            </div>
+                                                    حذف فیلتر
+                                                </a>
+                                            <?php endif; ?>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="icon-search4 position-left"
+                                                   aria-hidden="true"></i>
+                                                فیلتر کُن
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="row">
@@ -210,7 +208,7 @@
                                         <tbody>
                                         <?php foreach ($orders as $key => $order): ?>
                                             <tr>
-                                                <td width="50px">
+                                                <td width="50px" data-order="<?= $key + 1; ?>">
                                                     <?= convertNumbersToPersian($key + 1); ?>
                                                 </td>
                                                 <td>
@@ -219,7 +217,7 @@
                                                 <td>
                                                     <?= $order['mobile']; ?>
                                                 </td>
-                                                <td>
+                                                <td data-order="<?= $order['order_date']; ?>">
                                                     <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
                                                 </td>
                                                 <td>
@@ -289,11 +287,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Footer -->
-            <?php $this->view("templates/be/copyright", $data); ?>
-            <!-- /footer -->
+                <!-- Footer -->
+                <?php $this->view("templates/be/copyright", $data); ?>
+                <!-- /footer -->
+            </div>
         </div>
         <!-- /content area -->
     </div>

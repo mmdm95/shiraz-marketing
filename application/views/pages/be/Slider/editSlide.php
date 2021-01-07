@@ -101,7 +101,7 @@
                                             آدرس لینک:
                                         </label>
                                         <input name="url"
-                                               type="url"
+                                               type="text"
                                                class="form-control"
                                                placeholder="مثال: www.spsroham.ir/contactUs"
                                                value="<?= $slideValues['url'] ?? $slideTrueValues['link'] ?? ''; ?>">

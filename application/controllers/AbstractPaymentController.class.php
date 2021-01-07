@@ -1,12 +1,17 @@
 <?php
 
+use HConvert\Converter\NumberConverter;
 use HPayment\Payment;
 
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 abstract class AbstractPaymentController extends HController
 {
+    /**
+     * @var \HAuthentication\Auth $auth
+     */
     protected $auth;
+
     protected $setting;
     protected $data = [];
     //-----
@@ -23,7 +28,9 @@ abstract class AbstractPaymentController extends HController
         self::PAYMENT_TABLE_IDPAY => [
             'PAY_798447359',
         ],
-        self::PAYMENT_TABLE_MABNA => [],
+        self::PAYMENT_TABLE_MABNA => [
+            'PAY_654812379',
+        ],
         self::PAYMENT_TABLE_BEH_PARDAKHT => [
             'PAY_342515312',
         ],
@@ -86,6 +93,11 @@ abstract class AbstractPaymentController extends HController
     const TBL_USER_ACCOUNT_BUY = 'user_accounts_buy';
     const TBL_USER_ACCOUNT_DEPOSIT = 'user_account_deposit';
 
+    /**
+     * @var NumberConverter
+     */
+    private $converter;
+
     //-----
 
     public function __construct()
@@ -100,6 +112,14 @@ abstract class AbstractPaymentController extends HController
             self::PAYMENT_TABLE_BEH_PARDAKHT => Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT,
             self::PAYMENT_TABLE_ZARINPAL => Payment::PAYMENT_STATUS_OK_ZARINPAL,
         ];
+
+        // initialize converter
+        $this->load->library('HConvert/vendor/autoload');
+        $this->converter = NumberConverter::getInstance();
+
+        // convert all string in POST and GET to persian
+        $this->_convertToPersianThenEnglishAlphabet($_GET);
+        $this->_convertToPersianThenEnglishAlphabet($_POST);
     }
 
     public function getCityAction()
@@ -199,5 +219,18 @@ abstract class AbstractPaymentController extends HController
             return true;
         }
         return false;
+    }
+
+    protected function _convertToPersianThenEnglishAlphabet(array &$arr)
+    {
+        if(!empty($arr)) {
+            foreach ($arr as $k => &$v) {
+                if(is_array($v)) {
+                    $this->_convertToPersianThenEnglishAlphabet($v);
+                } elseif(is_string($v)) {
+                    $v = $this->converter->toEnglish($this->converter->toPersian($v));
+                }
+            }
+        }
     }
 }

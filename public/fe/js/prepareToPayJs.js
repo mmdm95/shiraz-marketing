@@ -9,7 +9,8 @@
         var
             theForm,
             //-----
-            get_token_url_beh_pardakht;
+            get_token_url_beh_pardakht,
+            get_token_url_mabna;
 
         var
             namespace = 'shoppingActions',
@@ -18,7 +19,8 @@
             //-----
             ajax_obj = {};
 
-        get_token_url_beh_pardakht = baseUrl + '_beh_pardakht_connection';
+        get_token_url_beh_pardakht = baseUrl + '_beh_pardakht_connection',
+            get_token_url_mabna = baseUrl + '_mabna_connection';
 
         //------------------------------
         //---------- Functions ---------
@@ -38,7 +40,8 @@
                             method: 'POST',
                             data: {
                                 paymentCode: code,
-                            }
+                            },
+                            async: false,
                         }, function (response) {
                             // console.log(response);
                             // console.log(JSON.parse(response));
@@ -47,13 +50,40 @@
 
                             shop.processAjaxData(res, function (content) {
                                 if (res.success) {
-                                    $this.attr('action', content[0] /* url */).attr('method', 'post');
+                                    $this.attr('action', content[0] /* url */)
+                                        .attr('method', 'post')
+                                        .attr('target', '_self');
                                     refId_field = _hiddenField('RefId', content[1] /* Reference ID */);
                                     $this.prepend(refId_field);
                                     //-----
                                     canSubmit = true;
-                                } else {
-                                    canSubmit = false;
+                                }
+                            });
+                        });
+                    } else if (code == 'PAY_654812379') {
+                        shop.ajaxRequest({
+                            url: get_token_url_mabna,
+                            method: 'POST',
+                            data: {
+                                paymentCode: code,
+                            },
+                            async: false,
+                        }, function (response) {
+                            // console.log(response);
+                            // console.log(JSON.parse(response));
+
+                            var res = JSON.parse(response);
+
+                            shop.processAjaxData(res, function (content) {
+                                if (res.success) {
+                                    $this.attr('action', content[0] /* url */)
+                                        .attr('method', 'post')
+                                        .attr('target', '_self');
+                                    refId_field = _hiddenField('terminalID', content[1] /* Terminal ID */);
+                                    $this.prepend(_hiddenField('token', content[2] /* TOKEN */));
+                                    $this.prepend(refId_field);
+                                    //-----
+                                    canSubmit = true;
                                 }
                             });
                         });

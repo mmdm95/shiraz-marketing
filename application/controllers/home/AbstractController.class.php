@@ -92,6 +92,7 @@ abstract class AbstractController extends AbstractPaymentController
             $this->paymentSettingMap = [
                 'PAY_798447359' => $this->data['setting']['payment']['bank_1']['enable'] ?? false,
                 'PAY_342515312' => $this->data['setting']['payment']['bank_2']['enable'] ?? false,
+                'PAY_654812379' => $this->data['setting']['payment']['bank_3']['enable'] ?? false,
                 PAYMENT_METHOD_WALLET => $this->data['setting']['payment']['wallet']['enable'] ?? false,
                 PAYMENT_METHOD_IN_PLACE => $this->data['setting']['payment']['in_place']['enable'] ?? false,
                 PAYMENT_METHOD_RECEIPT => $this->data['setting']['payment']['receipt']['enable'] ?? false,
@@ -183,7 +184,7 @@ abstract class AbstractController extends AbstractPaymentController
 
                         $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
-                            $form->setError('کاربری با این نام شماره موبایل وجود ندارد!');
+                            $form->setError('کاربری با این شماره موبایل وجود ندارد!');
                             return;
                         }
                     })->afterCheckCallback(function ($values) use ($model, $form) {
@@ -422,7 +423,7 @@ abstract class AbstractController extends AbstractPaymentController
                         }
                         $form->isRequired(['username'], 'فیلدهای ضروری را خالی نگذارید.');
                         if (!$model->is_exist(self::TBL_USER, 'mobile=:username', ['username' => $values['username']])) {
-                            $form->setError('کاربری با این نام شماره موبایل وجود ندارد!');
+                            $form->setError('کاربری با این شماره موبایل وجود ندارد!');
                             return;
                         }
                         if ($model->is_exist(self::TBL_USER, 'mobile=:username AND active=:active', ['username' => $values['username'], 'active' => 1])) {
@@ -1578,7 +1579,7 @@ abstract class AbstractController extends AbstractPaymentController
                 $hasProductType = true;
             }
             $res['quantity'] = $res['quantity'] > $res['stock_count'] ? $res['stock_count'] : $res['quantity'];
-            $discount = $res['discount_until'] > time() ? convertNumbersToPersian($res['discount_price'], true) : $res['price'];
+            $discount = (is_null($res['discount_until']) || $res['discount_until'] > time()) ? convertNumbersToPersian($res['discount_price'], true) : $res['price'];
             $res['discount_percentage'] = floor(((convertNumbersToPersian($res['price'], true) - $discount) / convertNumbersToPersian($res['price'], true)) * 100);
 
             $items[] = $res;
@@ -1609,7 +1610,7 @@ abstract class AbstractController extends AbstractPaymentController
         $model = new \ProductModel();
         //-----
         foreach ($saved_cart_items as $id => $eachItem) {
-            $mainItem = $model->getProducts('p.id=:id AND p.stock_count>:sc AND p.available=:av', ['id' => $id, 'sc' => 0, 'av' => 1]);
+            $mainItem = $model->getProducts('p.id=:id AND p.stock_count>:sc AND p.publish=:pub AND p.available=:av', ['id' => $id, 'sc' => 0, 'pub' => 1, 'av' => 1]);
             $this->haveCartAccess = true;
             if (!count($mainItem) ||
                 (count($mainItem) && $mainItem[0]['available'] == 0)) {
@@ -1710,9 +1711,9 @@ abstract class AbstractController extends AbstractPaymentController
         foreach ($items as $item) {
             $totalAmount += $item['price'] * $item['quantity'];
 
-            if($item['discount_percentage'] == 0) {
+            if ($item['discount_percentage'] == 0) {
                 $discount = $item['price'];
-            } elseif($item['discount_percentage'] == 100) {
+            } elseif ($item['discount_percentage'] == 100) {
                 $discount = 0;
             } else {
                 $discount = $item['discount_price'];
@@ -1935,7 +1936,7 @@ abstract class AbstractController extends AbstractPaymentController
 
     // Gateway connection functions
 
-    protected function _idpay_connection($parameters)
+    protected function _idpay_connection($parameters, $removeItems = true)
     {
         if (!$this->auth->isLoggedIn()) return false;
         //-----
@@ -1966,8 +1967,10 @@ abstract class AbstractController extends AbstractPaymentController
                 ]);
 
                 if ($res) {
-                    // Delete cart items
-                    $this->removeAllFromCartAction();
+                    if ((bool)$removeItems) {
+                        // Delete cart items
+                        $this->removeAllFromCartAction();
+                    }
 
                     // Send user to idpay for transaction
                     $this->redirect($payRes['link'], $redirectMessage, $wait);
@@ -2016,7 +2019,7 @@ abstract class AbstractController extends AbstractPaymentController
                 'invoiceID' => $parameters['order_code'],
                 'Amount' => $parameters['price'] * 10,
                 'callbackURL' => $parameters['backUrl'],
-                'terminalID' => '69005147'])->get_result();
+                'terminalID' => '69006300'])->get_result();
 
             // Handle result of payment gateway
             if (isset($payRes['Status']) && isset($payRes['AccessToken']) && $payRes['Status'] == 0) {
@@ -2029,7 +2032,7 @@ abstract class AbstractController extends AbstractPaymentController
                 ]);
                 // Required information
                 $token = $payRes['AccessToken'];
-                $terminal = '69005147';
+                $terminal = '69006300';
                 $url = $mabna->urls[PaymentMabna::PAYMENT_URL_PAYMENT_MABNA];
 
                 if ($res) {
@@ -2133,11 +2136,19 @@ abstract class AbstractController extends AbstractPaymentController
             $orderID = $common->generate_random_unique_code(self::PAYMENT_TABLE_BEH_PARDAKHT, 'order_id', '', 6,
                 15, 10, CommonModel::DIGITS);
             $payRes = $beh_pardakht->create_request([
-                'orderId' => $orderID,
-                'amount' => $parameters['price'] * 10,
-                'localDate' => date('Ymd'),
-                'localTime' => date('Gis'),
-                'callBackUrl' => $parameters['backUrl']])->get_result();
+                'orderId' => (int)$orderID,
+                'amount' => (int)$parameters['price'] * 10,
+                'localDate' => (string)date('Ymd'),
+                'localTime' => (string)date('Gis'),
+                'additionalData' => '',
+                'callBackUrl' => $parameters['backUrl'],
+                'payerId' => 0])->get_result();
+            //------------------------------
+//            $orderModel->returnProductsToStock($parameters['order_code']);
+//            $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+//            $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
+//            message(self::AJAX_TYPE_SUCCESS, 200, ['', $beh_pardakht->urls[PaymentBehPardakht::PAYMENT_URL_PAYMENT_BEH_PARDAKHT], $payRes['RefId']]);
+            //------------------------------
 
             // Handle result of payment gateway
             if (isset($payRes['ResCode']) && isset($payRes['RefId']) && $payRes['ResCode'] == 0) {
@@ -2158,8 +2169,8 @@ abstract class AbstractController extends AbstractPaymentController
                     // Delete cart items
                     $this->removeAllFromCartAction();
 
-                    // Send user to mabna for transaction
-                    message(self::AJAX_TYPE_SUCCESS, 200, [$url, $refId]);
+                    // Send user to beh_pardakht for transaction
+                    message(self::AJAX_TYPE_SUCCESS, 200, ['', $url, $refId]);
                 } else {
                     $orderModel->returnProductsToStock($parameters['order_code']);
                     $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
@@ -2295,10 +2306,16 @@ abstract class AbstractController extends AbstractPaymentController
 
                 // Store current result from bank gateway
                 if (!isset($status)) {
-                    $updateColumns = [
-                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                        'payment_date' => $postVars['date'],
-                    ];
+                    if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
+                        $updateColumns = [
+                            'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                            'payment_date' => $postVars['date'],
+                        ];
+                    } else {
+                        $updateColumns = [
+                            'payment_date' => $postVars['date'],
+                        ];
+                    }
                 } else {
                     $updateColumns = [
                         'payment_date' => $postVars['date'],
@@ -2335,7 +2352,7 @@ abstract class AbstractController extends AbstractPaymentController
             $model = new Model();
             $mabna = PaymentFactory::get_instance(PaymentFactory::BANK_TYPE_MABNA);
             $postVars = $mabna->handle_request()->get_result();
-            $terminal = '69005147';
+            $terminal = '69006300';
 
             // Check for factor first and If factor exists
             if (isset($postVars['respcode']) && isset($postVars['respmsg']) && isset($postVars['amount']) &&
@@ -2458,10 +2475,16 @@ abstract class AbstractController extends AbstractPaymentController
 
                 // Store current result from bank gateway
                 if (!isset($status)) {
-                    $updateColumns = [
-                        'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                        'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
-                    ];
+                    if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
+                        $updateColumns = [
+                            'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                            'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
+                        ];
+                    } else {
+                        $updateColumns = [
+                            'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
+                        ];
+                    }
                 } else {
                     $updateColumns = [
                         'payment_date' => is_numeric($postVars['datePaid']) ? $postVars['datePaid'] : time(),
@@ -2623,7 +2646,6 @@ abstract class AbstractController extends AbstractPaymentController
 
             // Check for factor first and If factor exists
             if (isset($postVars['RefId']) && isset($postVars['ResCode']) && isset($postVars['SaleOrderId']) &&
-                isset($postVars['SaleReferenceId']) && isset($postVars['CardHolderPAN']) && isset($postVars['FinalAmount']) &&
                 $model->is_exist(self::PAYMENT_TABLE_BEH_PARDAKHT, 'order_id=:oi AND ref_id=:ri', ['oi' => $postVars['SaleOrderId'], 'ri' => $postVars['RefId']])) {
                 $orderCode = $model->select_it(null, self::PAYMENT_TABLE_BEH_PARDAKHT, 'order_code',
                     'order_id=:oi AND ref_id=:ri', ['oi' => $postVars['SaleOrderId'], 'ri' => $postVars['RefId']]);
@@ -2646,7 +2668,7 @@ abstract class AbstractController extends AbstractPaymentController
                             $orderPayment = $orderPayment[0];
                             // Check if factor was advice before
                             if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED &&
-                                !in_array($orderPayment['status'], [Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT, Payment::PAYMENT_STATUS_DUPLICATE_BEH_PARDAKHT])) {
+                                (is_null($orderPayment['status']) || !in_array($orderPayment['status'], [Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT, Payment::PAYMENT_STATUS_DUPLICATE_BEH_PARDAKHT]))) {
                                 // If all are ok send advice to bank gateway
                                 // This means ready to transfer money to our bank account
                                 $advice = $beh_pardakht->verify_request([
@@ -2654,64 +2676,78 @@ abstract class AbstractController extends AbstractPaymentController
                                     'saleOrderId' => $postVars['SaleOrderId'],
                                     'saleReferenceId' => $postVars['SaleReferenceId'],
                                 ])->get_result();
+                                $advice['ResCode'] = $advice['return'];
 
                                 // Check for error
-                                if (isset($advice['ResCode']) &&
-                                    ($advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT || $advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT)) {
+                                if ($advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT || $advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
                                     $settle = $beh_pardakht->settle_request([
                                         'orderId' => $postVars['SaleOrderId'],
                                         'saleOrderId' => $postVars['SaleOrderId'],
                                         'saleReferenceId' => $postVars['SaleReferenceId'],
-                                    ]);
+                                    ])->get_result();
 
-                                    $status = $advice['ResCode'];
-                                    // Check for status if it's just OK/0 [0 => OK, etc.]
-                                    if ($status == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
-                                        // Transaction
-                                        $model->transactionBegin();
-                                        // Store extra info from bank's gateway result
-                                        $res1 = $model->update_it(self::TBL_ORDER, [
-                                            'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
-                                        ], 'order_code=:oc', ['oc' => $order['order_code']]);
-                                        $res2 = $model->update_it(self::PAYMENT_TABLE_BEH_PARDAKHT, [
-                                            'payment_code' => $advice['SaleReferenceId'] ?: '',
-                                            'status' => $status,
-                                        ], 'order_code=:oc', ['oc' => $order['order_code']]);
-                                        $success = $beh_pardakht->get_message($advice['ResCode']);
-                                        $traceNumber = $advice['SaleReferenceId'];
+                                    if ($settle['return'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
+                                        $status = $advice['ResCode'];
+                                        // Check for status if it's just OK/0 [0 => OK, etc.]
+                                        if ($status == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
+                                            // Transaction
+                                            $model->transactionBegin();
+                                            // Store extra info from bank's gateway result
+                                            $res1 = $model->update_it(self::TBL_ORDER, [
+                                                'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
+                                            ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                            $res2 = $model->update_it(self::PAYMENT_TABLE_BEH_PARDAKHT, [
+                                                'payment_code' => $postVars['SaleReferenceId'],
+                                                'status' => $status,
+                                            ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                            $success = $beh_pardakht->get_message($advice['ResCode']);
+                                            $traceNumber = $postVars['SaleReferenceId'];
 
-                                        $this->data['ref_id'] = $traceNumber;
-                                        $this->data['have_ref_id'] = true;
-                                        if ($res1 && $res2) {
-                                            $model->transactionComplete();
-                                            // Set success parameters
-                                            $this->data['success'] = $success;
-                                            $this->data['is_success'] = true;
+                                            $this->data['ref_id'] = $traceNumber;
+                                            $this->data['have_ref_id'] = true;
+                                            if ($res1 && $res2) {
+                                                $model->transactionComplete();
+                                                // Set success parameters
+                                                $this->data['success'] = $success;
+                                                $this->data['is_success'] = true;
 
-                                            // Send sms to user if is login
-                                            if ($this->auth->isLoggedIn()) {
-                                                // Send SMS code goes here
-                                                $this->load->library('HSMS/rohamSMS');
-                                                $sms = new rohamSMS();
-                                                try {
-                                                    $body = $this->setting['sms']['productRegistrationMsg'];
-                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
-                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
-                                                    $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
-                                                } catch (SMSException $e) {
-                                                    die($e->getMessage());
+                                                // Send sms to user if is login
+                                                if ($this->auth->isLoggedIn()) {
+                                                    // Send SMS code goes here
+                                                    $this->load->library('HSMS/rohamSMS');
+                                                    $sms = new rohamSMS();
+                                                    try {
+                                                        $body = $this->setting['sms']['productRegistrationMsg'];
+                                                        $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                                        $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
+                                                        $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                                    } catch (SMSException $e) {
+                                                        die($e->getMessage());
+                                                    }
                                                 }
+                                            } else {
+                                                $model->transactionRollback();
+                                                $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                                $this->data['error'] .= "<br>";
+                                                $this->data['error'] .= 'لطفا از صفحه خود اسکرین شات بگیرید و کد رهگیری را یادداشت نمایید.';
+                                                $this->data['is_success'] = false;
                                             }
                                         } else {
-                                            $model->transactionRollback();
-                                            $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                            $this->data['error'] = 'عملیات پرداخت انجام نشد!';
                                             $this->data['is_success'] = false;
+                                            $this->data['ref_id'] = $postVars['SaleReferenceId'];
+                                            $this->data['have_ref_id'] = true;
                                         }
+                                    } else {
+                                        $this->data['error'] = 'عملیات پرداخت انجام نشد!';
+                                        $this->data['is_success'] = false;
+                                        $this->data['ref_id'] = $postVars['SaleReferenceId'];
+                                        $this->data['have_ref_id'] = true;
                                     }
                                 } else {
                                     $this->data['error'] = $beh_pardakht->get_message($advice['ResCode']);
                                     $this->data['is_success'] = false;
-                                    $this->data['ref_id'] = $advice['SaleReferenceId'];
+                                    $this->data['ref_id'] = $postVars['SaleReferenceId'];
                                     $this->data['have_ref_id'] = true;
                                 }
                             } else {
@@ -2731,17 +2767,24 @@ abstract class AbstractController extends AbstractPaymentController
 
                         // Store current result from bank gateway
                         if (!isset($status)) {
-                            $updateColumns = [
-                                'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                                'payment_date' => is_numeric($postVars['']) ? $postVars[''] : time(),
-                            ];
+                            if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
+                                $updateColumns = [
+                                    'payment_status' => OWN_PAYMENT_STATUS_FAILED,
+                                    'payment_date' => time(),
+                                ];
+                            } else {
+                                $updateColumns = [
+                                    'payment_date' => time(),
+                                ];
+                            }
                         } else {
                             $updateColumns = [
-                                'payment_date' => is_numeric($postVars['']) ? $postVars[''] : time(),
+                                'payment_date' => time(),
                             ];
                         }
                         $model->update_it(self::TBL_ORDER, $updateColumns, 'order_code=:oc', ['oc' => $order['order_code']]);
                         $model->update_it(self::PAYMENT_TABLE_BEH_PARDAKHT, [
+                            'payment_code' => $postVars['SaleReferenceId'],
                             'sale_reference_id' => $postVars['SaleReferenceId'],
                             'status' => isset($status) ? $status : $postVars['ResCode'],
                             'msg' => isset($status) ? $beh_pardakht->get_message($advice['ResCode']) : $beh_pardakht->get_message($postVars['ResCode']),

@@ -63,7 +63,7 @@
                                         <tbody>
                                         <?php foreach ($slideValues as $key => $slide): ?>
                                             <tr>
-                                                <td width="50px">
+                                                <td width="50px" data-order="<?= $key + 1; ?>">
                                                     <?= convertNumbersToPersian($key + 1); ?>
                                                 </td>
                                                 <td width="100px">

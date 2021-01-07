@@ -45,10 +45,10 @@ class BlogController extends AbstractController
         //-----
         $blog = new BlogModel();
         $this->data['blog'] = $blog->getBlogDetail('b.id=:id', ['id' => $param[0]]);
-        $next = $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id ASC']);
-        $prev = $blog->getSiblingBlog('b.id<:id', ['id' => $this->data['blog']['id']], ['id DESC']);
-        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id', ['id' => $this->data['blog']['id']], ['id ASC']);
+        $next = $blog->getSiblingBlog('b.id>:id AND b.publish=:bPub', ['id' => $this->data['blog']['id'], 'bPub' => 1], ['id DESC']);
+        $this->data['nextBlog'] = count($next) ? $next : $blog->getSiblingBlog('b.id<:id AND b.publish=:bPub', ['id' => $this->data['blog']['id'], 'bPub' => 1], ['id ASC']);
+        $prev = $blog->getSiblingBlog('b.id<:id AND b.publish=:bPub', ['id' => $this->data['blog']['id'], 'bPub' => 1], ['id DESC']);
+        $this->data['prevBlog'] = count($prev) ? $prev : $blog->getSiblingBlog('b.id>:id AND b.publish=:bPub', ['id' => $this->data['blog']['id'], 'bPub' => 1], ['id ASC']);
         //-----
         $this->data['lastPosts'] = $blog->getAllBlog('b.publish=:pub', ['pub' => 1], 4);
         //-----

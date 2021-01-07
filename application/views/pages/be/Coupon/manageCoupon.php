@@ -74,7 +74,7 @@
                                                 <tbody>
                                                 <?php foreach ($copValues as $key => $coupon): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>

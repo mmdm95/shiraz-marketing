@@ -346,7 +346,8 @@
 
                                             <h6 class="no-margin">
                                                 <label class="no-margin">
-                                                    <button type="submit" name="pdfExporter" class="btn btn-danger btn-sm no-margin">
+                                                    <button type="submit" name="pdfExporter"
+                                                            class="btn btn-danger btn-sm no-margin">
                                                         <i class="icon-file-pdf position-left" aria-hidden="true"></i>
                                                         چاپ فاکتور
                                                     </button>
@@ -488,7 +489,7 @@
                                         <tbody>
                                         <?php foreach ($order['products'] as $key => $item): ?>
                                             <tr>
-                                                <td width="50px">
+                                                <td width="50px" data-order="<?= $key + 1; ?>">
                                                     <?= convertNumbersToPersian($key + 1); ?>
                                                 </td>
                                                 <td width="120px">

@@ -12,7 +12,6 @@ class HomeController extends AbstractController
     public function indexAction()
     {
         $this->_shared();
-
         $model = new Model();
         $productModel = new ProductModel();
         $blogModel = new BlogModel();
@@ -22,7 +21,7 @@ class HomeController extends AbstractController
         //-----
         $this->data['newestProducts'] = $productModel->getProducts('p.publish=:pub', ['pub' => 1], 24);
         //-----
-        $this->data['lastNews'] = $blogModel->getAllBlog('b.publish=:pub', ['pub' => 1], 6);
+        $this->data['lastNews'] = $blogModel->getAllBlog('b.publish=:pub', ['pub' => 1], 8);
         //-----
         $this->data['ourTeam'] = $this->setting['pages']['index']['showOurTeam'] == 1
             ? $model->select_it(null, self::TBL_USER, ['first_name', 'last_name', 'image', 'province', 'city'], 'is_in_team=:iit', ['iit' => 1])

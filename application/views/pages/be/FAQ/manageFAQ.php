@@ -66,7 +66,7 @@
                                         <tbody>
                                         <?php foreach ($faqValues as $key => $faq): ?>
                                             <tr>
-                                                <td>
+                                                <td width="50" data-order="<?= $key + 1; ?>">
                                                     <?= convertNumbersToPersian(($key + 1)); ?>
                                                 </td>
                                                 <td>

@@ -10,7 +10,7 @@ interface HIAuthorizator
      *
      * @param $resource
      * @param $privilege
-     * @param string|int|null $username <p>If this parameter is null this means we poin to current user.</p>
+     * @param string|int|null $username <p>If this parameter is null this means we point to current user.</p>
      * @return mixed
      *
      */

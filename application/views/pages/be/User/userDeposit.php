@@ -187,15 +187,15 @@
                                                 <tbody>
                                                 <?php foreach ($user['transactions'] as $key => $transaction): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
                                                             <?php if ($transaction['deposit_type'] == DEPOSIT_TYPE_OTHER): ?>
                                                                 <?php if (!empty($transaction['payer_name'])): ?>
                                                                     <?= $transaction['payer_name']; ?>
+                                                                    -
                                                                 <?php endif; ?>
-                                                                -
                                                                 <?= convertNumbersToPersian($transaction['payer_mobile']) ?? ''; ?>
                                                             <?php elseif ($transaction['deposit_type'] == DEPOSIT_TYPE_SELF): ?>
                                                                 کاربر

@@ -71,6 +71,9 @@
             defaultRout = '<?= base_url(); ?>admin/',
             urlPath = defaultRout + "easyFileManager";
 
+        var renameModal = $('#modal_rename'),
+            renameInput = $('#renameInput');
+
         var chksLen = 0,
             chksPath = [];
 
@@ -80,7 +83,7 @@
         $(window).on('hashchange', list).trigger('hashchange');
         $('#table').tablesorter();
 
-        $('#table').on('click', '.delete', function (data) {
+        $('#table').on('click', '.delete', function () {
             var sure = confirm('آیا مطمئن هستید؟');
             if (sure) {
                 $.post(urlPath, {'do': 'delete', file: $(this).attr('data-file'), xsrf: XSRF}, function (response) {
@@ -88,6 +91,30 @@
                 list();
             }
             return false;
+        }).on('click', '.rename', function () {
+            var path = $(this).attr('data-file');
+            var name = $(this).attr('data-file-name');
+            if (path && name) {
+                renameModal.modal();
+                renameInput.attr('data-path', path).val(name);
+            }
+            return false;
+        });
+
+        $('#renameFile').on('click', function () {
+            var name = $.trim(renameInput.val());
+            var path = renameInput.attr('data-path');
+            if ('' !== name && path) {
+                $.post(urlPath, {
+                    'do': 'rename',
+                    file: path,
+                    newName: name,
+                    xsrf: XSRF
+                }, function (response) {
+                }, 'json');
+                list();
+                refreshtree();
+            }
         });
 
         $('#mkdir').submit(function (e) {
@@ -294,7 +321,7 @@
                         effectTime: 800,
                         threshold: 0,
                         // callback
-                        afterLoad: function(element) {
+                        afterLoad: function (element) {
                             $(element).css({'background': 'none'});
                         }
                     });
@@ -302,7 +329,7 @@
                     $('[data-popup=lightbox]').on('click', function (e) {
                         e.preventDefault();
                     }).each(function () {
-                        if($.fn.fancybox) {
+                        if ($.fn.fancybox) {
                             $(this).fancybox({
                                 href: $(this).attr('data-url')
                             });
@@ -358,6 +385,7 @@
             var $dl_link = $('<a/>').attr('href', winLoc + '/download/' + data.path.replace('.', '@'))
                 .attr('target', "_blank").addClass('download btn btn-success').text('دانلود').prepend("<i class='icon-download4 position-right'></i>");
             var $delete_link = $('<a href="#" />').attr('data-file', data.path).addClass('delete btn btn-default').text('حذف').prepend("<i class='icon-cross3 position-right'></i>");
+            var $rename_link = $('<a href="#" />').attr('data-file-name', data.name).attr('data-file', data.path).attr('data-toggle', 'modal').attr('data-target', '#modal_rename').addClass('rename btn btn-warning').text('تغییر نام').prepend("<i class='icon-pencil7 position-right'></i>");
             var perms = [];
             if (data.is_readable) perms.push('read');
             if (data.is_writable) perms.push('write');
@@ -370,7 +398,7 @@
                     .html($('<span class="size" />').text(formatFileSize(data.size))))
                 .append($('<td/>').attr('data-sort', data.mtime).text(formatTimestamp(data.mtime)))
                 .append($('<td/>').text(perms.join('+')))
-                .append($('<td/>').append($dl_link).append(data.is_deleteable ? $delete_link : ''));
+                .append($('<td/>').append($dl_link).append($rename_link).append(data.is_deleteable ? $delete_link : ''));
         }
 
         function setImagesBg(data) {
@@ -466,8 +494,8 @@
                 var $this = $(this), prevTopScroll;
                 $this.on('click', function () {
                     prevTopScroll = $('html').scrollTop();
-                    setTimeout(function() {
-                        $('html').animate({ scrollTop: prevTopScroll }, 200);
+                    setTimeout(function () {
+                        $('html').animate({scrollTop: prevTopScroll}, 200);
                     }, 200);
                 });
             });
@@ -485,7 +513,7 @@
 
         function formatFileSize(bytes) {
             var s = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
-            for (var pos = 0; bytes >= 1000; pos++, bytes /= 1024);
+            for (var pos = 0; bytes >= 1000; pos++, bytes /= 1024) ;
             var d = Math.round(bytes * 10);
             return pos ? [parseInt(d / 10), ".", d % 10, " ", s[pos]].join('') : bytes + ' bytes';
         }

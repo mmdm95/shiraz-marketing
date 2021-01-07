@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <?php
-                    $discount = $product['discount_until'] > time() ? convertNumbersToPersian($product['discount_price'], true) : convertNumbersToPersian($product['price'], true);
+                    $discount = (is_null($product['discount_until']) || $product['discount_until'] > time()) ? convertNumbersToPersian($product['discount_price'], true) : convertNumbersToPersian($product['price'], true);
                     $discountPercentage = floor(((convertNumbersToPersian($product['price'], true) - $discount) / convertNumbersToPersian($product['price'], true)) * 100);
                     ?>
                     <div class="box-body pt-0">
@@ -129,15 +129,25 @@
                         <div class="box-body pt-0">
                             <div class="mb-4 row justify-content-center">
                                 <div class="col-lg-8 col-md-6 col-sm-12">
-                                    <select class="input-select2 cartAddCountSelect"
-                                            data-cart-quantity-for="#addToCartBtn">
-                                        <?php for ($i = 0; $i < $product['max_cart_count'] && $i < $product['stock_count']; ++$i): ?>
-                                            <option value="<?= ($i + 1); ?>"
-                                                <?= count($curCartItem) ? ($curCartItem[0]['quantity'] == ($i + 1) ? 'selected' : '') : ($i == 0 ? 'selected' : ''); ?>>
-                                                <?= convertNumbersToPersian(($i + 1)); ?>
-                                            </option>
-                                        <?php endfor; ?>
-                                    </select>
+                                    <?php
+                                    $cartCount = $product['max_cart_count'] > $product['stock_count'] ? $product['stock_count'] : $product['max_cart_count'];
+                                    ?>
+                                    <div class="product-detail-cart-count">
+                                        <div class="product-detail-cart-count-btn product-detail-cart-count-btn-minus">
+                                            <i class="la la-minus" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="product-detail-cart-count-input">
+                                            <input type="number" value="<?= $cartCount > 0 ? 1 : 0; ?>"
+                                                   min="<?= $cartCount <= 0 ? 0 : 1; ?>"
+                                                   max="<?= $cartCount <= 0 ? 0 : $cartCount; ?>"
+                                                   class="form-control cartAddCountInput"
+                                                   placeholder="" autocomplete="false"
+                                                   data-cart-quantity-for="#addToCartBtn">
+                                        </div>
+                                        <div class="product-detail-cart-count-btn product-detail-cart-count-btn-plus">
+                                            <i class="la la-plus" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="product-detail-side justify-content-center">
@@ -179,7 +189,7 @@
                                     <?= $product['place']; ?>
                                 </div>
                             </div>
-                            <?php if ($product['discount_until'] > time()): ?>
+                            <?php if (!is_null($product['discount_until']) && $product['discount_until'] > time() && $discountPercentage != 0): ?>
                                 <div class="product-detail-side-item product-detail-side-time">
                                     <i class="la la-clock-o" aria-hidden="true"></i>
                                     <div countdown
@@ -290,6 +300,12 @@
                                             ویژه
                                         </div>
                                     <?php endif; ?>
+                                    <div class="card-side-top-right">
+                                        <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $related['id']; ?>"
+                                                data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
+                                            <i class="la la-cart-plus" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
                                     <div class="card-img">
                                         <div class="img-placeholder">
                                             <i class="la la-image" aria-hidden="true"></i>
@@ -315,7 +331,7 @@
                                     </div>
 
                                     <?php
-                                    $discount = $related['discount_until'] > time() ? convertNumbersToPersian($related['discount_price'], true) : convertNumbersToPersian($related['price'], true);
+                                    $discount = (is_null($related['discount_until']) || $related['discount_until'] > time()) ? convertNumbersToPersian($related['discount_price'], true) : convertNumbersToPersian($related['price'], true);
                                     $discountPercentage = floor(((convertNumbersToPersian($related['price'], true) - $discount) / convertNumbersToPersian($related['price'], true)) * 100);
                                     ?>
                                     <div class="card-info">

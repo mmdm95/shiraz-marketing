@@ -220,8 +220,8 @@ class OrderModel extends HModel
     {
         $select = $this->select();
         $select->cols([
-            'ud.id', 'ud.payer_id AS payer', 'ud.deposit_price', 'ud.description', 'ud.deposit_type',
-            'ud.deposit_date', 'u1.first_name', 'u1.last_name', 'u1.mobile',
+            'ud.id', 'ud.deposit_code', 'ud.user_id', 'ud.payer_id AS payer', 'ud.deposit_price', 'ud.description',
+            'ud.deposit_type', 'ud.deposit_date', 'u1.first_name', 'u1.last_name', 'u1.mobile',
             'CONCAT(u2.first_name, " ", u2.last_name) AS payer_name', 'u2.mobile AS payer_mobile'
         ])->from(AbstractPaymentController::TBL_USER_ACCOUNT_DEPOSIT . ' AS ud');
 

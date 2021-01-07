@@ -867,6 +867,63 @@
                                             </div>
                                         </div>
 
+                                        <?php $this->view('templates/be/title', ['header_title' => 'تنظیم عکس و نوشته درگاه بانک سوم']) ?>
+                                        <div class="row pl-20 pr-20 pb-20">
+                                            <div class="col-lg-5 mt-10">
+                                                <div class="form-group">
+                                                    <label>متن مورد نظر</label>
+                                                    <input name="bankText3" type="text"
+                                                           class="form-control" placeholder=""
+                                                           value="<?= set_value($values_payment['bankText3'] ?? $setting['payment']['bank_3']['text'] ?? ''); ?>">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7 pt-20">
+                                                <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
+                                                    border-left-info border-left-xlg shadow-depth1 btn-rounded text-right"
+                                                       for="paymentEnable3">
+                                                        <span class="pull-left h5 no-margin">
+                                                            <i class="icon-switch2 position-left text-info"></i>
+                                                            وضعیت فعالسازی نحوه پرداخت
+                                                        </span>
+                                                    <input type="checkbox" name="bankEnable3" id="paymentEnable3"
+                                                           class="switchery" <?= set_value($values_payment['bankEnable3'] ?? $setting['payment']['bank_3']['enable'] ?? '', 1, 'checked', '', '=='); ?> />
+                                                </label>
+                                            </div>
+                                            <div class="col-lg-12 mt-10 mb-10">
+                                                <div class="cursor-pointer pick-file" data-toggle="modal"
+                                                     data-target="#modal_full"
+                                                     style="border: dashed 2px #ddd; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                                    <input class="image-file" type="hidden"
+                                                           name="bankImg3"
+                                                           value="<?= $values_payment['bankImg3'] ?? $setting['payment']['bank_3']['image'] ?? ''; ?>">
+                                                    <div class="media stack-media-on-mobile">
+                                                        <div class="media-left">
+                                                            <div class="thumb">
+                                                                <a class="display-inline-block"
+                                                                   style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                                    <img src="<?= set_value($values_payment['bankImg3'] ?? $setting['payment']['bank_3']['image'] ?? '', '', base_url($values_images['bankImg3'] ?? $setting['payment']['bank_3']['image'] ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                         class="img-rounded" alt=""
+                                                                         style="width: 100px; height: 100px; object-fit: contain;"
+                                                                         data-base-url="<?= base_url(); ?>">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="media-body">
+                                                            <h6 class="media-heading">
+                                                                <a class="text-grey-300">
+                                                                    انتخاب تصویر:
+                                                                </a>
+                                                                <a class="io-image-name display-block">
+                                                                    <?= basename($values_payment['bankImg3'] ?? $setting['payment']['bank_3']['image'] ?? ''); ?>
+                                                                </a>
+                                                            </h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <?php $this->view('templates/be/title', ['header_title' => 'تنظیم عکس و نوشته کیف پول']) ?>
                                         <div class="row pl-20 pr-20 pb-20">
                                             <div class="col-lg-5 mt-10">
@@ -880,12 +937,12 @@
                                             <div class="col-lg-7 pt-20">
                                                 <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
                                                     border-left-info border-left-xlg shadow-depth1 btn-rounded text-right"
-                                                       for="paymentEnable3">
+                                                       for="paymentEnable4">
                                                         <span class="pull-left h5 no-margin">
                                                             <i class="icon-switch2 position-left text-info"></i>
                                                             وضعیت فعالسازی نحوه پرداخت
                                                         </span>
-                                                    <input type="checkbox" name="walletEnable" id="paymentEnable3"
+                                                    <input type="checkbox" name="walletEnable" id="paymentEnable4"
                                                            class="switchery" <?= set_value($values_payment['walletEnable'] ?? $setting['payment']['wallet']['enable'] ?? '', 1, 'checked', '', '=='); ?> />
                                                 </label>
                                             </div>
@@ -937,12 +994,12 @@
                                             <div class="col-lg-7 pt-20">
                                                 <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
                                                     border-left-info border-left-xlg shadow-depth1 btn-rounded text-right"
-                                                       for="paymentEnable4">
+                                                       for="paymentEnable5">
                                                         <span class="pull-left h5 no-margin">
                                                             <i class="icon-switch2 position-left text-info"></i>
                                                             وضعیت فعالسازی نحوه پرداخت
                                                         </span>
-                                                    <input type="checkbox" name="receiptEnable" id="paymentEnable4"
+                                                    <input type="checkbox" name="receiptEnable" id="paymentEnable5"
                                                            class="switchery" <?= set_value($values_payment['receiptEnable'] ?? $setting['payment']['receipt']['enable'] ?? '', 1, 'checked', '', '=='); ?> />
                                                 </label>
                                             </div>
@@ -994,12 +1051,12 @@
                                             <div class="col-lg-7 pt-20">
                                                 <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
                                                     border-left-info border-left-xlg shadow-depth1 btn-rounded text-right"
-                                                       for="paymentEnable5">
+                                                       for="paymentEnable6">
                                                         <span class="pull-left h5 no-margin">
                                                             <i class="icon-switch2 position-left text-info"></i>
                                                             وضعیت فعالسازی نحوه پرداخت
                                                         </span>
-                                                    <input type="checkbox" name="inPlaceEnable" id="paymentEnable5"
+                                                    <input type="checkbox" name="inPlaceEnable" id="paymentEnable6"
                                                            class="switchery" <?= set_value($values_payment['inPlaceEnable'] ?? $setting['payment']['in_place']['enable'] ?? '', 1, 'checked', '', '=='); ?> />
                                                 </label>
                                             </div>

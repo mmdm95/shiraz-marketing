@@ -8,9 +8,11 @@ use AbstractPaymentController;
 use Exception;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
+use HConvert\Converter\NumberConverter;
 use HForm\Form;
 use Model;
 use UserModel;
+
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 
@@ -68,6 +70,59 @@ abstract class AbstractController extends AbstractPaymentController
         }
 
 //        $model = new Model();
+//        $products = $model->select_it(null, AbstractPaymentController::TBL_PRODUCT, ['id', 'title', 'image']);
+//        $this->load->library('HConvert/vendor/autoload');
+//        $converter = NumberConverter::getInstance();
+//        foreach ($products as $product) {
+//            $title = $converter->toPersian($product['title']);
+//            $title = $converter->toEnglish($title);
+//            //-----
+//            $image = $converter->toPersian($product['image']);
+//            $image = $converter->toEnglish($image);
+//            //-----
+//            $model->update_it(AbstractPaymentController::TBL_PRODUCT, [
+//                'title' => $title,
+//                'slug' => url_title($title),
+//                'image' => $image,
+//            ], 'id=:id', ['id' => $product['id']]);
+//        }
+        //-----
+//        $products = $model->select_it(null, AbstractPaymentController::TBL_PRODUCT_GALLERY, ['id', 'image']);
+//        $this->load->library('HConvert/vendor/autoload');
+//        $converter = NumberConverter::getInstance();
+//        foreach ($products as $product) {
+//            $image = $converter->toPersian($product['image']);
+//            $image = $converter->toEnglish($image);
+//            //-----
+//            $model->update_it(AbstractPaymentController::TBL_PRODUCT_GALLERY, [
+//                'image' => $image,
+//            ], 'id=:id', ['id' => $product['id']]);
+//        }
+
+//        $this->load->library('HConvert/vendor/autoload');
+//        function recursiveFileFix($folder)
+//        {
+//            $converter = NumberConverter::getInstance();
+//            $files = array_diff(scandir($folder), ['.', '..']);
+//            foreach ($files as $entry) {
+//                if ($entry !== basename(__FILE__)) {
+//                    $i = $folder . '/' . $entry;
+//                    if(is_dir($i)) {
+//                        recursiveFileFix($i);
+//                    } else {
+//                        $filename = $converter->toPersian($i);
+//                        $filename = $converter->toEnglish($filename);
+//                        rename($i, $filename);
+//                    }
+//                }
+//            }
+//        }
+//        $file = UPLOAD_PATH;
+//        $file = str_replace('\\', '/', $file);
+//        $file = str_replace('//', '/', $file);
+//        $file = rtrim($file, '/');
+//        recursiveFileFix($file);
+
 //        $model->insert_it('users', [
 //            'mobile' => '09139518055',
 //            'password' => password_hash('m9516271', PASSWORD_DEFAULT),
@@ -107,6 +162,30 @@ abstract class AbstractController extends AbstractPaymentController
         // ProductManager role_page_perm
 //        foreach ([7] as $r) {
 //            foreach ([3, 14] as $pg) {
+//                for ($pr = 1; $pr <= 4; ++$pr) {
+//                    $model->insert_it('roles_pages_perms', [
+//                        'role_id' => $r,
+//                        'page_id' => $pg,
+//                        'perm_id' => $pr,
+//                    ]);
+//                }
+//            }
+//        }
+        // UserManager role_page_perm
+//        foreach ([8] as $r) {
+//            foreach ([2] as $pg) {
+//                for ($pr = 1; $pr <= 4; ++$pr) {
+//                    $model->insert_it('roles_pages_perms', [
+//                        'role_id' => $r,
+//                        'page_id' => $pg,
+//                        'perm_id' => $pr,
+//                    ]);
+//                }
+//            }
+//        }
+        // OrderManager role_page_perm
+//        foreach ([9] as $r) {
+//            foreach ([11, 12] as $pg) {
 //                for ($pr = 1; $pr <= 4; ++$pr) {
 //                    $model->insert_it('roles_pages_perms', [
 //                        'role_id' => $r,

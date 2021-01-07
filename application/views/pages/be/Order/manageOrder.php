@@ -196,7 +196,7 @@
                                         <tbody>
                                         <?php foreach ($orders as $key => $order): ?>
                                             <tr>
-                                                <td width="50px">
+                                                <td width="50px" data-order="<?= $key + 1; ?>">
                                                     <?= convertNumbersToPersian($key + 1); ?>
                                                 </td>
                                                 <td>
@@ -205,7 +205,7 @@
                                                 <td>
                                                     <?= $order['mobile']; ?>
                                                 </td>
-                                                <td>
+                                                <td data-order="<?= $order['order_date']; ?>">
                                                     <?= jDateTime::date('j F Y در ساعت H:i', $order['order_date']); ?>
                                                 </td>
                                                 <td>
@@ -216,7 +216,7 @@
                                                            aria-hidden="true"></i>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td>
+                                                <td data-order="<?= $order['payment_date']; ?>">
                                                     <?= !empty($order['payment_date']) ? jDateTime::date('j F Y در ساعت H:i', $order['payment_date']) : '<i class="icon-minus2 text-danger" aria-hidden="true"></i>'; ?>
                                                 </td>
                                                 <td>

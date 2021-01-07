@@ -126,6 +126,8 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
      */
     public function __construct($setAuthSetting = false)
     {
+        parent::__construct();
+        //-----
         $this->authData = new \stdClass();
         $this->_parseAuthData($setAuthSetting);
         if ($setAuthSetting) {
@@ -179,8 +181,13 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             "{$this->authData->columns->user_role->user_id->column}=:uId",
             ['uId' => $row[$this->authData->columns->user->id->column]]);
         // If we need to check admin roles but we don't have any role
-        if ($checkAdminRoles && !count($roleId)) {
+        if (!count($roleId)) {
             return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
+        }
+        if ($checkAdminRoles) {
+            if (!$this->isInAdminRole($username)) {
+                return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
+            }
         }
         if (count($roleId)) {
             $roleId = array_column($roleId, $this->authData->columns->user_role->role_id->column);
@@ -202,12 +209,6 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             if (count($role)) {
                 $row['role_name'] = array_column($role, $this->authData->columns->role->name->column);
                 $row['role_desc'] = array_column($role, $this->authData->columns->role->description->column);
-            }
-
-            if ($checkAdminRoles) {
-                if (!$this->isInAdminRole($username)) {
-                    return ['err' => 'نام کاربری یا کلمه عبور اشتباه است.'];
-                }
             }
         }
 
@@ -435,7 +436,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
 
                 $this->_removeStoredIdentity();
 
-                $res = $cookie->set_cookie($this->storageName . $this->storageNameAndNamespaceSeparator . $this->namespace, json_encode($this->identity), $this->expiration, '/', null, null, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
+                $res = $cookie->set_cookie($this->storageName . $this->storageNameAndNamespaceSeparator . $this->namespace, json_encode($this->identity), $this->expiration, '/', null, false, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
                 return $res;
                 break;
             case self::session:
@@ -623,6 +624,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
         }
         $uId = $result[0];
         $roleId = $this->_fetchRole($role);
+        $roleId = $roleId[0][$this->authData->columns->role->id->column];
 
         if (!$this->existsDataInDB($this->authData->tables->user_role,
             "{$this->authData->columns->user_role->user_id->column}=:uId AND {$this->authData->columns->user_role->role_id->column}=:roleId", [
@@ -658,6 +660,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
         }
         $uId = $result[0];
         $roleId = $this->_fetchRole($role);
+        $roleId = $roleId[0][$this->authData->columns->role->id->column];
         $this->_removeUR($uId, $roleId);
         return $this;
     }
@@ -852,7 +855,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             $this->removeDataFromDB($this->authData->tables->user_role,
                 "{$this->authData->columns->user_role->user_id->column}=:uId AND {$this->authData->columns->user_role->role_id->column}=:roleId", [
                     'uId' => $uId,
-                    'paId' => $roleId
+                    'roleId' => $roleId
                 ]);
         }
     }
@@ -905,7 +908,11 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
             throw new HAException('نام کاربری باید از نوع رشته یا عدد باشد.');
         }
 
-        if (is_numeric($username)) {
+        if (!$this->existsDataInDB($this->authData->tables->user,
+            "{$this->authData->columns->user->username->column}=:user", [
+                'user' => $username
+            ])
+        ) {
             if (!$this->existsDataInDB($this->authData->tables->user,
                 "{$this->authData->columns->user->id->column}=:user", [
                     'user' => $username
@@ -914,19 +921,11 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
                 return [];
             }
             return [0 => [$this->authData->columns->user->id->column => $username]];
-        } else {
-            if (!$this->existsDataInDB($this->authData->tables->user,
-                "{$this->authData->columns->user->username->column}=:user", [
-                    'user' => $username
-                ])
-            ) {
-                return [];
-            }
-            return $this->getDataFromDB($this->authData->tables->user, '*',
-                "{$this->authData->columns->user->username->column}=:user", [
-                    'user' => $username
-                ]);
         }
+        return $this->getDataFromDB($this->authData->tables->user, '*',
+            "{$this->authData->columns->user->username->column}=:user", [
+                'user' => $username
+            ]);
     }
 
     /**
@@ -1123,7 +1122,8 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     public function isInAdminRole($username = null)
     {
         foreach ($this->authData->data->admin_roles as $adminRole) {
-            if ($this->hasUserRole($adminRole, $username)) {
+            $res = $this->hasUserRole($adminRole, $username);
+            if (!is_array($res) && (bool)$res) {
                 return true;
             }
         }
@@ -1478,7 +1478,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     protected function _storeStorageType()
     {
         $cookie = new \CookieModel();
-        $res = $cookie->set_cookie('storageType' . $this->storageNameAndNamespaceSeparator . $this->namespace, $this->storageType, $this->expiration, '/', null, null, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
+        $res = $cookie->set_cookie('storageType' . $this->storageNameAndNamespaceSeparator . $this->namespace, $this->storageType, $this->expiration, '/', null, false, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
         return $res;
     }
 
@@ -1507,7 +1507,7 @@ class Auth extends BasicDB implements HIAuthenticator, HIAuthorizator, HIRole, H
     protected function _removeStoredStorageType()
     {
         $cookie = new \CookieModel();
-        $res = $cookie->set_cookie('storageType' . $this->storageNameAndNamespaceSeparator . $this->namespace, '', time() - 3600, '/', null, null, true, \CookieModel::COOKIE_ENCRYPT_DECRYPT);
+        $res = $cookie->set_cookie('storageType' . $this->storageNameAndNamespaceSeparator . $this->namespace, '', time() - 3600);
         return $res;
     }
 

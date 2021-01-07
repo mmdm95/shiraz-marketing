@@ -70,7 +70,7 @@
                                             </div>
                                         </div>
                                         <div class="panel-body">
-                                            <div class="col-lg-12 mb-15">
+                                            <div class="col-sm-12 mb-15">
                                                 <div class="cursor-pointer pick-file border border-lg border-default"
                                                      data-toggle="modal"
                                                      data-target="#modal_full"
@@ -171,40 +171,52 @@
                                                        placeholder="محل"
                                                        value="<?= $pValues['place'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-12">
                                                 <span class="text-danger">*</span>
                                                 <label>قیمت:</label>
                                                 <input name="price" type="text" class="form-control"
                                                        placeholder="به تومان"
                                                        value="<?= $pValues['price'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-7">
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-12">
                                                 <span class="text-danger">*</span>
                                                 <label>قیمت با تخفیف:</label>
                                                 <input name="discount_price" type="text" class="form-control"
                                                        placeholder="تومان"
                                                        value="<?= $pValues['discount_price'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-4">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 pt-10">
+                                                <div class="alert-warning p-10">
+                                                    <label class="checkbox-inline">
+                                                        <input type="checkbox" class="styled" name="no_expire"
+                                                            <?= set_value($pValues['no_expire'] ?? '', 'on', 'checked', '', '=='); ?>>
+                                                        نادیده گرفتن زمان تخفیف
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-12">
                                                 <label>زمان تخفیف:</label>
                                                 <input type="hidden" name="discount_expire" id="altDateField">
                                                 <input type="text" class="form-control myAltDatepicker"
                                                        placeholder="تاریخ انقضا" readonly data-alt-field="#altDateField"
                                                        value="<?= date('Y/m/d H:i', (int)($pValues['discount_expire'] ?? time())); ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-7">
+                                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                                <span class="text-danger">*</span>
                                                 <label>پاداش خرید:</label>
                                                 <input name="reward" type="text" class="form-control"
                                                        placeholder="درصد"
                                                        value="<?= $pValues['reward'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-7">
+                                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                                <span class="text-danger">*</span>
                                                 <label>تعداد موجود:</label>
                                                 <input name="stock_count" type="text" class="form-control"
                                                        placeholder="عدد"
                                                        value="<?= $pValues['stock_count'] ?? ''; ?>">
                                             </div>
-                                            <div class="form-group col-lg-4 col-md-4 col-sm-7">
+                                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                                <span class="text-danger">*</span>
                                                 <label>حداکثر تعداد در یک خرید:</label>
                                                 <input name="max_basket_count" type="text" class="form-control"
                                                        placeholder="عدد"

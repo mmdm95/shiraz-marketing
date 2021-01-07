@@ -47,6 +47,12 @@
                             <div class="off-label">
                                 ویژه
                             </div>
+                            <div class="card-side-top-right">
+                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $offer['id']; ?>"
+                                        data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
+                                    <i class="la la-cart-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <div class="card-img">
                                 <div class="img-placeholder">
                                     <i class="la la-image" aria-hidden="true"></i>
@@ -72,7 +78,7 @@
                             </div>
 
                             <?php
-                            $discount = $offer['discount_until'] > time() ? convertNumbersToPersian($offer['discount_price'], true) : convertNumbersToPersian($offer['price'], true);
+                            $discount = (is_null($offer['discount_until']) || $offer['discount_until'] > time()) ? convertNumbersToPersian($offer['discount_price'], true) : convertNumbersToPersian($offer['price'], true);
                             $discountPercentage = floor(((convertNumbersToPersian($offer['price'], true) - $discount) / convertNumbersToPersian($offer['price'], true)) * 100);
                             ?>
                             <div class="card-info">
@@ -124,7 +130,7 @@
                             </div>
                             <div class="card-timer">
                                 <div countdown
-                                     data-date="<?= date('Y-m-d H:i:s', $offer['discount_until']); ?>">
+                                     data-date="<?= date('Y-m-d H:i:s', !is_null($offer['discount_until']) ? $offer['discount_until'] : (time() - 86400)); ?>">
                                     <div class="col">
                                         <span data-days>0</span>
                                         روز
@@ -173,6 +179,12 @@
                                     ویژه
                                 </div>
                             <?php endif; ?>
+                            <div class="card-side-top-right">
+                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $item['id']; ?>"
+                                        data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
+                                    <i class="la la-cart-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <div class="card-img">
                                 <div class="img-placeholder">
                                     <i class="la la-image" aria-hidden="true"></i>
@@ -197,7 +209,7 @@
                             </div>
 
                             <?php
-                            $discount = $item['discount_until'] > time() ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
+                            $discount = (is_null($item['discount_until']) || $item['discount_until'] > time()) ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
                             $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
                             ?>
                             <div class="card-info">
@@ -260,7 +272,7 @@
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
-                        آخرین اخبار شیراز مارکتینگ
+                        آخرین مطالب
                     </h1>
                 </div>
                 <a href="<?= base_url('blog/all'); ?>" class="btn btn-secondary rounded-pill my-2">
@@ -268,9 +280,9 @@
                     <i class="la la-arrow-left float-left font-size-21px mr-3" aria-hidden="true"></i>
                 </a>
             </div>
-            <div class="row">
+            <div class="items-slider-col-3 owl-carousel">
                 <?php foreach ($lastNews as $news): ?>
-                    <div class="card-wrapper col-lg-4 col-md-6 col-12">
+                    <div class="card-wrapper semi-col-3">
                         <div class="card card-news">
                             <div class="card-img">
                                 <div class="img-placeholder">

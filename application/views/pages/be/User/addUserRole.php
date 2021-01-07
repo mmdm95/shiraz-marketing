@@ -19,6 +19,12 @@
                         <h5>
                             <i class="icon-circle position-left"></i> <span
                                     class="text-semibold">مدیریت نقش کاربران</span>
+                            <small>
+                                <?php if (!empty($user['first_name']) || !empty($user['last_name'])): ?>
+                                    <?= $user['first_name'] . ' ' . $user['last_name'] . ' - '; ?>
+                                <?php endif; ?>
+                                <?= $user['username']; ?>
+                            </small>
                         </h5>
                     </div>
                 </div>
@@ -28,6 +34,11 @@
                             <a href="<?= base_url(); ?>admin/index">
                                 <i class="icon-home2 position-left"></i>
                                 داشبورد
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= base_url(); ?>admin/user/manageUser">
+                                مدیریت کاربران
                             </a>
                         </li>
                         <li class="active">مدیریت نقش کاربران</li>
@@ -50,7 +61,7 @@
                                             <?php $this->view("templates/be/alert/error", ['errors' => $errors ?? null]); ?>
                                             <?php $this->view("templates/be/alert/success", ['success' => $success ?? null]); ?>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-lg-6">
                                             <div class="panel panel-white">
                                                 <div class="panel-heading">
                                                     <h6 class="panel-title">افزودن نقش به کاربر</h6>
@@ -77,7 +88,7 @@
                                                     </div>
 
                                                     <div class="text-right col-md-12">
-                                                        <a href="<?= base_url('admin/user/manageUser'); ?>"
+                                                        <a href="<?= base_url('admin/user/manageAdminUser'); ?>"
                                                            class="btn btn-default mr-5">
                                                             بازگشت
                                                         </a>
@@ -117,7 +128,7 @@
                                                 <tbody>
                                                 <?php foreach ($userRoles as $key => $role): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td>
@@ -129,7 +140,7 @@
                                                                     <a class="deleteUserRoleBtn"
                                                                        title="حذف" data-popup="tooltip">
                                                                         <input type="hidden"
-                                                                               value="<?= $param[0] . '-' . $role['id']; ?>">
+                                                                               value="<?= $param[0] . '-' . $role['role_id']; ?>">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </li>

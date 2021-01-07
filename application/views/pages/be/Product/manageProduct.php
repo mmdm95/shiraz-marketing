@@ -56,13 +56,19 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="table-responsive">
-                                            <table class="table table-hover table-bordered datatable-highlight">
+                                            <table class="table table-hover table-bordered datatable-product">
                                                 <thead>
                                                 <tr>
+                                                    <th id="chks">
+                                                        <label class="checkbox-switch no-margin-bottom">
+                                                            <input type="checkbox" class="styled">
+                                                        </label>
+                                                    </th>
                                                     <th>#</th>
                                                     <th>تصویر</th>
                                                     <th>عنوان</th>
                                                     <th>دسته‌بندی</th>
+                                                    <th>نوع کالا</th>
                                                     <th>تعداد موجود</th>
                                                     <th>تعداد فروخته شده</th>
                                                     <th>وضعیت نمایش</th>
@@ -77,7 +83,14 @@
                                                 <tbody>
                                                 <?php foreach ($products as $key => $product): ?>
                                                     <tr>
-                                                        <td width="50px">
+                                                        <th class="product-chk"
+                                                            data-product-id="<?= $product['id']; ?>">
+                                                            <label class="checkbox-switch no-margin-bottom">
+                                                                <input type="checkbox" class="styled"
+                                                                       name="product_group_checkbox">
+                                                            </label>
+                                                        </th>
+                                                        <td width="50px" data-order="<?= $key + 1; ?>">
                                                             <?= convertNumbersToPersian($key + 1); ?>
                                                         </td>
                                                         <td width="100px">
@@ -100,6 +113,15 @@
                                                         </td>
                                                         <td>
                                                             <?= $product['category_name']; ?>
+                                                        </td>
+                                                        <td>
+                                                            <?php if ($product['product_type'] == PRODUCT_TYPE_SERVICE): ?>
+                                                                خدمات
+                                                            <?php elseif ($product['product_type'] == PRODUCT_TYPE_ITEM): ?>
+                                                                کالا
+                                                            <?php else: ?>
+                                                                نامشخص
+                                                            <?php endif; ?>
                                                         </td>
                                                         <td class="success" align="center">
                                                             <?= convertNumbersToPersian($product['stock_count']); ?>
@@ -167,6 +189,30 @@
                     </div>
                 </div>
                 <!-- /form centered -->
+
+                <ul id="multiOperationMenu" class="fab-menu fab-menu-fixed fab-menu-bottom-right hide"
+                    data-fab-toggle="click">
+                    <li>
+                        <a class="fab-menu-btn btn bg-teal-400 btn-float btn-rounded btn-icon">
+                            <i class="fab-icon-open icon-paragraph-justify3"></i>
+                            <i class="fab-icon-close icon-cross2"></i>
+                        </a>
+
+                        <ul class="fab-menu-inner">
+                            <li>
+                                <form action="" method="post" id="multiEditForm">
+                                    <div data-fab-label="تغییر دسته‌جمعی">
+                                        <button type="submit"
+                                                class="btn btn-default btn-rounded btn-icon btn-float">
+                                            <i class="icon-pencil"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
                 <!-- Footer -->
                 <?php $this->view("templates/be/copyright", $data); ?>
                 <!-- /footer -->

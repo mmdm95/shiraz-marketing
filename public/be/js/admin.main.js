@@ -262,7 +262,7 @@
         });
         //**********
 
-        //********** ManageUser Action
+        //********** ManageUserRole Action
         $('.deleteUserRoleBtn').on('click', function (e) {
             e.preventDefault();
             var del_btn = $(this);
@@ -326,6 +326,7 @@
                         var opts, action = false;
 
                         // console.log(data);
+                        // console.log(JSON.parse(data));
                         data = JSON.parse(data);
                         if (status == 'success') {
                             if (data.success) {

@@ -44,7 +44,7 @@
                     </div>
                     <div class="box box-info">
                         <div class="box-body text-secondary">
-                            <?php if ($setting['payment']['bank_1']['enable']): ?>
+                            <?php if (isset($setting['payment']['bank_1']) && $setting['payment']['bank_1']['enable']): ?>
                                 <div class="custom-control custom-radio mb-4">
                                     <input type="radio" class="custom-control-input" id="payRadio1" name="payment_radio"
                                            checked="checked" required value="PAY_798447359">
@@ -56,7 +56,7 @@
                                 </div>
                             <?php endif; ?>
 
-                            <?php if ($setting['payment']['bank_2']['enable']): ?>
+                            <?php if (isset($setting['payment']['bank_2']) && $setting['payment']['bank_2']['enable']): ?>
                                 <div class="custom-control custom-radio mb-4">
                                     <input type="radio" class="custom-control-input" id="payRadio2" name="payment_radio"
                                            required value="PAY_342515312">
@@ -68,11 +68,23 @@
                                 </div>
                             <?php endif; ?>
 
-                            <?php if ($setting['payment']['wallet']['enable']): ?>
+                            <?php if (isset($setting['payment']['bank_3']) && $setting['payment']['bank_3']['enable']): ?>
                                 <div class="custom-control custom-radio mb-4">
                                     <input type="radio" class="custom-control-input" id="payRadio3" name="payment_radio"
-                                           required value="<?= PAYMENT_METHOD_WALLET; ?>">
+                                           required value="PAY_654812379">
                                     <label class="custom-control-label" for="payRadio3">
+                                        <img src="<?= base_url($setting['payment']['bank_3']['image']); ?>" alt=""
+                                             class="img-40px-40px">
+                                        <?= $setting['payment']['bank_3']['text']; ?>
+                                    </label>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($setting['payment']['wallet']['enable']): ?>
+                                <div class="custom-control custom-radio mb-4">
+                                    <input type="radio" class="custom-control-input" id="payRadio4" name="payment_radio"
+                                           required value="<?= PAYMENT_METHOD_WALLET; ?>">
+                                    <label class="custom-control-label" for="payRadio4">
                                         <img src="<?= base_url($setting['payment']['wallet']['image']); ?>" alt=""
                                              class="img-40px-40px">
                                         <?= $setting['payment']['wallet']['text']; ?>
@@ -82,9 +94,9 @@
 
                             <?php if ($setting['payment']['receipt']['enable']): ?>
                                 <div class="custom-control custom-radio mb-4">
-                                    <input type="radio" class="custom-control-input" id="payRadio4" name="payment_radio"
+                                    <input type="radio" class="custom-control-input" id="payRadio5" name="payment_radio"
                                            required value="<?= PAYMENT_METHOD_RECEIPT; ?>">
-                                    <label class="custom-control-label" for="payRadio4">
+                                    <label class="custom-control-label" for="payRadio5">
                                         <img src="<?= base_url($setting['payment']['receipt']['image']); ?>" alt=""
                                              class="img-40px-40px">
                                         <?= $setting['payment']['receipt']['text']; ?>
@@ -94,9 +106,9 @@
 
                             <?php if ($setting['payment']['in_place']['enable']): ?>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="payRadio5" name="payment_radio"
+                                    <input type="radio" class="custom-control-input" id="payRadio6" name="payment_radio"
                                            required value="<?= PAYMENT_METHOD_IN_PLACE; ?>">
-                                    <label class="custom-control-label" for="payRadio5">
+                                    <label class="custom-control-label" for="payRadio6">
                                         <img src="<?= base_url($setting['payment']['in_place']['image']); ?>" alt=""
                                              class="img-40px-40px">
                                         <?= $setting['payment']['in_place']['text']; ?>

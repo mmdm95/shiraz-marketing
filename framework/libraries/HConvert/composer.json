@@ -1,0 +1,20 @@
+{
+    "name": "heeva/h-convert",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MMDM",
+            "email": "mmdehghan95@gmail.com"
+        }
+    ],
+    "require": {},
+    "description": "",
+    "config": {
+        "optimize-autoloader": true
+    },
+    "autoload": {
+        "psr-4": {
+            "HConvert\\":"vendor/src/"
+        }
+    }
+}

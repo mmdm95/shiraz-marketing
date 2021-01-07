@@ -10,7 +10,7 @@ $pageAfter = $pageAfter ?? 4;
     <nav aria-label="صفحه‌بندی آیتم‌ها">
         <ul class="pagination flex-row-reverse justify-content-center">
             <li class="page-item <?= $firstPage == $pageNo ? 'disabled' : ''; ?>">
-                <a class="page-link" <?= $firstPage != $pageNo ? 'href="' . $href . '/page/' . $firstPage . '"' : ''; ?> >
+                <a class="page-link" <?= $firstPage != $pageNo ? 'href="' . $href . '/page/' . $firstPage . (isset($_GET['q']) ? '?q=' . $_GET['q'] : '') . '"' : ''; ?> >
                     <i class="la la-angle-double-left" aria-hidden="true"></i>
                 </a>
             </li>
@@ -25,14 +25,14 @@ $pageAfter = $pageAfter ?? 4;
             <?php for ($i = $pageNo - $pageBefore; $i < $pageNo; $i++): ?>
                 <?php if ($i <= 0) continue; ?>
                 <li class="page-item <?= $pageNo == $i ? 'active' : ''; ?>">
-                    <a class="page-link" href="<?= $href . '/page/' . $i; ?>">
+                    <a class="page-link" href="<?= $href . '/page/' . $i . (isset($_GET['q']) ? '?q=' . $_GET['q'] : ''); ?>">
                         <?= convertNumbersToPersian($i); ?>
                     </a>
                 </li>
             <?php endfor; ?>
             <?php for ($i = $pageNo; $i <= $pageNo + $pageAfter && $i <= $lastPage; $i++): ?>
                 <li class="page-item <?= $pageNo == $i ? 'active' : ''; ?>">
-                    <a class="page-link" href="<?= $href . '/page/' . $i; ?>">
+                    <a class="page-link" href="<?= $href . '/page/' . $i . (isset($_GET['q']) ? '?q=' . $_GET['q'] : ''); ?>">
                         <?= convertNumbersToPersian($i); ?>
                     </a>
                 </li>
@@ -46,7 +46,7 @@ $pageAfter = $pageAfter ?? 4;
             <?php endif; ?>
 
             <li class="page-item <?= $lastPage == $pageNo ? 'disabled' : ''; ?>">
-                <a class="page-link" <?= $lastPage != $pageNo ? 'href="' . $href . '/page/' . $lastPage . '"' : ''; ?> >
+                <a class="page-link" <?= $lastPage != $pageNo ? 'href="' . $href . '/page/' . $lastPage . (isset($_GET['q']) ? '?q=' . $_GET['q'] : '') . '"' : ''; ?> >
                     <i class="la la-angle-double-right" aria-hidden="true"></i>
                 </a>
             </li>

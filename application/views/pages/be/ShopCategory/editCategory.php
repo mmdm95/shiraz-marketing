@@ -183,6 +183,10 @@
                     </div>
                 </div>
 
+                <!-- file-picker -->
+                <?php $this->view("templates/be/file-picker", $data); ?>
+                <!-- /file-picker -->
+
                 <!-- Footer -->
                 <?php $this->view("templates/be/copyright", $data); ?>
                 <!-- /footer -->

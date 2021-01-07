@@ -32,7 +32,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url(); ?>admin/manageComplaint">
+                            <a href="<?= base_url(); ?>admin/manageComplaints">
                                 مدیریت شکایات
                             </a>
                         </li>

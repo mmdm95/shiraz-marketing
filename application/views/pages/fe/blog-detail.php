@@ -60,10 +60,12 @@
                         در تاریخ
                         <?= jDateTime::date('j F Y', $blog['created_at']); ?>
                     </li>
-                    <li class="list-inline-item">
-                        آپدیت شده در تاریخ
-                        <?= jDateTime::date('j F Y', $blog['updated_at']); ?>
-                    </li>
+                    <?php if (!empty($blog['updated_at'])): ?>
+                        <li class="list-inline-item">
+                            آپدیت شده در تاریخ
+                            <?= jDateTime::date('j F Y', $blog['updated_at']); ?>
+                        </li>
+                    <?php endif; ?>
                     <li class="list-inline-item">
                         در دسته‌بندی
                         <a href="<?= base_url('blog/all/category/' . $blog['category_id']); ?>"

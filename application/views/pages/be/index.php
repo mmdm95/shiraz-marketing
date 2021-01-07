@@ -71,8 +71,8 @@
                                                    style="min-width: 130px;"
                                                    class="btn btn-info btn-float btn-float-lg border-left border-grey-300
                                                    border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
-                                                    <i class="icon-basket" aria-hidden="true"></i>
-                                                    <span>مشاهده سفارش‌ها</span>
+                                                    <i class="icon-cart" aria-hidden="true"></i>
+                                                    <span>مدیریت سفارشات</span>
                                                 </a>
                                             </li>
                                         <?php endif; ?>
@@ -95,7 +95,7 @@
                                                    class="btn btn-info btn-float btn-float-lg border-left border-grey-300
                                                    border-left-info-300 bg-white border-left-lg display-block panel no-border-radius">
                                                     <i class="icon-stack" aria-hidden="true"></i>
-                                                    <span>مدیریت فایل</span>
+                                                    <span>مدیریت فایل‌ها</span>
                                                 </a>
                                             </li>
                                         <?php endif; ?>
@@ -170,6 +170,17 @@
                                                             <?= convertNumbersToPersian($userAllCount); ?>
                                                         </h3>
                                                         کاربر
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6 col-md-3 col-lg-3">
+                                                <div class="panel text-pink-400 border-top-lg border-top-pink-400">
+                                                    <div class="panel-body">
+                                                        <h3 class="no-margin">
+                                                            <?= convertNumbersToPersian($adminUserCount); ?>
+                                                        </h3>
+                                                        کاربر ادمین
                                                     </div>
                                                 </div>
                                             </div>
