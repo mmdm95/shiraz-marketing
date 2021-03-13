@@ -3,6 +3,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
 
 use Admin\AbstractController\AbstractController;
 use Apfelbox\FileDownload\FileDownload;
+use application\handlers\datatable\DatatableHandler;
 use HAuthentication\Auth;
 use HAuthentication\HAException;
 use HForm\Form;
@@ -524,19 +525,6 @@ class ShopController extends AbstractController
             $this->error->access_denied();
             die();
         }
-        //-----
-        $productModel = new ProductModel();
-        $where = '';
-        $params = [];
-        try {
-            if (!$this->auth->hasUserRole([AUTH_ROLE_SUPER_USER, AUTH_ROLE_ADMIN])) {
-                $where = 'p.delete!=:del';
-                $params['del'] = 1;
-            }
-        } catch (HAException $e) {
-            var_dump($e->getMessage());
-        }
-        $this->data['products'] = $productModel->getProducts($where, $params);
 
         // Base configuration
         $this->data['title'] = titleMaker(' | ', set_value($this->setting['main']['title'] ?? ''), 'مشاهده محصولات');
@@ -1117,6 +1105,163 @@ class ShopController extends AbstractController
         ]);
     }
 
+    public function getProductPaginatedTableAction()
+    {
+        $columns = [
+            ['db' => 'p.id', 'db_alias' => 'id', 'dt' => 'id'],
+            [
+                'dt' => 'chk',
+                'formatter' => function ($row) {
+                    return '<div class="product-chk" 
+                    data-product-id="' . $row['id'] . '"> 
+                    <input type="checkbox" class="styled" name="product_group_checkbox">
+                    </div>';
+                }
+            ],
+            [
+                'db' => 'p.image',
+                'db_alias' => 'image',
+                'dt' => 'image',
+                'formatter' => function ($d, $row) {
+                    return $this->load->view('templates/be/parser/image-placeholder', [
+                        'url' => $d,
+                        'alt' => $row['title'],
+                    ], true);
+                }
+            ],
+            [
+                'db' => 'p.title',
+                'db_alias' => 'title',
+                'dt' => 'title',
+                'formatter' => function ($d, $row) {
+                    $res = '<a href="' . base_url('product/detail/' . $row['id'] . $row['slug']) . '" target="_blank">
+                        ' . $d . '
+                        </a>';
+                    if (1 == $row['is_special']) {
+                        $res .= '<span class="label label-danger ml-5">ویژه</span>';
+                    }
+
+                    return $res;
+                }
+            ],
+            ['db' => 'c.name', 'db_alias' => 'category_name', 'dt' => 'category'],
+            [
+                'db' => 'p.stock_count',
+                'db_alias' => 'stock_count',
+                'dt' => 'stock',
+                'formatter' => function ($d) {
+                    return '<span class="text-success">' . $d . '</span>';
+                }
+            ],
+            [
+                'db' => 'p.sold_count',
+                'db_alias' => 'sold_count',
+                'dt' => 'sold',
+                'formatter' => function ($d) {
+                    return '<span class="text-info">' . $d . '</span>';
+                }
+            ],
+            [
+                'db' => 'p.product_type',
+                'db_alias' => 'product_type',
+                'dt' => 'type',
+                'formatter' => function ($d) {
+                    $res = 'نامشخص';
+                    if ($d == PRODUCT_TYPE_SERVICE) {
+                        $res = 'خدمات';
+                    } elseif ($d == PRODUCT_TYPE_ITEM) {
+                        $res = 'کالا';
+                    }
+
+                    return $res;
+                }
+            ],
+            [
+                'db' => 'p.publish',
+                'db_alias' => 'publish',
+                'dt' => 'publish',
+                'formatter' => function ($d) {
+                    if (1 == $d) {
+                        $res = $this->load->view('templates/be/parser/status-label-bordered', [
+                            'label' => 'فعال',
+                            'class' => 'border-left-success',
+                        ], true);
+                    } else {
+                        $res = $this->load->view('templates/be/parser/status-label-bordered', [
+                            'label' => 'غیر فعال',
+                            'class' => 'border-left-danger',
+                        ], true);
+                    }
+
+                    return $res;
+                }
+            ],
+            [
+                'db' => 'p.available',
+                'db_alias' => 'available',
+                'dt' => 'availability',
+                'formatter' => function ($d, $row) {
+                    return $this->load->view('templates/be/operations/op-product-switch', [
+                        'id' => $row['id'],
+                        'status' => $d,
+                    ], true);
+                }
+            ],
+            [
+                'dt' => 'operations',
+                'formatter' => function ($row) {
+                    return $this->load->view('templates/be/operations/op-product', [
+                        'row' => $row,
+                    ], true);
+                }
+            ],
+        ];
+
+        if (in_array(AUTH_ROLE_SUPER_USER, $this->auth->getIdentity()->role_id) ||
+            in_array(AUTH_ROLE_ADMIN, $this->auth->getIdentity()->role_id)) {
+            $columns[] = [
+                'db' => '(CASE WHEN (u.id IS NOT NULL) THEN CONCAT(u.first_name, " ", u.last_name) WHEN (u.mobile IS NOT NULL) THEN u.mobile ELSE NULL END)',
+                'db_alias' => 'creator',
+                'dt' => 'creator',
+                'formatter' => function ($d) {
+                    $res = $this->load->view('templates/be/parser/dash-icon', [], true);
+                    if (!is_null($d)) {
+                        $res = $d;
+                    }
+                    return $res;
+                }
+            ];
+        }
+
+
+        $res = DatatableHandler::handle($_POST, $columns, function ($cols, $where, $bindValues, $limit, $offset, $order) {
+            $productModel = new ProductModel();
+
+            $cols[] = 'p.slug';
+            $cols[] = 'p.is_special';
+
+            try {
+                if (!$this->auth->hasUserRole([AUTH_ROLE_SUPER_USER, AUTH_ROLE_ADMIN])) {
+                    if ('' == $where) {
+                        $where = 'p.delete!=:del';
+                    } else {
+                        $where = ' AND (p.delete!=:del)';
+                    }
+                    $bindValues['del'] = 1;
+                }
+            } catch (HAException $e) {
+            }
+
+            $res = $productModel->getProducts($where, $bindValues, $limit, $offset, $order, $cols);
+            $count = $productModel->getProductsCount($where, $bindValues);
+            $totalCount = $productModel->getProductsCount();
+
+            return [$res, $count, $totalCount];
+        });
+
+        echo json_encode($res);
+    }
+
     //-----
 
     public function manageOrdersAction()
@@ -1270,6 +1415,7 @@ class ShopController extends AbstractController
                 if ($this->data['cancelStatusID'] != $this->data['order']['send_status']) {
                     $res = $model->update_it(self::TBL_ORDER, [
                         'send_status' => (int)$values['send_status'],
+                        'send_status_changed_by' => $this->auth->getIdentity() ? ($this->auth->getIdentity()->id ?? 0) : 0,
                     ], 'id=:id', ['id' => $this->data['param'][0]]);
                 }
                 $res2 = true;
@@ -1893,6 +2039,68 @@ class ShopController extends AbstractController
                     $html .= $this->data['order']['address'];
                     $html .= "</strong>
         </div>
+    </div>
+</div>
+<br>
+<div class='section'>
+    <div class='section-header'>
+        <strong>
+            محصولات خریداری شده
+        </strong>
+    </div>
+    <div class='section-body'>
+        <table class='table'>
+        <thead>
+            <tr>
+                <th>
+                    ردیف
+                </th>
+                <th>
+                    نام کالا
+                </th>
+                <th>
+                    تعداد
+                </th>
+                <th>
+                    فی
+                </th>
+                <th>
+                    تخفیف
+                </th>
+                <th>
+                    قیمت نهایی
+                </th>
+            </tr>
+        </thead>
+        <tbody>";
+                    $i = 0;
+                    foreach ($this->data['order']['products'] as $product) {
+                        $html .= "<tr>";
+                        $html .= "<td>";
+                        $html .= convertNumbersToPersian(++$i);
+                        $html .= "</td>";
+                        $html .= "<td>";
+                        $html .= $product['title'];
+                        $html .= "</td>";
+                        $html .= "<td>";
+                        $html .= convertNumbersToPersian($product['product_count']);
+                        $html .= "</td>";
+                        $html .= "<td>";
+                        $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($product['product_unit_price'], true)));
+                        $html .= "تومان";
+                        $html .= "</td>";
+                        $html .= "<td>";
+                        $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($product['product_discounted_price'], true)));
+                        $html .= "تومان";
+                        $html .= "</td>";
+                        $html .= "<td>";
+                        $html .= convertNumbersToPersian(number_format(convertNumbersToPersian($product['product_price'], true)));
+                        $html .= "تومان";
+                        $html .= "</td>";
+                        $html .= "</tr>";
+                    }
+                    $html .= "</tbody>
+        </table>
     </div>
 </div>
 </body>

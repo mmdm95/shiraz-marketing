@@ -11,6 +11,7 @@ use HAuthentication\HAException;
 use HConvert\Converter\NumberConverter;
 use HForm\Form;
 use Model;
+use OrderModel;
 use UserModel;
 
 
@@ -259,6 +260,22 @@ abstract class AbstractController extends AbstractPaymentController
         if ($loadHeaderAndFooter) {
             $this->load->view('templates/be/admin-header-part', $this->data);
             $this->load->view('templates/be/admin-js-part', $this->data);
+        }
+
+        // show wait for check products alert to admin
+        if (ACTION != 'login') {
+            try {
+                if (
+                    $this->auth->isAllow('order', AUTH_ACCESS_READ) &&
+                    $this->auth->isAllow('order', AUTH_ACCESS_UPDATE)
+                ) {
+                    $orderModel = new OrderModel();
+                    $this->load->view('templates/be/alert/product-check', [
+                        'checkProductsCount' => $orderModel->getOrdersCount('ss.priority=:status', ['status' => SEND_STATUS_IN_QUEUE]),
+                    ]);
+                }
+            } catch (HAException $e) {
+            }
         }
 
         $allPages = is_string($pages) ? [$pages] : (is_array($pages) ? $pages : []);

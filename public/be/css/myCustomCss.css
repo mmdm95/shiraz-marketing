@@ -1,3 +1,7 @@
+.full-width-force {
+    width: 100% !important;
+}
+
 .rtl {
     direction: rtl;
 }

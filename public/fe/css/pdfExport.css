@@ -51,3 +51,22 @@ body {
 .section-important {
     border: 3px solid #777 !important;
 }
+
+.table {
+    direction: rtl;
+    width: 100%;
+}
+
+.table th,
+.table td {
+    text-align: right;
+    padding: 5px;
+}
+
+.table thead th {
+    border-bottom: 2px solid #000;
+}
+
+.table tbody tr:not(:last-child) {
+    border-bottom: 1px solid #000;
+}

@@ -11,7 +11,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'blog/deleteBlog', function () {
+            $.delete_something_action(this, 'blog/deleteBlog', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -28,7 +28,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'blog/deleteCategory', function () {
+            $.delete_something_action(this, 'blog/deleteCategory', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -45,7 +45,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteComplaint', function () {
+            $.delete_something_action(this, 'deleteComplaint', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -62,7 +62,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteComplaint', function () {
+            $.delete_something_action(this, 'deleteComplaint', function () {
                 setTimeout(function () {
                     window.location.href = default_rout + 'manageComplaints';
                 }, 2000);
@@ -75,7 +75,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteContact', function () {
+            $.delete_something_action(this, 'deleteContact', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -92,7 +92,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteContact', function () {
+            $.delete_something_action(this, 'deleteContact', function () {
                 setTimeout(function () {
                     window.location.href = default_rout + 'manageContactUs';
                 }, 2000);
@@ -105,7 +105,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/deleteCoupon', function () {
+            $.delete_something_action(this, 'shop/deleteCoupon', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -122,7 +122,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteFAQ', function () {
+            $.delete_something_action(this, 'deleteFAQ', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -139,7 +139,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/deleteReturnOrder', function () {
+            $.delete_something_action(this, 'shop/deleteReturnOrder', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -156,7 +156,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/deleteReturnOrder', function () {
+            $.delete_something_action(this, 'shop/deleteReturnOrder', function () {
                 setTimeout(function () {
                     window.location.href = default_rout + 'shop/manageReturnOrders';
                 }, 2000);
@@ -169,7 +169,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/closeReturnOrder', function () {
+            $.delete_something_action(this, 'shop/closeReturnOrder', function () {
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -182,7 +182,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/deleteProduct', function () {
+            $.delete_something_action(this, 'shop/deleteProduct', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -199,7 +199,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'shop/deleteCategory', function () {
+            $.delete_something_action(this, 'shop/deleteCategory', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -216,7 +216,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteSlide', function () {
+            $.delete_something_action(this, 'deleteSlide', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -233,7 +233,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'deleteStaticPage', function () {
+            $.delete_something_action(this, 'deleteStaticPage', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -250,7 +250,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'user/deleteUser', function () {
+            $.delete_something_action(this, 'user/deleteUser', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -267,7 +267,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'user/deleteUserRole', function () {
+            $.delete_something_action(this, 'user/deleteUserRole', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -284,7 +284,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'user/deleteMarketer', function () {
+            $.delete_something_action(this, 'user/deleteMarketer', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -301,7 +301,7 @@
             e.preventDefault();
             var del_btn = $(this);
 
-            delete_something_action(this, 'user/deleteMarketerRequest', function () {
+            $.delete_something_action(this, 'user/deleteMarketerRequest', function () {
                 $(del_btn).closest('tr').fadeOut(800, function () {
                     if ($.fn.DataTable) {
                         dataTable.DataTable().row($(this)).remove().draw();
@@ -311,9 +311,10 @@
                 });
             });
         });
+
         //**********
 
-        function delete_something_action(selector, sendUrl, callback) {
+        $.delete_something_action = function (selector, sendUrl, callback) {
             var _this = this, del_btn = $(selector);
             var id = $(del_btn).find('input[type=hidden]').val();
             if ($.trim(id) != '') {
@@ -385,7 +386,7 @@
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'blog/showInSide', {stat: stat});
+            $.active_deactive_action(this, 'blog/showInSide', {stat: stat});
         });
         //**********
 
@@ -395,7 +396,7 @@
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'shop/availableProduct', {stat: stat});
+            $.active_deactive_action(this, 'shop/availableProduct', {stat: stat});
         });
         //**********
 
@@ -405,7 +406,7 @@
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'user/activeDeactive', {stat: stat});
+            $.active_deactive_action(this, 'user/activeDeactive', {stat: stat});
         });
         //**********
 
@@ -415,7 +416,7 @@
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'user/inOurTeam', {stat: stat});
+            $.active_deactive_action(this, 'user/inOurTeam', {stat: stat});
         });
         //**********
 
@@ -425,11 +426,11 @@
             var btn = $(this);
             var stat = btn.is(':checked') ? 1 : 0;
 
-            active_deactive_action(this, 'user/acceptMarketer', {stat: stat});
+            $.active_deactive_action(this, 'user/acceptMarketer', {stat: stat});
         });
         //**********
 
-        function active_deactive_action(selector, sendUrl, params, callback) {
+        $.active_deactive_action = function (selector, sendUrl, params, callback) {
             var _this = this, btn = $(selector);
             var id = $(btn).parent().find('input[type=hidden]').val();
             if ($.trim(id) != '') {

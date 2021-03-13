@@ -45,6 +45,7 @@
                         }, function (response) {
                             // console.log(response);
                             // console.log(JSON.parse(response));
+                            // return false;
 
                             var res = JSON.parse(response);
 
@@ -71,6 +72,7 @@
                         }, function (response) {
                             // console.log(response);
                             // console.log(JSON.parse(response));
+                            // return false;
 
                             var res = JSON.parse(response);
 

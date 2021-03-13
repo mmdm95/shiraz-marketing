@@ -25,7 +25,7 @@ use UserModel;
 
 include_once CONTROLLER_PATH . 'AbstractPaymentController.class.php';
 
-abstract class AbstractController extends AbstractPaymentController
+abstract class AbstractControllerCopy extends AbstractPaymentController
 {
     //-----
     protected $haveCartAccess = false;
@@ -1386,7 +1386,7 @@ abstract class AbstractController extends AbstractPaymentController
 
     public function payResultAction($param)
     {
-        if (!isset($param[0]) || !in_array($param[0], array_keys($this->paymentResultParam))) {
+        if (!$this->auth->isLoggedIn() || !isset($param[0]) || !in_array($param[0], array_keys($this->paymentResultParam))) {
             $this->error->show_404();
         }
         //-----
@@ -1786,7 +1786,6 @@ abstract class AbstractController extends AbstractPaymentController
         foreach ($items as $item) {
             try {
                 $productTotalPrice = $item['price'] * $item['quantity'];
-                $productTotalDiscountPrice = $item['discount_price'] * $item['quantity'];
                 // Add to total amount and total discounted amount variable
                 $totalAmount += $productTotalPrice;
                 $totalDiscountedAmount += $item['discount_price'] * $item['quantity'];
@@ -1796,7 +1795,6 @@ abstract class AbstractController extends AbstractPaymentController
                     'product_id' => $item['id'],
                     'product_count' => $item['quantity'],
                     'product_unit_price' => $item['price'],
-                    'product_discounted_price' => $productTotalDiscountPrice,
                     'product_price' => $productTotalPrice,
                 ]);
                 $model->update_it(self::TBL_PRODUCT, [], 'id=:id', ['id' => $item['id']], [
@@ -2022,16 +2020,6 @@ abstract class AbstractController extends AbstractPaymentController
                 'Amount' => $parameters['price'] * 10,
                 'callbackURL' => $parameters['backUrl'],
                 'terminalID' => '69006300'])->get_result();
-            //------------------------------
-//            $orderModel->returnProductsToStock($parameters['order_code']);
-//            $model->delete_it(self::TBL_ORDER, 'order_code=:oc', ['oc' => $parameters['order_code']]);
-//            $model->delete_it(self::TBL_ORDER_ITEM, 'order_code=:oc', ['oc' => $parameters['order_code']]);
-//            message(self::AJAX_TYPE_SUCCESS, 200, ['', $mabna->urls[PaymentMabna::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA], $payRes,
-//                'invoiceID' => $parameters['order_code'],
-//                'Amount' => $parameters['price'] * 10,
-//                'callbackURL' => $parameters['backUrl'],
-//                'terminalID' => '69006300']);
-            //------------------------------
 
             // Handle result of payment gateway
             if (isset($payRes['Status']) && isset($payRes['AccessToken']) && $payRes['Status'] == 0) {
@@ -2225,7 +2213,7 @@ abstract class AbstractController extends AbstractPaymentController
                 ], 'order_code=:oc', ['oc' => $postVars['order_id']])[0];
                 // Select order payment according to gateway id result
                 $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_IDPAY, [
-                    'user_id', 'payment_id', 'status'
+                    'payment_id', 'status'
                 ], 'order_code=:oc AND payment_id=:pId', ['oc' => $postVars['order_id'], 'pId' => $postVars['id']]);
                 // If there is a record in gateway table(only one record is acceptable)
                 if (count($orderPayment) == 1) {
@@ -2250,9 +2238,6 @@ abstract class AbstractController extends AbstractPaymentController
 
                                 // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
                                 if ($status == Payment::PAYMENT_STATUS_OK_IDPAY) {
-                                    $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
-                                    $traceNumber = $advice['payment']['track_id'];
-
                                     // Transaction
                                     $model->transactionBegin();
                                     // Store extra info from bank's gateway result
@@ -2263,6 +2248,8 @@ abstract class AbstractController extends AbstractPaymentController
                                         'payment_code' => $advice['payment']['track_id'],
                                         'status' => $status,
                                     ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                    $success = $idpay->get_message($status, Payment::PAYMENT_STATUS_VERIFY_IDPAY);
+                                    $traceNumber = $advice['payment']['track_id'];
 
                                     $this->data['ref_id'] = $traceNumber;
                                     $this->data['have_ref_id'] = true;
@@ -2272,20 +2259,16 @@ abstract class AbstractController extends AbstractPaymentController
                                         $this->data['success'] = $success;
                                         $this->data['is_success'] = true;
 
-                                        // get user mobile from user id of gateway table
-                                        $mobile = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $orderPayment['user_id']]);
-                                        if (count($mobile)) {
-                                            $mobile = $mobile[0]['mobile'];
-
-                                            // Send sms to user
+                                        // Send sms to user if is login
+                                        if ($this->auth->isLoggedIn()) {
                                             // Send SMS code goes here
                                             $this->load->library('HSMS/rohamSMS');
                                             $sms = new rohamSMS();
                                             try {
                                                 $body = $this->setting['sms']['productRegistrationMsg'];
-                                                $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $mobile, $body);
+                                                $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
                                                 $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
-                                                $is_sent = $sms->set_numbers($mobile)->body($body)->send();
+                                                $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
                                             } catch (SMSException $e) {
                                                 die($e->getMessage());
                                             }
@@ -2326,16 +2309,16 @@ abstract class AbstractController extends AbstractPaymentController
                     if ($order['payment_status'] == OWN_PAYMENT_STATUS_NOT_PAYED) {
                         $updateColumns = [
                             'payment_status' => OWN_PAYMENT_STATUS_FAILED,
-                            'payment_date' => $postVars['date'] ?: time(),
+                            'payment_date' => $postVars['date'],
                         ];
                     } else {
                         $updateColumns = [
-                            'payment_date' => $postVars['date'] ?: time(),
+                            'payment_date' => $postVars['date'],
                         ];
                     }
                 } else {
                     $updateColumns = [
-                        'payment_date' => $postVars['date'] ?: time(),
+                        'payment_date' => $postVars['date'],
                     ];
                 }
                 $model->update_it(self::TBL_ORDER, $updateColumns, 'order_code=:oc', ['oc' => $order['order_code']]);
@@ -2375,7 +2358,7 @@ abstract class AbstractController extends AbstractPaymentController
             if (isset($postVars['respcode']) && isset($postVars['respmsg']) && isset($postVars['amount']) &&
                 isset($postVars['payload']) && isset($postVars['terminalid']) && isset($postVars['tracenumber']) &&
                 isset($postVars['rrn']) && isset($postVars['datePaid']) && isset($postVars['digitalreceipt']) &&
-                isset($postVars['issuerbank']) && isset($postVars['payid']) &&
+                isset($postVars['datePaid']) && isset($postVars['issuerbank']) && isset($postVars['payid']) &&
                 isset($postVars['cardnumber']) && isset($postVars['invoiceid']) &&
                 $postVars['respcode'] == 0 && $postVars['terminalid'] == $terminal &&
                 $model->is_exist(self::TBL_ORDER, 'order_code=:oc', ['oc' => $postVars['invoiceid']]) &&
@@ -2388,7 +2371,7 @@ abstract class AbstractController extends AbstractPaymentController
                 ], 'order_code=:oc', ['oc' => $postVars['invoiceid']])[0];
                 // Select order payment according to gateway id result
                 $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_MABNA, [
-                    'user_id', 'status'
+                    'status'
                 ], 'order_code=:oc', ['oc' => $postVars['order_id']]);
                 // If there is a record in gateway table(only one record is acceptable)
                 if (count($orderPayment) == 1) {
@@ -2414,9 +2397,6 @@ abstract class AbstractController extends AbstractPaymentController
                                 // Check for status if it's just OK/100 [100 => OK, 101 => Duplicate, etc.]
                                 if ($status == Payment::PAYMENT_ADVICE_OK_MABNA) {
                                     if ($advice['ReturnId'] == (intval($order['final_price']) * 10)) {
-                                        $success = $advice['Message'];
-                                        $traceNumber = $postVars['tracenumber'];
-
                                         // Transaction
                                         $model->transactionBegin();
                                         // Store extra info from bank's gateway result
@@ -2427,6 +2407,8 @@ abstract class AbstractController extends AbstractPaymentController
                                             'payment_code' => $postVars['tracenumber'] ?: '',
                                             'status' => $status,
                                         ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                        $success = $advice['Message'];
+                                        $traceNumber = $postVars['tracenumber'];
 
                                         $this->data['ref_id'] = $traceNumber;
                                         $this->data['have_ref_id'] = true;
@@ -2436,20 +2418,16 @@ abstract class AbstractController extends AbstractPaymentController
                                             $this->data['success'] = $success;
                                             $this->data['is_success'] = true;
 
-                                            // get user mobile from user id of gateway table
-                                            $mobile = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $orderPayment['user_id']]);
-                                            if (count($mobile)) {
-                                                $mobile = $mobile[0]['mobile'];
-
-                                                // Send sms to user
+                                            // Send sms to user if is login
+                                            if ($this->auth->isLoggedIn()) {
                                                 // Send SMS code goes here
                                                 $this->load->library('HSMS/rohamSMS');
                                                 $sms = new rohamSMS();
                                                 try {
                                                     $body = $this->setting['sms']['productRegistrationMsg'];
-                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $mobile, $body);
+                                                    $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
                                                     $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
-                                                    $is_sent = $sms->set_numbers($mobile)->body($body)->send();
+                                                    $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
                                                 } catch (SMSException $e) {
                                                     die($e->getMessage());
                                                 }
@@ -2590,20 +2568,16 @@ abstract class AbstractController extends AbstractPaymentController
                                 if ($res1 && $res2) {
                                     $model->transactionComplete();
 
-                                    // get user mobile from user id of gateway table
-                                    $mobile = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $curPay['user_id']]);
-                                    if (count($mobile)) {
-                                        $mobile = $mobile[0]['mobile'];
-
-                                        // Send sms to user
+                                    // Send sms to user if is login
+                                    if ($this->auth->isLoggedIn()) {
                                         // Send SMS code goes here
                                         $this->load->library('HSMS/rohamSMS');
                                         $sms = new rohamSMS();
                                         try {
                                             $body = $this->setting['sms']['productRegistrationMsg'];
-                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $mobile, $body);
+                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
                                             $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $curPay['order_code'], $body);
-                                            $is_sent = $sms->set_numbers($mobile)->body($body)->send();
+                                            $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
                                         } catch (SMSException $e) {
                                             die($e->getMessage());
                                         }
@@ -2686,7 +2660,7 @@ abstract class AbstractController extends AbstractPaymentController
                         $order = $order[0];
                         // Select order payment according to gateway id result
                         $orderPayment = $model->select_it(null, self::PAYMENT_TABLE_BEH_PARDAKHT, [
-                            'user_id', 'status'
+                            'status'
                         ], 'order_code=:oc', ['oc' => $this->data['order_code']]);
                         // If there is a record in gateway table(only one record is acceptable)
                         if (count($orderPayment) == 1) {
@@ -2702,73 +2676,61 @@ abstract class AbstractController extends AbstractPaymentController
                                     'saleOrderId' => $postVars['SaleOrderId'],
                                     'saleReferenceId' => $postVars['SaleReferenceId'],
                                 ])->get_result();
+                                $advice['ResCode'] = $advice['return'];
 
-                                if (isset($advice['return'])) {
-                                    $advice['ResCode'] = $advice['return'];
+                                // Check for error
+                                if ($advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT || $advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
+                                    $settle = $beh_pardakht->settle_request([
+                                        'orderId' => $postVars['SaleOrderId'],
+                                        'saleOrderId' => $postVars['SaleOrderId'],
+                                        'saleReferenceId' => $postVars['SaleReferenceId'],
+                                    ])->get_result();
 
-                                    // Check for error
-                                    if ($advice['ResCode'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT || $advice['ResCode'] == Payment::PAYMENT_STATUS_DUPLICATE_BEH_PARDAKHT) {
-                                        $settle = $beh_pardakht->settle_request([
-                                            'orderId' => $postVars['SaleOrderId'],
-                                            'saleOrderId' => $postVars['SaleOrderId'],
-                                            'saleReferenceId' => $postVars['SaleReferenceId'],
-                                        ])->get_result();
+                                    if ($settle['return'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
+                                        $status = $advice['ResCode'];
+                                        // Check for status if it's just OK/0 [0 => OK, etc.]
+                                        if ($status == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
+                                            // Transaction
+                                            $model->transactionBegin();
+                                            // Store extra info from bank's gateway result
+                                            $res1 = $model->update_it(self::TBL_ORDER, [
+                                                'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
+                                            ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                            $res2 = $model->update_it(self::PAYMENT_TABLE_BEH_PARDAKHT, [
+                                                'payment_code' => $postVars['SaleReferenceId'],
+                                                'status' => $status,
+                                            ], 'order_code=:oc', ['oc' => $order['order_code']]);
+                                            $success = $beh_pardakht->get_message($advice['ResCode']);
+                                            $traceNumber = $postVars['SaleReferenceId'];
 
-                                        if ($settle['return'] == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
-                                            $status = $advice['ResCode'];
-                                            // Check for status if it's just OK/0 [0 => OK, etc.]
-                                            if ($status == Payment::PAYMENT_STATUS_OK_BEH_PARDAKHT) {
-                                                // Transaction
-                                                $model->transactionBegin();
-                                                // Store extra info from bank's gateway result
-                                                $res1 = $model->update_it(self::TBL_ORDER, [
-                                                    'payment_status' => OWN_PAYMENT_STATUS_SUCCESSFUL
-                                                ], 'order_code=:oc', ['oc' => $order['order_code']]);
-                                                $res2 = $model->update_it(self::PAYMENT_TABLE_BEH_PARDAKHT, [
-                                                    'payment_code' => $postVars['SaleReferenceId'],
-                                                    'status' => $status,
-                                                ], 'order_code=:oc', ['oc' => $order['order_code']]);
-                                                $success = $beh_pardakht->get_message($advice['ResCode']);
-                                                $traceNumber = $postVars['SaleReferenceId'];
+                                            $this->data['ref_id'] = $traceNumber;
+                                            $this->data['have_ref_id'] = true;
+                                            if ($res1 && $res2) {
+                                                $model->transactionComplete();
+                                                // Set success parameters
+                                                $this->data['success'] = $success;
+                                                $this->data['is_success'] = true;
 
-                                                $this->data['ref_id'] = $traceNumber;
-                                                $this->data['have_ref_id'] = true;
-                                                if ($res1 && $res2) {
-                                                    $model->transactionComplete();
-                                                    // Set success parameters
-                                                    $this->data['success'] = $success;
-                                                    $this->data['is_success'] = true;
-
-                                                    // get user mobile from user id of gateway table
-                                                    $mobile = $model->select_it(null, self::TBL_USER, ['mobile'], 'id=:id', ['id' => $orderPayment['user_id']]);
-                                                    if (count($mobile)) {
-                                                        $mobile = $mobile[0]['mobile'];
-
-                                                        // Send sms to user
-                                                        // Send SMS code goes here
-                                                        $this->load->library('HSMS/rohamSMS');
-                                                        $sms = new rohamSMS();
-                                                        try {
-                                                            $body = $this->setting['sms']['productRegistrationMsg'];
-                                                            $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $mobile, $body);
-                                                            $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
-                                                            $is_sent = $sms->set_numbers($mobile)->body($body)->send();
-                                                        } catch (SMSException $e) {
-                                                            die($e->getMessage());
-                                                        }
+                                                // Send sms to user if is login
+                                                if ($this->auth->isLoggedIn()) {
+                                                    // Send SMS code goes here
+                                                    $this->load->library('HSMS/rohamSMS');
+                                                    $sms = new rohamSMS();
+                                                    try {
+                                                        $body = $this->setting['sms']['productRegistrationMsg'];
+                                                        $body = str_replace(SMS_REPLACEMENT_CHARS['mobile'], $this->data['identity']->mobile, $body);
+                                                        $body = str_replace(SMS_REPLACEMENT_CHARS['orderCode'], $order['order_code'], $body);
+                                                        $is_sent = $sms->set_numbers($this->data['identity']->mobile)->body($body)->send();
+                                                    } catch (SMSException $e) {
+                                                        die($e->getMessage());
                                                     }
-                                                } else {
-                                                    $model->transactionRollback();
-                                                    $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
-                                                    $this->data['error'] .= "<br>";
-                                                    $this->data['error'] .= 'لطفا از صفحه خود اسکرین شات بگیرید و کد رهگیری را یادداشت نمایید.';
-                                                    $this->data['is_success'] = false;
                                                 }
                                             } else {
-                                                $this->data['error'] = 'عملیات پرداخت انجام نشد!';
+                                                $model->transactionRollback();
+                                                $this->data['error'] = 'عملیات پرداخت انجام شد. خطا در ثبت تراکنش، با پشتیبانی جهت ثبت تراکنش تماس حاصل فرمایید.';
+                                                $this->data['error'] .= "<br>";
+                                                $this->data['error'] .= 'لطفا از صفحه خود اسکرین شات بگیرید و کد رهگیری را یادداشت نمایید.';
                                                 $this->data['is_success'] = false;
-                                                $this->data['ref_id'] = $postVars['SaleReferenceId'];
-                                                $this->data['have_ref_id'] = true;
                                             }
                                         } else {
                                             $this->data['error'] = 'عملیات پرداخت انجام نشد!';
@@ -2777,13 +2739,13 @@ abstract class AbstractController extends AbstractPaymentController
                                             $this->data['have_ref_id'] = true;
                                         }
                                     } else {
-                                        $this->data['error'] = $beh_pardakht->get_message($advice['ResCode']);
+                                        $this->data['error'] = 'عملیات پرداخت انجام نشد!';
                                         $this->data['is_success'] = false;
                                         $this->data['ref_id'] = $postVars['SaleReferenceId'];
                                         $this->data['have_ref_id'] = true;
                                     }
                                 } else {
-                                    $this->data['error'] = 'پرداخت انجام نشد، وضعیت نامشخص می‌باشد.';
+                                    $this->data['error'] = $beh_pardakht->get_message($advice['ResCode']);
                                     $this->data['is_success'] = false;
                                     $this->data['ref_id'] = $postVars['SaleReferenceId'];
                                     $this->data['have_ref_id'] = true;

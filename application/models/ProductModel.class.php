@@ -11,16 +11,23 @@ class ProductModel extends HModel
         $this->db = $this->getDb();
     }
 
-    public function getProducts($where = '', $bindParams = [], $limit = null, $offset = 0, $orderBy = ['p.id DESC'])
-    {
-        $select = $this->select();
-        $select->cols([
+    public function getProducts(
+        $where = '',
+        $bindParams = [],
+        $limit = null,
+        $offset = 0,
+        $orderBy = ['p.id DESC'],
+        $columns = [
             'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.price', 'p.discount_until', 'p.stock_count',
             'p.max_cart_count', 'p.place', 'p.available', 'p.category_id', 'p.is_special', 'p.sold_count', 'p.product_type',
             'p.publish', 'c.slug AS category_slug', 'c.name AS category_name', 'c.icon AS category_icon',
             'u.mobile AS username', 'u.first_name AS user_first_name', 'u.last_name AS user_last_name',
             'ci.name AS city_name', 'pr.name AS province_name'
-        ])->from($this->table . ' AS p');
+        ]
+    )
+    {
+        $select = $this->select();
+        $select->cols($columns)->from($this->table . ' AS p');
 
         try {
             $select->join(

@@ -101,7 +101,7 @@
             }
         }
 
-        function active_deactive_action(selector, sendUrl, params, callback) {
+        $.active_deactive_action = function (selector, sendUrl, params, callback) {
             var _this = this, btn = $(selector);
             var id = $(btn).parent().find('input[type=hidden]').val();
             if ($.trim(id) != '') {

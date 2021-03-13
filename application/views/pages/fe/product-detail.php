@@ -253,14 +253,24 @@
 
             <div class="col-lg-12">
                 <div class="box">
-                    <div class="box-header">
+                    <div class="box-header" style="cursor: pointer;"
+                         data-toggle="collapse"
+                         data-target="#collapseDesc"
+                         role="button"
+                         aria-expanded="false"
+                         aria-controls="collapseDesc">
                         <i class="la la-file-text float-right ml-2" aria-hidden="true"></i>
-                        <h5>
+                        <h5 class="d-inline-block">
                             توضیحات
                         </h5>
+                        <button type="button" class="btn float-left mr-2 px-2">
+                            <i class="la la-angle-down" aria-hidden="true"></i>
+                        </button>
                     </div>
-                    <div class="box-body normal-line-height">
-                        <?= $product['description']; ?>
+                    <div class="collapse" id="collapseDesc">
+                        <div class="box-body normal-line-height">
+                            <?= $product['description']; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,7 +311,8 @@
                                         </div>
                                     <?php endif; ?>
                                     <div class="card-side-top-right">
-                                        <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $related['id']; ?>"
+                                        <button class="btn bg-white text-success rounded-pill add-to-cart-btn"
+                                                data-item-id="<?= $related['id']; ?>"
                                                 data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
                                             <i class="la la-cart-plus" aria-hidden="true"></i>
                                         </button>

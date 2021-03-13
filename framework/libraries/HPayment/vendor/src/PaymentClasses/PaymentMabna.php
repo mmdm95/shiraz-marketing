@@ -64,7 +64,7 @@ class PaymentMabna extends Payment
      * @var array
      */
     public $urls = [
-        self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA => 'https://mabna.shaparak.ir:8081/V1/PeymentApi/GetToken',
+        self::PAYMENT_URL_PAYMENT_GET_TOKEN_MABNA => 'https://mabna.shaparak.ir:8082/Token.svc?wsdl',
         self::PAYMENT_URL_PAYMENT_MABNA => 'https://mabna.shaparak.ir:8080/Pay',
         self::PAYMENT_URL_BILL_MABNA => 'https://mabna.shaparak.ir:8080/Bill',
         self::PAYMENT_URL_BATCH_BILL_MABNA => 'https://mabna.shaparak.ir:8080/BatchBill',
@@ -198,6 +198,7 @@ class PaymentMabna extends Payment
         if (is_array($data) && count($data)) {
             // Send request to gateway
             $this->_result = json_decode($this->_send_request($data), true);
+//            $this->_result = $this->_send_request($data);
         }
     }
 

@@ -151,7 +151,7 @@ class PaymentZarinPal extends Payment
 
             if ($result->Status == self::PAYMENT_STATUS_OK_ZARINPAL) {
                 $this->_parameters[$this->statusStr] = self::PAYMENT_TRANSACTION_SUCCESS_ZARINPAL;
-            } else if ($result->Status == self::PAYMENT_TRANSACTION_DUPLICATE_ZARINPAL) {
+            } else if ($result->Status == self::PAYMENT_STATUS_DUPLICATE_ZARINPAL) {
                 $this->_parameters[$this->statusStr] = self::PAYMENT_TRANSACTION_DUPLICATE_ZARINPAL;
             } else {
                 $this->_parameters[$this->statusStr] = self::PAYMENT_TRANSACTION_FAILED_ZARINPAL;

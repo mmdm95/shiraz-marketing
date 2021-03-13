@@ -24,7 +24,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.static_id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -56,7 +56,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.static_id=o.send_status'
             );
         } catch (\Aura\SqlQuery\Exception $e) {
             die('unexpected error: ' . $e->getMessage());
@@ -157,7 +157,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.static_id=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -194,7 +194,7 @@ class OrderModel extends HModel
             $select->join(
                 'LEFT',
                 AbstractPaymentController::TBL_SEND_STATUS . ' AS ss',
-                'ss.id=o.send_status'
+                'ss.static_id=o.send_status'
             )->join(
                 'RIGHT',
                 AbstractPaymentController::TBL_RETURN_ORDER . ' AS ro',
@@ -289,7 +289,7 @@ class OrderModel extends HModel
     public function getStatusId($priority)
     {
         $model = new Model();
-        $res = $model->select_it(null, AbstractPaymentController::TBL_SEND_STATUS, 'id', 'priority=:pr', ['pr' => $priority]);
-        return count($res) ? $res[0]['id'] : -1;
+        $res = $model->select_it(null, AbstractPaymentController::TBL_SEND_STATUS, 'static_id', 'priority=:pr', ['pr' => $priority]);
+        return count($res) ? $res[0]['static_id'] : -1;
     }
 }
