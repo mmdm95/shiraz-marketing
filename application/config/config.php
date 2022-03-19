@@ -19,7 +19,7 @@ defined('BASE_PATH') OR exit('No direct script access allowed');
  *     1.2.5.0 instead of 1.2.5-a
  *     1.2.5.0.1 instead of 1.2.5-a1 (I'm not sure)
  */
-defined('APP_VERSION') OR define('APP_VERSION', '1.1.25');
+defined('APP_VERSION') OR define('APP_VERSION', '1.2.0');
 
 //===============================================
 
@@ -168,6 +168,20 @@ defined('MARITAL_STATUS') OR define('MARITAL_STATUS', [
     MARRIAGE_MARRIED => 'متأهل',
     MARRIAGE_SINGLE => 'مجرد',
     MARRIAGE_DEAD => 'فوت همسر'
+]);
+
+// tabbed slider predefined items
+defined("SLIDER_TABBED_NEWEST") OR define("SLIDER_TABBED_NEWEST", 1);
+defined("SLIDER_TABBED_MOST_VIEWED") OR define("SLIDER_TABBED_MOST_VIEWED", 2);
+defined("SLIDER_TABBED_MOST_DISCOUNT") OR define("SLIDER_TABBED_MOST_DISCOUNT", 3);
+// featured = اختصاصی - is_special in products
+defined("SLIDER_TABBED_SPECIAL") OR define("SLIDER_TABBED_SPECIAL", 4);
+// special = ویژه - from festivals
+defined("SLIDER_TABBED_TYPES") OR define("SLIDER_TABBED_TYPES", [
+    SLIDER_TABBED_NEWEST => 'جدیدترین',
+    SLIDER_TABBED_MOST_VIEWED => 'پربازدیدترین',
+    SLIDER_TABBED_MOST_DISCOUNT => 'پرتخفیف ترین',
+    SLIDER_TABBED_SPECIAL => 'ویژه',
 ]);
 
 //===============================================

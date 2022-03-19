@@ -27,7 +27,10 @@
                 <h1 class="fast-navigation-link-title col">
                     <?= $nextBlog['title']; ?>
                 </h1>
-                <img src="<?= base_url($nextBlog['image']); ?>" alt="<?= $nextBlog['title']; ?>">
+                <?= $this->view('templates/fe/parser/image-placeholder', [
+                    'url' => base_url($nextBlog['image']),
+                    'alt' => $nextBlog['title'],
+                ], true); ?>
             </div>
         </a>
     <?php endif; ?>
@@ -36,7 +39,10 @@
            class="fast-navigation-link fast-prev-navigation">
             <i class="la la-angle-left fast-navigation-link-icon" aria-hidden="true"></i>
             <div class="d-flex">
-                <img src="<?= base_url($prevBlog['image']); ?>" alt="<?= $prevBlog['title']; ?>">
+                <?= $this->view('templates/fe/parser/image-placeholder', [
+                    'url' => base_url($prevBlog['image']),
+                    'alt' => $prevBlog['title'],
+                ], true); ?>
                 <h1 class="fast-navigation-link-title col">
                     <?= $prevBlog['title']; ?>
                 </h1>
@@ -48,7 +54,11 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="box overflow-hidden">
-                    <img src="<?= base_url($blog['image']); ?>" alt="<?= $blog['title']; ?>" class="img-fluid w-100">
+                    <?= $this->view('templates/fe/parser/image-placeholder', [
+                        'url' => base_url($blog['image']),
+                        'alt' => $blog['title'],
+                        'class' => 'img-fluid w-100',
+                    ], true); ?>
                 </div>
                 <div class="section-header section-header-low-gap">
                     <h1 class="section-title">
@@ -111,7 +121,10 @@
                                             <i class="la la-image" aria-hidden="true"></i>
                                         </div>
                                         <a href="<?= base_url('blog/detail/' . $item['id'] . '/' . $item['slug']); ?>">
-                                            <img src="<?= base_url($item['image']); ?>" alt="<?= $item['title']; ?>">
+                                            <?= $this->view('templates/fe/parser/image-placeholder', [
+                                                'url' => base_url($item['image']),
+                                                'alt' => $item['title'],
+                                            ], true); ?>
                                         </a>
                                         <div class="card-date">
                                             <?php
@@ -209,7 +222,10 @@
                                     <div class="page-side">
                                         <a href="<?= base_url('blog/detail/' . $post['id'] . '/' . $post['slug']) ?>"
                                            class="page-side-img">
-                                            <img src="<?= base_url($post['image']); ?>" alt="<?= $post['title']; ?>">
+                                            <?= $this->view('templates/fe/parser/image-placeholder', [
+                                                'url' => base_url($post['image']),
+                                                'alt' => $post['title'],
+                                            ], true); ?>
                                         </a>
                                         <ul class="page-side-detail list-unstyled col m-0 p-0">
                                             <li class="mb-2 text-secondary">

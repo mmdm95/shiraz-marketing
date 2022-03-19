@@ -1,4 +1,7 @@
 <?php
+
+use Sim\File\FileSystem;
+
 defined('BASE_PATH') OR exit('No direct script access allowed');
 
 const GRS_NUMBER = 0x1;
@@ -704,4 +707,80 @@ if (!function_exists('dir_entries')) {
 
         return $tmp;
     }
+}
+
+/**
+ * @param int $time
+ * @return int
+ */
+function get_today_start_of_time(int $time): int
+{
+    return strtotime("today", $time);
+}
+
+/**
+ * @param int $time
+ * @return int
+ */
+function get_today_end_of_time(int $time): int
+{
+    return strtotime("tomorrow, -1 second", $time);
+}
+
+/**
+ * @param $val
+ * @return bool
+ */
+function is_value_checked($val): bool
+{
+    return in_array($val, ['yes', 'on', 1, '1', true, "true"], true);
+}
+
+/**
+ * @param string $filename
+ * @return string
+ */
+function get_image_name(string $filename): string
+{
+    return str_replace(['//', '\\'], '/', $filename);
+}
+
+/**
+ * @param string $filename
+ * @return bool
+ */
+function is_image_exists(string $filename): bool
+{
+    $filename = get_image_name($filename);
+    $ext = FileSystem::getFileExtension($filename);
+    $validImageExt = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
+
+    return file_exists($filename) && in_array($ext, $validImageExt);
+}
+
+/**
+ * @see https://betterprogramming.pub/generate-contrasting-text-for-your-random-background-color-ac302dc87b4
+ *
+ * @param string $bgColor
+ * @param string $lightColor
+ * @param string $darkColor
+ * @return string
+ */
+function get_color_from_bg(string $bgColor, string $lightColor = '#ffffff', string $darkColor = '#000000'): string
+{
+    $color = ($bgColor[0] === '#') ? substr($bgColor, 1) : $bgColor;
+    if (strlen($color) === 3) {
+        $colorArr = array_map(function ($value) {
+            return $value . $value;
+        }, str_split($color));
+        $color = '';
+        foreach ($colorArr as $c) {
+            $color .= $c;
+        }
+    }
+    $r = hexdec(substr($color, 0, 2)); // hexToR
+    $g = hexdec(substr($color, 2, 2)); // hexToG
+    $b = hexdec(substr($color, 4, 2)); // hexToB
+    $brightness = round((($r * 299) + ($g * 587) + ($b * 114)) / 1000);
+    return $brightness > 150 ? $darkColor : $lightColor;
 }

@@ -55,9 +55,15 @@
                                         </div>
                                     </div>
                                     <div class="panel-body">
+                                        <?php if (in_array(AUTH_ROLE_SUPER_USER, $identity->role_id) ||
+                                            in_array(AUTH_ROLE_ADMIN, $identity->role_id)): ?>
+                                            <?php $dtColumns = '[{"data":"chk"},{"data":"id"},{"data":"image"},{"data":"title"},{"data":"category"},{"data":"type"},{"data":"stock"},{"data":"sold"},{"data":"publish"},{"data":"availability"},{"data":"creator"},{"data":"operations"}]'; ?>
+                                        <?php else: ?>
+                                            <?php $dtColumns = '[{"data":"chk"},{"data":"id"},{"data":"image"},{"data":"title"},{"data":"category"},{"data":"type"},{"data":"stock"},{"data":"sold"},{"data":"publish"},{"data":"availability"},{"data":"operations"}]'; ?>
+                                        <?php endif; ?>
                                         <div class="table-responsive">
                                             <table class="table table-hover table-bordered datatable-product"
-                                                   data-columns='[{"data":"chk"},{"data":"id"},{"data":"image"},{"data":"title"},{"data":"category"},{"data":"type"},{"data":"stock"},{"data":"sold"},{"data":"publish"},{"data":"availability"},{"data":"creator"},{"data":"operations"}]'
+                                                   data-columns='<?= $dtColumns; ?>'
                                                    data-ajax-url="<?= base_url('admin/shop/getProductPaginatedTable'); ?>">
                                                 <thead>
                                                 <tr>

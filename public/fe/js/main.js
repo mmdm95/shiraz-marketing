@@ -592,4 +592,14 @@
             formControl.focus();
         });
     });
+
+    $('.lazy').lazy({
+        effect: "fadeIn",
+        effectTime: 800,
+        threshold: 0,
+        // callback
+        afterLoad: function (element) {
+            $(element).css({'background': 'none'});
+        }
+    });
 })(jQuery);

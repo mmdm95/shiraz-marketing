@@ -805,6 +805,10 @@ class HomeController extends AbstractController
             echo $e;
         }
 
+        // get categories
+        $categoryModel = new \CategoryModel();
+        $this->data['categories'] = $categoryModel->getCategories('c.publish=:pub', ['pub' => 1]);
+
         $this->load->library('HForm/Form');
 
         $this->data['setting'] = [];
@@ -909,13 +913,54 @@ class HomeController extends AbstractController
         $formIndex = new Form();
         $this->data['errors_index'] = [];
         $this->data['form_token_index'] = $formIndex->csrfToken('settingIndexPage');
-        $formIndex->setFieldsName(['indexPagePanel', 'showOurTeam'])
-            ->setDefaults('showOurTeam', 0)
+        $formIndex->setFieldsName([
+            'indexPagePanel',
+            'showOurTeam',
+            'inp-setting-general-slider-image',
+            'inp-setting-general-slider-image-link',
+            'inp-setting-general-slider-title',
+            'inp-setting-general-slider-type',
+            'inp-setting-general-slider-limit',
+            'inp-setting-general-slider-category',
+            'inp-setting-general-slider-link',
+        ])
+            ->setDefaults([
+                'showOurTeam',
+                'inp-setting-general-slider-image',
+                'inp-setting-general-slider-image-link',
+                'inp-setting-general-slider-title',
+                'inp-setting-general-slider-type',
+                'inp-setting-general-slider-limit',
+                'inp-setting-general-slider-category',
+                'inp-setting-general-slider-link',
+            ], [0, [], [], [], [], [], [], []])
             ->setMethod('post', [], ['showOurTeam']);
         try {
-            $formIndex->afterCheckCallback(function () use ($formIndex) {
+            $formIndex->afterCheckCallback(function ($values) use ($formIndex) {
                 $this->data['setting']['pages']['index']['showOurTeam'] = $formIndex->isChecked('showOurTeam') ? 1 : 0;
-                //-----
+                // prepare and map slider items then store them
+                $assembled = [];
+                $counter = 0;
+                foreach ($values['inp-setting-general-slider-title'] as $title) {
+                    if (
+                        '' !== trim($title) &&
+                        in_array(
+                            $values['inp-setting-general-slider-type'][$counter] ?? '',
+                            array_keys(SLIDER_TABBED_TYPES)
+                        )
+                    ) {
+                        $assembled[$counter]['image_link'] = $values['inp-setting-general-slider-image-link'][$counter] ?? '';
+                        $assembled[$counter]['image'] = $values['inp-setting-general-slider-image'][$counter] ?? '';
+                        $assembled[$counter]['title'] = $title;
+                        $assembled[$counter]['type'] = $values['inp-setting-general-slider-type'][$counter] ?? '';
+                        $assembled[$counter]['category'] = $values['inp-setting-general-slider-category'][$counter] ?? '';
+                        $assembled[$counter]['limit'] = $values['inp-setting-general-slider-limit'][$counter] ?? '';
+                        $assembled[$counter]['link'] = $values['inp-setting-general-slider-link'][$counter] ?? '';
+                        ++$counter;
+                    }
+                }
+                $this->data['setting']['pages']['index']['sliders'] = $assembled;
+                    //-----
 
                 $this->setting = array_merge_recursive_distinct($this->setting, $this->data['setting']);
                 $res = write_json(CORE_PATH . 'config.json', $this->setting);

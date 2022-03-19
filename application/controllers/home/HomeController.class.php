@@ -19,7 +19,14 @@ class HomeController extends AbstractController
         $this->data['mainSlides'] = $model->select_it(null, self::TBL_MAIN_SLIDER);
         $this->data['offers'] = $productModel->getProducts('p.publish=:pub AND p.is_special=:spec', ['pub' => 1, 'spec' => 1], 6);
         //-----
-        $this->data['newestProducts'] = $productModel->getProducts('p.publish=:pub', ['pub' => 1], 24);
+        $generalSlider = [];
+        foreach ($this->setting['pages']['index']['sliders'] ?? [] as $k => $slider) {
+            if (is_array($slider)) {
+                $generalSlider[$k]['info'] = $slider;
+                $generalSlider[$k]['items'] = $productModel->getSliders($slider);
+            }
+        }
+        $this->data['productsSliders'] = $generalSlider;
         //-----
         $this->data['lastNews'] = $blogModel->getAllBlog('b.publish=:pub', ['pub' => 1], 8);
         //-----

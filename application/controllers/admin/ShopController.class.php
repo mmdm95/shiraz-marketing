@@ -1233,7 +1233,6 @@ class ShopController extends AbstractController
             ];
         }
 
-
         $res = DatatableHandler::handle($_POST, $columns, function ($cols, $where, $bindValues, $limit, $offset, $order) {
             $productModel = new ProductModel();
 
@@ -1242,10 +1241,10 @@ class ShopController extends AbstractController
 
             try {
                 if (!$this->auth->hasUserRole([AUTH_ROLE_SUPER_USER, AUTH_ROLE_ADMIN])) {
-                    if ('' == $where) {
-                        $where = 'p.delete!=:del';
+                    if ('' == trim($where)) {
+                        $where .= 'p.delete!=:del';
                     } else {
-                        $where = ' AND (p.delete!=:del)';
+                        $where .= ' AND (p.delete!=:del)';
                     }
                     $bindValues['del'] = 1;
                 }

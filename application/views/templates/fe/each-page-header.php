@@ -3,7 +3,10 @@
 <div class="container">
     <div class="page-all-header__wrapper card">
         <div class="page-img">
-            <img src="<?= base_url(isset($page_image) && !empty($page_image) ? $page_image : ''); ?>" alt="">
+            <?= $this->view('templates/fe/parser/image-placeholder', [
+                'url' => base_url(isset($page_image) && !empty($page_image) ? $page_image : ''),
+                'alt' => '',
+            ], true); ?>
         </div>
 
         <div class="page-all-header">

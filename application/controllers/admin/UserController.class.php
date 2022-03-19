@@ -1055,6 +1055,10 @@ class UserController extends AbstractController
             if (is_array($hasRole) || !((bool)$hasRole)) {
                 message(self::AJAX_TYPE_ERROR, 200, 'نقش انتخاب شده نامعتبر است.');
             }
+            $userRoles = $this->auth->getUserRole($id);
+            if(count($userRoles) <= 1) {
+                message(self::AJAX_TYPE_ERROR, 200, 'کاربر باید حداقل دارای یک نقش باشد.');
+            }
             //-----
             $res = $this->auth->removeUserRole($role, $id);
             if ($res) {

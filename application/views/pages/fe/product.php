@@ -94,7 +94,10 @@
                                     <i class="la la-image" aria-hidden="true"></i>
                                 </div>
                                 <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
-                                    <img src="<?= base_url($item['image']); ?>" alt="<?= $item['title']; ?>">
+                                    <?= $this->view('templates/fe/parser/image-placeholder', [
+                                        'url' => base_url($item['image']),
+                                        'alt' => $item['title'],
+                                    ], true); ?>
                                 </a>
                                 <span class="card-location">
                                     <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>

@@ -15,7 +15,7 @@
                             <?php foreach ($mainSlides as $slide): ?>
                                 <div>
                                     <a href="<?= $slide['link']; ?>">
-                                        <img src="<?= base_url($slide['image']); ?>" alt="<?= $slide['link']; ?>">
+                                        <img src="<?= $slide['image']; ?>" alt="<?= $slide['link']; ?>">
                                     </a>
                                 </div>
                             <?php endforeach; ?>
@@ -28,7 +28,7 @@
 
     <?php if (count($offers)): ?>
         <div class="container card-container">
-            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
+            <div class="section-header justify-content-between flex-column flex-sm-row">
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
@@ -48,7 +48,8 @@
                                 ویژه
                             </div>
                             <div class="card-side-top-right">
-                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $offer['id']; ?>"
+                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn"
+                                        data-item-id="<?= $offer['id']; ?>"
                                         data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
                                     <i class="la la-cart-plus" aria-hidden="true"></i>
                                 </button>
@@ -58,8 +59,7 @@
                                     <i class="la la-image" aria-hidden="true"></i>
                                 </div>
                                 <a href="<?= base_url('product/detail/' . $offer['id'] . '/' . $offer['slug']); ?>">
-                                    <img src="<?= base_url($offer['image']); ?>"
-                                         alt="<?= $offer['title']; ?>">
+                                    <img src="<?= base_url($offer['image']); ?>" alt="<?= $offer['title']; ?>">
                                 </a>
                                 <span class="card-location">
                                     <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
@@ -156,119 +156,162 @@
         </div>
     <?php endif; ?>
 
-    <?php if (count($newestProducts)): ?>
-        <div class="container card-container">
-            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
-                <div class="d-flex align-items-center">
-                    <div class="section-title-icon"></div>
-                    <h1 class="section-title">
-                        جدیدترین تخفیف‌ها
-                    </h1>
-                </div>
-                <a href="<?= base_url('product/all'); ?>" class="btn btn-secondary rounded-pill my-2">
-                    مشاهده همه
-                    <i class="la la-arrow-left float-left font-size-21px mr-3" aria-hidden="true"></i>
-                </a>
-            </div>
-            <div class="row">
-                <?php foreach ($newestProducts as $item): ?>
-                    <div class="card-wrapper col-lg-3 col-md-6 col-12">
-                        <div class="card">
-                            <?php if ($item['is_special'] == 1): ?>
-                                <div class="off-label">
-                                    ویژه
+    <?php if (count($productsSliders ?? [])): ?>
+        <?php foreach ($productsSliders as $sliderItem): ?>
+            <?php
+            $slider = $sliderItem['items'] ?? [];
+            $info = $sliderItem['info'] ?? [];
+            $col_1 = 'col-xl-3';
+            $col_2 = 'col-xl-9';
+            $hasSideImage = true;
+
+            if (!isset($info['image']) || empty($info['image'])) {
+                $col_1 = '';
+                $col_2 = 'col-xl-12';
+                $hasSideImage = false;
+            }
+            ?>
+
+            <?php if (count($slider ?? [])): ?>
+                <div class="container">
+                    <div class="row align-items-center">
+                        <?php if ($hasSideImage): ?>
+                            <div class="<?= $col_1; ?> d-none d-xl-block">
+                                <a href="<?= $info['image_link']; ?>">
+                                    <img src="<?= base_url($info['image']); ?>"
+                                         alt="<?= $info['image']; ?>" width="100%" height="auto"
+                                         style="border-radius: .5rem;">
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        <div class="<?= $col_2; ?>">
+                            <?php if (!empty($info['title'] ?? []) || !empty($info['link'] ?? [])): ?>
+                                <div class="section-header justify-content-between flex-column flex-sm-row">
+                                    <?php if (!empty($info['title'] ?? [])): ?>
+                                        <div class="d-flex align-items-center">
+                                            <div class="section-title-icon"></div>
+                                            <h1 class="section-title">
+                                                <?= $info['title']; ?>
+                                            </h1>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($info['link'] ?? [])): ?>
+                                        <a href="<?= base_url($info['link']); ?>"
+                                           class="btn btn-secondary rounded-pill my-2">
+                                            مشاهده همه
+                                            <i class="la la-arrow-left float-left font-size-21px mr-3"
+                                               aria-hidden="true"></i>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
-                            <div class="card-side-top-right">
-                                <button class="btn bg-white text-success rounded-pill add-to-cart-btn" data-item-id="<?= $item['id']; ?>"
-                                        data-toggle="tooltip" data-placement="left" title="افزودن به سبد خرید">
-                                    <i class="la la-cart-plus" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <div class="card-img">
-                                <div class="img-placeholder">
-                                    <i class="la la-image" aria-hidden="true"></i>
-                                </div>
-                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
-                                    <img src="<?= base_url($item['image']); ?>" alt="<?= $item['title']; ?>">
-                                </a>
-                                <span class="card-location">
-                                    <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
-                                    <?= $item['province_name']; ?>
-                                    ،
-                                    <?= $item['city_name']; ?>
-                                    ،
-                                    <?= $item['place']; ?>
-                                </span>
-                            </div>
-                            <div class="card-title">
-                                <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>"
-                                   title="<?= $item['title']; ?>">
-                                    <?= $item['title']; ?>
-                                </a>
-                            </div>
 
-                            <?php
-                            $discount = (is_null($item['discount_until']) || $item['discount_until'] > time()) ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
-                            $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
-                            ?>
-                            <div class="card-info">
-                                <div>
-                                    <?php if ($discountPercentage != 0 && $item['available'] == 1 && $item['stock_count'] > 0): ?>
-                                        <span class="btn rounded-pill card-off-percentage">
-                                            <?= convertNumbersToPersian($discountPercentage); ?>
-                                            ٪
-                                            <span class="card-off-percentage-takhfif">
-                                                تخفیف
-                                            </span>
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                                <div>
-                                    <?php if ($item['available'] == 1 && $item['stock_count'] > 0): ?>
-                                        <?php if ($discountPercentage != 0): ?>
-                                            <div class="card-price-off">
-                                                <?php if ($discountPercentage == 100): ?>
-                                                    رایگان
-                                                <?php else: ?>
-                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
-                                                    تومان
+                            <div class="container card-container">
+                                <div class="items-slider-col-3 owl-carousel">
+                                    <?php foreach ($slider as $item): ?>
+                                        <div class="card-wrapper semi-col-3">
+                                            <div class="card">
+                                                <?php if ($item['is_special'] == 1): ?>
+                                                    <div class="off-label">
+                                                        ویژه
+                                                    </div>
                                                 <?php endif; ?>
+                                                <div class="card-side-top-right">
+                                                    <button class="btn bg-white text-success rounded-pill add-to-cart-btn"
+                                                            data-item-id="<?= $item['id']; ?>"
+                                                            data-toggle="tooltip" data-placement="left"
+                                                            title="افزودن به سبد خرید">
+                                                        <i class="la la-cart-plus" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="card-img">
+                                                    <div class="img-placeholder">
+                                                        <i class="la la-image" aria-hidden="true"></i>
+                                                    </div>
+                                                    <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
+                                                        <img src="<?= base_url($item['image']); ?>"
+                                                             alt="<?= $item['title']; ?>">
+                                                    </a>
+                                                    <span class="card-location">
+                                                        <i class="la la-map-marker card-location-icon"
+                                                           aria-hidden="true"></i>
+                                                        <?= $item['province_name']; ?>
+                                                        ،
+                                                        <?= $item['city_name']; ?>
+                                                        ،
+                                                        <?= $item['place']; ?>
+                                                    </span>
+                                                </div>
+                                                <div class="card-title">
+                                                    <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>"
+                                                       title="<?= $item['title']; ?>">
+                                                        <?= $item['title']; ?>
+                                                    </a>
+                                                </div>
+
+                                                <?php
+                                                $discount = (is_null($item['discount_until']) || $item['discount_until'] > time()) ? convertNumbersToPersian($item['discount_price'], true) : convertNumbersToPersian($item['price'], true);
+                                                $discountPercentage = floor(((convertNumbersToPersian($item['price'], true) - $discount) / convertNumbersToPersian($item['price'], true)) * 100);
+                                                ?>
+                                                <div class="card-info">
+                                                    <div>
+                                                        <?php if ($discountPercentage != 0 && $item['available'] == 1 && $item['stock_count'] > 0): ?>
+                                                            <span class="btn rounded-pill card-off-percentage">
+                                                                <?= convertNumbersToPersian($discountPercentage); ?>
+                                                                ٪
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <div>
+                                                        <?php if ($item['available'] == 1 && $item['stock_count'] > 0): ?>
+                                                            <?php if ($discountPercentage != 0): ?>
+                                                                <div class="card-price-off">
+                                                                    <?php if ($discountPercentage == 100): ?>
+                                                                        رایگان
+                                                                    <?php else: ?>
+                                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['discount_price'], true))); ?>
+                                                                        تومان
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                                <div class="card-price">
+                                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                                                </div>
+                                                            <?php else: ?>
+                                                                <div class="card-price-off">
+                                                                    <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
+                                                                        رایگان
+                                                                    <?php else: ?>
+                                                                        <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
+                                                                        تومان
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                                <!-- This div is not empty. have half space in it -->
+                                                                <div class="card-price">‌</div>
+                                                            <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <div class="unavailable">
+                                                                ناموجود
+                                                            </div>
+                                                            <!-- This div is not empty. have half space in it -->
+                                                            <div class="card-price">‌</div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="card-price">
-                                                <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="card-price-off">
-                                                <?php if (convertNumbersToPersian($item['price'], true) == 0): ?>
-                                                    رایگان
-                                                <?php else: ?>
-                                                    <?= convertNumbersToPersian(number_format(convertNumbersToPersian($item['price'], true))); ?>
-                                                    تومان
-                                                <?php endif; ?>
-                                            </div>
-                                            <!-- This div is not empty. have half space in it -->
-                                            <div class="card-price">‌</div>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <div class="unavailable">
-                                            ناموجود
                                         </div>
-                                        <!-- This div is not empty. have half space in it -->
-                                        <div class="card-price">‌</div>
-                                    <?php endif; ?>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <?php if (count($lastNews)): ?>
         <div class="container card-container">
-            <div class="section-header align-sm-items-center justify-content-between flex-column flex-sm-row">
+            <div class="section-header justify-content-between flex-column flex-sm-row">
                 <div class="d-flex align-items-center">
                     <div class="section-title-icon"></div>
                     <h1 class="section-title">
@@ -350,8 +393,11 @@
                             <div>
                                 <div class="box">
                                     <div class="box-body">
-                                        <img src="<?= base_url($team['image']); ?>"
-                                             alt="" class="our-team-img">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($team['image']),
+                                            'alt' => '',
+                                            'class' => 'our-team-img'
+                                        ], true); ?>
                                         <h1 class="our-team-name">
                                             <?= $team['first_name'] . ' ' . $team['last_name']; ?>
                                         </h1>

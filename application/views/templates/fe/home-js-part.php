@@ -1,18 +1,10 @@
 <?php defined('BASE_PATH') OR exit('No direct script access allowed'); ?>
 
 <!-- inject:js-->
-<!-- select2 Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/select2.full.min.js?<?= app_version(); ?>"></script>
-<!-- iziToast Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/iziToast.min.js?<?= app_version(); ?>"></script>
-<!-- mCustomScrollbar Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/jquery.mCustomScrollbar.concat.min.js?<?= app_version(); ?>"></script>
-<!-- off-canvas Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/js-offcanvas.js?<?= app_version(); ?>"></script>
-<!-- owl-carousel Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/owl.carousel.min.js?<?= app_version(); ?>"></script>
-<!-- countdown Js -->
-<script type="text/javascript" src="<?= asset_url(); ?>fe/js/countdown.min.js?<?= app_version(); ?>"></script>
+<!-- combine of [be/js/plugins/loaders/lazy.min.js],[fe/js/select2.full.min.js], -->
+<!-- [fe/js/iziToast.min.js],[fe/js/jquery.mCustomScrollbar.concat.min.js],[fe/js/js-offcanvas.js], -->
+<!-- [fe/js/owl.carousel.min.js],[fe/js/countdown.min.js] -->
+<script type="text/javascript" src="<?= asset_url(); ?>fe/js/bundle-bottom.js?<?= app_version(); ?>"></script>
 <!-- main Js -->
 <script type="text/javascript" src="<?= asset_url(); ?>fe/js/main.js?<?= app_version(); ?>"></script>
 <!-- cart Js -->

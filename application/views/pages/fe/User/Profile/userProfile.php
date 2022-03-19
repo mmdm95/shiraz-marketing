@@ -43,7 +43,10 @@
                     <div class="col-lg-2 col-lg-push-0 col-sm-4 col-sm-push-4 col-xs-4 col-xs-push-4">
                         <div class="thumbnail">
                             <div class="thumb">
-                                <img src="<?= base_url($user['image']); ?>" alt="<?= $user['mobile']; ?>">
+                                <?= $this->view('templates/fe/parser/image-placeholder', [
+                                    'url' => base_url($user['image']),
+                                    'alt' => $user['mobile'],
+                                ], true); ?>
                             </div>
                         </div>
                     </div>

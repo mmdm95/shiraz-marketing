@@ -245,8 +245,6 @@ class ReportController extends AbstractController
         try {
             $form->afterCheckCallback(function () use ($form, $name) {
                 $this->load->library('PhpSpreadsheet/vendor/autoload');
-                // Create empty xlsx file
-                fopen(PUBLIC_PATH . $name . '.xlsx', "w");
                 //-----
                 $orderModel = new OrderModel();
                 //-----
@@ -254,7 +252,7 @@ class ReportController extends AbstractController
                 $orders = $orderModel->getOrders($info['where'], $info['params']);
                 //-----
                 // Create IO for file
-                $spreadsheet = IOFactory::load(PUBLIC_PATH . $name . '.xlsx');
+                $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                 $spreadsheetArray = [
                     0 => [
                         '#',
@@ -332,7 +330,9 @@ class ReportController extends AbstractController
                 $spreadsheetArray[$totalOrders + 1][] = number_format(convertNumbersToPersian($totalAmount, true));
 
                 // Add whole array to spreadsheet
-                $spreadsheet->getActiveSheet()->fromArray($spreadsheetArray);
+                $spreadsheet->getActiveSheet()
+                    ->setRightToLeft(true)
+                    ->fromArray($spreadsheetArray);
                 // Create writer
                 $writer = new Xlsx($spreadsheet);
                 $writer->save(PUBLIC_PATH . $name . ".xlsx");
@@ -379,8 +379,6 @@ class ReportController extends AbstractController
              */
                 function () use ($form, $name) {
                     $this->load->library('PhpSpreadsheet/vendor/autoload');
-                    // Create empty xlsx file
-                    fopen(PUBLIC_PATH . $name . '.xlsx', "w");
                     //-----
                     $model = new Model();
                     $orderModel = new OrderModel();
@@ -389,7 +387,7 @@ class ReportController extends AbstractController
                     $transactions = $orderModel->getUserDeposit($info['where'], $info['params']);
                     //-----
                     // Create IO for file
-                    $spreadsheet = IOFactory::load(PUBLIC_PATH . $name . '.xlsx');
+                    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $spreadsheetArray = [
                         0 => [
                             '#',
@@ -515,7 +513,9 @@ class ReportController extends AbstractController
                     $spreadsheetArray[$totalWallet + 1][] = number_format(convertNumbersToPersian($totalAmount, true));
 
                     // Add whole array to spreadsheet
-                    $spreadsheet->getActiveSheet()->fromArray($spreadsheetArray);
+                    $spreadsheet->getActiveSheet()
+                        ->setRightToLeft(true)
+                        ->fromArray($spreadsheetArray);
                     // Create writer
                     $writer = new Xlsx($spreadsheet);
                     $writer->save(PUBLIC_PATH . $name . ".xlsx");

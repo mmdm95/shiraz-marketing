@@ -6,7 +6,10 @@
         <div class="row justify-content-center">
             <div class="logo-container">
                 <a href="<?= base_url('index'); ?>" class="logo-wrapper">
-                    <img src="<?= base_url($logo); ?>" alt="<?= $setting['main']['title']; ?>">
+                    <?= $this->view('templates/fe/parser/image-placeholder', [
+                        'url' => base_url($logo),
+                        'alt' => $setting['main']['title'],
+                    ], true); ?>
                     <h1 class="irentezar">
                         شیراز مارکتینگ
                     </h1>

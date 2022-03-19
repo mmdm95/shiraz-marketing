@@ -500,22 +500,455 @@
                                     <form action="<?= base_url(); ?>admin/setting#indexPanel" method="post">
                                         <?= $data['form_token_index']; ?>
 
-                                        <div class="row">
-                                            <div class="pl-20 pr-20">
-                                                <div class="col-lg-12">
-                                                    <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
+                                        <div class="row pl-20 pr-20 mb-3">
+                                            <div class="col-lg-12">
+                                                <label class="m-0 pt-5 pb-5 pl-10 pr-10 display-block bg-white btn-default border-left
                                                     border-left-info border-left-xlg shadow-depth1 btn-rounded text-right"
-                                                           for="showOurTeam">
+                                                       for="showOurTeam">
                                                         <span class="pull-left h5 no-margin">
                                                             <i class="icon-switch2 position-left text-info"></i>
                                                             نمایش تیم ما
                                                         </span>
-                                                        <input type="checkbox" name="showOurTeam" id="showOurTeam"
-                                                               class="switchery" <?= set_value($values_main['showOurTeam'] ?? $setting['pages']['index']['showOurTeam'] ?? '', 1, 'checked', '', '=='); ?> />
-                                                    </label>
-                                                </div>
+                                                    <input type="checkbox" name="showOurTeam" id="showOurTeam"
+                                                           class="switchery" <?= set_value($values_main['showOurTeam'] ?? $setting['pages']['index']['showOurTeam'] ?? '', 1, 'checked', '', '=='); ?> />
+                                                </label>
                                             </div>
                                         </div>
+
+                                        <!-- General slider -->
+                                        <?php $this->view('templates/be/title', ['header_title' => 'اسلایدرهای صفحه']) ?>
+                                        <div class="row-flex pl-20 pr-20">
+                                            <div class="col-flex-12 __all_general_slider_container">
+                                                <?php
+                                                $items = $setting['pages']['index']['sliders'] ?? [];
+                                                $errorItemImages = $_POST['inp-setting-general-slider-image'] ?? [];
+                                                $errorItemImagesLinks = $_POST['inp-setting-general-slider-image-link'] ?? [];
+                                                $errorItemTitles = $_POST['inp-setting-general-slider-title'] ?? [];
+                                                $errorItemTypes = $_POST['inp-setting-general-slider-type'] ?? [];
+                                                $errorItemLimits = $_POST['inp-setting-general-slider-limit'] ?? [];
+                                                $errorItemCategories = $_POST['inp-setting-general-slider-category'] ?? [];
+                                                $errorItemLinks = $_POST['inp-setting-general-slider-link'] ?? [];
+                                                ?>
+                                                <?php if (is_array($errors_index ?? '') && count($errors_index ?? [])): ?>
+                                                    <?php
+                                                    $counter = 0;
+                                                    ?>
+                                                    <?php foreach ($errorItemTitles as $k => $t): ?>
+                                                        <div id="__sample_general_item"
+                                                             class="row-flex mx-0 border-pink border-dashed rounded p-3 mb-3 mt-4 position-relative __general_items">
+                                                            <?php
+                                                            $img = $_POST['inp-setting-general-slider-image'][$counter] ?? ($errorItemImages[$k] ?? '');
+                                                            $img = $img && is_image_exists($img) ? $img : '';
+                                                            ?>
+                                                            <div class="col-flex-12 form-group">
+                                                                <div class="border-purple border-dashed rounded p-3">
+                                                                    <div class="cursor-pointer pick-file border border-lg border-default"
+                                                                         data-toggle="modal"
+                                                                         data-target="#modal_full"
+                                                                         style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                                                        <input class="image-file" type="hidden"
+                                                                               name="inp-setting-general-slider-image[]"
+                                                                               value="<?= $img ?? ''; ?>">
+                                                                        <div class="media stack-media-on-mobile">
+                                                                            <div class="media-left">
+                                                                                <div class="thumb">
+                                                                                    <a class="display-inline-block"
+                                                                                       style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                                                        <img
+                                                                                                src="<?= set_value($img ?? '', '', base_url($img ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                                                class="img-rounded"
+                                                                                                alt=""
+                                                                                                style="width: 100px; height: 100px; object-fit: contain;"
+                                                                                                data-base-url="<?= base_url(); ?>">
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="media-body">
+                                                                                <h6 class="media-heading">
+                                                                                    <a class="io-image-lbl text-grey-300">
+                                                                                        انتخاب تصویر
+                                                                                    </a>
+                                                                                    <a class="io-image-name display-block">
+                                                                                        <?= basename($img); ?>
+                                                                                    </a>
+                                                                                </h6>
+
+                                                                                <small class="clear-img-val">&times;
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="w-100 mt-3">
+                                                                        <label>
+                                                                            لینک تصویر کنار اسلایدر (اختیاری):
+                                                                        </label>
+                                                                        <input type="text"
+                                                                               class="form-control"
+                                                                               placeholder="برای مثال: http://www.example.com"
+                                                                               name="inp-setting-general-slider-image-link[]"
+                                                                               value="<?= $_POST['inp-setting-general-slider-image-link'][$counter] ?? $errorItemImagesLinks[$k] ?? ''; ?>">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    <span class="text-danger">*</span>
+                                                                    عنوان اسلایدر:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="وارد کنید"
+                                                                       name="inp-setting-general-slider-title[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-title'][$counter] ?? $t; ?>">
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    <span class="text-danger">*</span>
+                                                                    نوع محصولات:
+                                                                </label>
+                                                                <select data-placeholder="نوع اسلایدر را انتخاب کنید..."
+                                                                        class="form-control form-control-select2"
+                                                                        name="inp-setting-general-slider-type[]"
+                                                                        data-fouc>
+                                                                    <option value="-1"
+                                                                            disabled="disabled"
+                                                                            selected="selected">
+                                                                        انتخاب کنید
+                                                                    </option>
+                                                                    <?php foreach (SLIDER_TABBED_TYPES as $type => $text): ?>
+                                                                        <option value="<?= $type; ?>"
+                                                                            <?= set_value($_POST['inp-setting-general-slider-type'][$counter] ?? $errorItemTypes[$k] ?? '', $type, 'selected', '', '=='); ?>>
+                                                                            <?= $text; ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    حداکثر تعداد نمایش:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="از نوع عددی"
+                                                                       name="inp-setting-general-slider-limit[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-limit'][$counter] ?? $errorItemLimits[$k] ?? ''; ?>">
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    دسته‌بندی:
+                                                                </label>
+                                                                <select data-placeholder="نوع دسته‌بندی را انتخاب کنید..."
+                                                                        class="form-control form-control-select2-searchable"
+                                                                        name="inp-setting-general-slider-category[]"
+                                                                        data-fouc>
+                                                                    <option value="-1"
+                                                                            selected="selected">
+                                                                        انتخاب کنید
+                                                                    </option>
+                                                                    <?php foreach ($categories as $category): ?>
+                                                                        <option value="<?= $category['id']; ?>"
+                                                                            <?= set_value($_POST['inp-setting-general-slider-category'][$counter] ?? $errorItemCategories[$k] ?? '', $category['id'], 'selected', '', '=='); ?>>
+                                                                            <?= $category['name']; ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-flex-lg-12 form-group">
+                                                                <label>
+                                                                    لینک مشاهده همه:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="برای مثال آدرس مطابق توضیحات راهنما برای محصولات"
+                                                                       name="inp-setting-general-slider-link[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-link'][$counter] ?? $errorItemLinks[$k] ?? ''; ?>">
+                                                            </div>
+
+                                                            <?php if (0 != $counter++): ?>
+                                                                <?php $this->view('templates/be/parser/dynamic-remover-btn'); ?>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                <?php elseif (count($items)): ?>
+                                                    <?php
+                                                    $counter = 0;
+                                                    ?>
+                                                    <?php foreach ($items as $item): ?>
+                                                        <div id="__sample_general_item"
+                                                             class="row-flex mx-0 border-pink border-dashed rounded p-3 mb-3 mt-4 position-relative __general_items">
+                                                            <?php
+                                                            $img = $_POST['inp-setting-general-slider-image'][$counter] ?? $item['image'] ?? '';
+                                                            $img = $img && is_image_exists($img) ? $img : '';
+                                                            ?>
+                                                            <div class="col-flex-12 form-group">
+                                                                <div class="col-flex-12 form-group">
+                                                                    <div class="border-purple border-dashed rounded p-3">
+                                                                        <div class="cursor-pointer pick-file border border-lg border-default"
+                                                                             data-toggle="modal"
+                                                                             data-target="#modal_full"
+                                                                             style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                                                            <input class="image-file" type="hidden"
+                                                                                   name="inp-setting-general-slider-image[]"
+                                                                                   value="<?= $img ?? ''; ?>">
+                                                                            <div class="media stack-media-on-mobile">
+                                                                                <div class="media-left">
+                                                                                    <div class="thumb">
+                                                                                        <a class="display-inline-block"
+                                                                                           style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                                                            <img
+                                                                                                    src="<?= set_value($img ?? '', '', base_url($img ?? ''), asset_url('be/images/placeholder.jpg')); ?>"
+                                                                                                    class="img-rounded"
+                                                                                                    alt=""
+                                                                                                    style="width: 100px; height: 100px; object-fit: contain;"
+                                                                                                    data-base-url="<?= base_url(); ?>">
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="media-body">
+                                                                                    <h6 class="media-heading">
+                                                                                        <a class="io-image-lbl text-grey-300">
+                                                                                            انتخاب تصویر
+                                                                                        </a>
+                                                                                        <a class="io-image-name display-block">
+                                                                                            <?= basename($img); ?>
+                                                                                        </a>
+                                                                                    </h6>
+
+                                                                                    <small class="clear-img-val">&times;
+                                                                                    </small>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="w-100 mt-3">
+                                                                            <label>
+                                                                                لینک تصویر کنار اسلایدر (اختیاری):
+                                                                            </label>
+                                                                            <input type="text"
+                                                                                   class="form-control"
+                                                                                   placeholder="برای مثال: http://www.example.com"
+                                                                                   name="inp-setting-general-slider-image-link[]"
+                                                                                   value="<?= $_POST['inp-setting-general-slider-image-link'][$counter] ?? $item['image_link'] ?? ''; ?>">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    <span class="text-danger">*</span>
+                                                                    عنوان اسلایدر:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="وارد کنید"
+                                                                       name="inp-setting-general-slider-title[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-title'][$counter] ?? $item['title']; ?>">
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    <span class="text-danger">*</span>
+                                                                    نوع محصولات:
+                                                                </label>
+                                                                <select data-placeholder="نوع اسلایدر را انتخاب کنید..."
+                                                                        class="form-control form-control-select2"
+                                                                        name="inp-setting-general-slider-type[]"
+                                                                        data-fouc>
+                                                                    <option value="-1"
+                                                                            disabled="disabled"
+                                                                            selected="selected">
+                                                                        انتخاب کنید
+                                                                    </option>
+                                                                    <?php foreach (SLIDER_TABBED_TYPES as $type => $text): ?>
+                                                                        <option value="<?= $type; ?>"
+                                                                            <?= set_value($_POST['inp-setting-general-slider-type'][$counter] ?? $item['type'] ?? '', $type, 'selected', '', '=='); ?>>
+                                                                            <?= $text; ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    حداکثر تعداد نمایش:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="از نوع عددی"
+                                                                       name="inp-setting-general-slider-limit[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-limit'][$counter] ?? $item['limit']; ?>">
+                                                            </div>
+                                                            <div class="col-flex-lg-6 form-group">
+                                                                <label>
+                                                                    دسته‌بندی:
+                                                                </label>
+                                                                <select data-placeholder="نوع دسته‌بندی را انتخاب کنید..."
+                                                                        class="form-control form-control-select2-searchable"
+                                                                        name="inp-setting-general-slider-category[]"
+                                                                        data-fouc>
+                                                                    <option value="-1"
+                                                                            selected="selected">
+                                                                        انتخاب کنید
+                                                                    </option>
+                                                                    <?php foreach ($categories as $category): ?>
+                                                                        <option value="<?= $category['id']; ?>"
+                                                                            <?= set_value($_POST['inp-setting-general-slider-category'][$counter] ?? $item['category'] ?? '', $category['id'], 'selected', '', '=='); ?>>
+                                                                            <?= $category['name']; ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-flex-lg-12 form-group">
+                                                                <label>
+                                                                    لینک مشاهده همه:
+                                                                </label>
+                                                                <input type="text"
+                                                                       class="form-control"
+                                                                       placeholder="برای مثال آدرس مطابق توضیحات راهنما برای محصولات"
+                                                                       name="inp-setting-general-slider-link[]"
+                                                                       value="<?= $_POST['inp-setting-general-slider-link'][$counter] ?? $item['link']; ?>">
+                                                            </div>
+
+                                                            <?php if (0 != $counter++): ?>
+                                                                <?php $this->view('templates/be/parser/dynamic-remover-btn'); ?>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <div id="__sample_general_item"
+                                                         class="row-flex mx-0 border-pink border-dashed rounded p-3 mb-3 mt-4 position-relative __general_items">
+                                                        <div class="col-flex-12 form-group">
+                                                            <div class="border-purple border-dashed rounded p-3">
+                                                                <div class="cursor-pointer pick-file border border-lg border-default"
+                                                                     data-toggle="modal"
+                                                                     data-target="#modal_full"
+                                                                     style="border-style: dashed; padding: 0 10px 10px 0; box-sizing: border-box;">
+                                                                    <input class="image-file" type="hidden"
+                                                                           name="inp-setting-general-slider-image[]"
+                                                                           value="">
+                                                                    <div class="media stack-media-on-mobile">
+                                                                        <div class="media-left">
+                                                                            <div class="thumb">
+                                                                                <a class="display-inline-block"
+                                                                                   style="-webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);-moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.4);">
+                                                                                    <img
+                                                                                            src="<?= asset_url('be/images/placeholder.jpg'); ?>"
+                                                                                            class="img-rounded"
+                                                                                            alt=""
+                                                                                            style="width: 100px; height: 100px; object-fit: contain;"
+                                                                                            data-base-url="<?= base_url(); ?>">
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="media-body">
+                                                                            <h6 class="media-heading">
+                                                                                <a class="io-image-lbl text-grey-300">
+                                                                                    انتخاب تصویر
+                                                                                </a>
+                                                                                <a class="io-image-name display-block">
+                                                                                </a>
+                                                                            </h6>
+
+                                                                            <small class="clear-img-val">&times;
+                                                                            </small>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="w-100 mt-3">
+                                                                    <label>
+                                                                        لینک تصویر کنار اسلایدر (اختیاری):
+                                                                    </label>
+                                                                    <input type="text"
+                                                                           class="form-control"
+                                                                           placeholder="برای مثال: http://www.example.com"
+                                                                           name="inp-setting-general-slider-image-link[]">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-flex-lg-6 form-group">
+                                                            <label>
+                                                                <span class="text-danger">*</span>
+                                                                عنوان اسلایدر:
+                                                            </label>
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   placeholder="وارد کنید"
+                                                                   name="inp-setting-general-slider-title[]">
+                                                        </div>
+                                                        <div class="col-flex-lg-6 form-group">
+                                                            <label>
+                                                                <span class="text-danger">*</span>
+                                                                نوع محصولات:
+                                                            </label>
+                                                            <select data-placeholder="نوع اسلایدر را انتخاب کنید..."
+                                                                    class="form-control form-control-select2"
+                                                                    name="inp-setting-general-slider-type[]"
+                                                                    data-fouc>
+                                                                <option value="-1"
+                                                                        disabled="disabled"
+                                                                        selected="selected">
+                                                                    انتخاب کنید
+                                                                </option>
+                                                                <?php foreach (SLIDER_TABBED_TYPES as $type => $text): ?>
+                                                                    <option value="<?= $type; ?>">
+                                                                        <?= $text; ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-flex-lg-6 form-group">
+                                                            <label>
+                                                                حداکثر تعداد نمایش:
+                                                            </label>
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   placeholder="از نوع عددی"
+                                                                   name="inp-setting-general-slider-limit[]">
+                                                        </div>
+                                                        <div class="col-flex-lg-6 form-group">
+                                                            <label>
+                                                                دسته‌بندی:
+                                                            </label>
+                                                            <select data-placeholder="نوع دسته‌بندی را انتخاب کنید..."
+                                                                    class="form-control form-control-select2-searchable"
+                                                                    name="inp-setting-general-slider-category[]"
+                                                                    data-fouc>
+                                                                <option value="-1"
+                                                                        selected="selected">
+                                                                    انتخاب کنید
+                                                                </option>
+                                                                <?php foreach ($categories as $category): ?>
+                                                                    <option value="<?= $category['id']; ?>">
+                                                                        <?= $category['name']; ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-flex-lg-12 form-group">
+                                                            <label>
+                                                                لینک مشاهده همه:
+                                                            </label>
+                                                            <input type="text"
+                                                                   class="form-control"
+                                                                   placeholder="برای مثال آدرس مطابق توضیحات راهنما برای محصولات"
+                                                                   name="inp-setting-general-slider-link[]">
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <div class="col-flex-md-8 col-flex-lg-6 mx-auto mt-3">
+                                                <button type="button"
+                                                        class="btn bg-white btn-block border-pink border-3 __duplicator_btn"
+                                                        data-container-element=".__all_general_slider_container"
+                                                        data-sample-element="#__sample_general_item"
+                                                        data-clearable-elements='["inp-setting-general-slider-title[]","inp-setting-general-slider-type[]","inp-setting-general-slider-limit[]","inp-setting-general-slider-category[]","inp-setting-general-slider-link[]","inp-setting-general-slider-image[]"]'
+                                                        data-removable-elements='[".img-placeholder-image"]'
+                                                        data-removable-classes-for-all='["has-image"]'
+                                                        data-add-remove="true">
+                                                    افزودن اسلایدر جدید
+                                                    <i class="icon-plus2 text-dark ml-2" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- /general slider -->
 
                                         <div class="text-center">
                                             <hr style="margin-bottom: 0;">

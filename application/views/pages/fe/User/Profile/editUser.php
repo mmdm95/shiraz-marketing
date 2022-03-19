@@ -48,8 +48,10 @@
                                 <div class="col-lg-3 col-sm-6">
                                     <div class="thumbnail">
                                         <div class="thumb">
-                                            <img src="<?= base_url($uTrueValues['image']); ?>"
-                                                 alt="<?= $uTrueValues['mobile']; ?>">
+                                            <?= $this->view('templates/fe/parser/image-placeholder', [
+                                                'url' => base_url($uTrueValues['image']),
+                                                'alt' => $uTrueValues['mobile'],
+                                            ], true); ?>
                                             <div class="caption-overflow">
                                                 <span>
                                                     <a href="<?= base_url('user/userProfile'); ?>"

@@ -49,8 +49,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio1" name="payment_radio"
                                            checked="checked" required value="PAY_798447359">
                                     <label class="custom-control-label" for="payRadio1">
-                                        <img src="<?= base_url($setting['payment']['bank_1']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['bank_1']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['bank_1']['text']; ?>
                                     </label>
                                 </div>
@@ -61,8 +64,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio2" name="payment_radio"
                                            required value="PAY_342515312">
                                     <label class="custom-control-label" for="payRadio2">
-                                        <img src="<?= base_url($setting['payment']['bank_2']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['bank_2']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['bank_2']['text']; ?>
                                     </label>
                                 </div>
@@ -73,8 +79,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio3" name="payment_radio"
                                            required value="PAY_654812379">
                                     <label class="custom-control-label" for="payRadio3">
-                                        <img src="<?= base_url($setting['payment']['bank_3']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['bank_3']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['bank_3']['text']; ?>
                                     </label>
                                 </div>
@@ -85,8 +94,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio4" name="payment_radio"
                                            required value="<?= PAYMENT_METHOD_WALLET; ?>">
                                     <label class="custom-control-label" for="payRadio4">
-                                        <img src="<?= base_url($setting['payment']['wallet']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['wallet']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['wallet']['text']; ?>
                                     </label>
                                 </div>
@@ -97,8 +109,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio5" name="payment_radio"
                                            required value="<?= PAYMENT_METHOD_RECEIPT; ?>">
                                     <label class="custom-control-label" for="payRadio5">
-                                        <img src="<?= base_url($setting['payment']['receipt']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['receipt']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['receipt']['text']; ?>
                                     </label>
                                 </div>
@@ -109,8 +124,11 @@
                                     <input type="radio" class="custom-control-input" id="payRadio6" name="payment_radio"
                                            required value="<?= PAYMENT_METHOD_IN_PLACE; ?>">
                                     <label class="custom-control-label" for="payRadio6">
-                                        <img src="<?= base_url($setting['payment']['in_place']['image']); ?>" alt=""
-                                             class="img-40px-40px">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($setting['payment']['in_place']['image']),
+                                            'alt' => '',
+                                            'class' => 'img-40px-40px',
+                                        ], true); ?>
                                         <?= $setting['payment']['in_place']['text']; ?>
                                     </label>
                                 </div>

@@ -1,0 +1,14 @@
+{
+    "name": "mohammad/shirazmarketing",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MMDM",
+            "email": "mmdehghan95@gmail.com"
+        }
+    ],
+    "require": {
+        "mmdm/sim-file": "^0.2.5"
+    }
+}

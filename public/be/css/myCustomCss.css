@@ -1,3 +1,8 @@
+.border-3 {
+    border-width: 3px !important;
+    border-style: solid;
+}
+
 .full-width-force {
     width: 100% !important;
 }
@@ -141,6 +146,32 @@
 .clear-img-val:hover,
 .clear-video-val:hover {
     background: #ddd;
+}
+
+/* clone remover button */
+
+.__clone_remover_btn {
+    display: flex;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    position: absolute !important;
+    width: 2rem;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    -webkit-transform: translate(-40%, -40%);
+    -moz-transform: translate(-40%, -40%);
+    -ms-transform: translate(-40%, -40%);
+    -o-transform: translate(-40%, -40%);
+    transform: translate(-40%, -40%);
 }
 
 .property-operation-container {

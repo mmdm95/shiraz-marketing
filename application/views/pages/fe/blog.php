@@ -98,7 +98,10 @@
                                     <i class="la la-image" aria-hidden="true"></i>
                                 </div>
                                 <a href="<?= base_url('blog/detail/' . $b['id'] . '/' . $b['slug']); ?>">
-                                    <img src="<?= base_url($b['image']); ?>" alt="<?= $b['title']; ?>">
+                                    <?= $this->view('templates/fe/parser/image-placeholder', [
+                                        'url' => base_url($b['image']),
+                                        'alt' => $b['title'],
+                                    ], true); ?>
                                 </a>
                                 <div class="card-date">
                                     <?php

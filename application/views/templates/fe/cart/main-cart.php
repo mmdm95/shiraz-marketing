@@ -13,7 +13,10 @@
                             </button>
                             <div class="shopping-cart-item-main">
                                 <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>">
-                                    <img src="<?= base_url($item['image']); ?>" alt="<?= $item['title']; ?>">
+                                    <?= $this->view('templates/fe/parser/image-placeholder', [
+                                        'url' => base_url($item['image']),
+                                        'alt' => $item['title'],
+                                    ], true); ?>
                                 </a>
                                 <div class="shopping-cart-item-title col">
                                     <a href="<?= base_url('product/detail/' . $item['id'] . '/' . $item['slug']); ?>"

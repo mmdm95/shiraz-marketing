@@ -176,4 +176,84 @@ class ProductModel extends HModel
         $res = $this->db->fetchAll($select->getStatement(), $select->getBindValues());
         return $res[0]['all_reward'];
     }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    public function getSliders(array $config)
+    {
+        if (!isset($config['type'])) return [];
+
+        $model = new Model();
+
+        $select = $model->select();
+        try {
+            $select
+                ->from(AbstractPaymentController::TBL_PRODUCT . ' AS p')
+                ->cols([
+                    'p.id', 'p.title', 'p.slug', 'p.image', 'p.discount_price', 'p.price', 'p.discount_until', 'p.stock_count',
+                    'p.max_cart_count', 'p.place', 'p.available', 'p.category_id', 'p.is_special', 'p.sold_count', 'p.product_type',
+                    'p.publish', 'c.name AS city_name', 'pr.name AS province_name'
+                ])
+                ->where('p.publish=:pub')
+                ->bindValue('pub', 1)
+                ->join(
+                    'INNER',
+                    AbstractPaymentController::TBL_CITY . ' AS c',
+                    'p.city_id=c.id'
+                )->join(
+                    'INNER',
+                    AbstractPaymentController::TBL_PROVINCE . ' AS pr',
+                    'c.province_id=pr.id'
+                );
+        } catch (\Aura\SqlQuery\Exception $e) {
+            return [];
+        }
+
+        $config['limit'] = isset($config['limit']) && (int)$config['limit'] > 0 ? (int)$config['limit'] : 4;
+
+        switch ($config['type']) {
+            case SLIDER_TABBED_NEWEST:
+                $select->orderBy(['p.id DESC']);
+                break;
+            case SLIDER_TABBED_MOST_VIEWED:
+                $select->orderBy(['p.view_count DESC']);
+                break;
+            case SLIDER_TABBED_MOST_DISCOUNT:
+                $select
+                    ->orderBy(['CASE WHEN (p.discount_until IS NULL OR p.discount_until >= UNIX_TIMESTAMP()) AND p.stock_count > 0 AND p.available = 1 THEN 0 ELSE 1 END', '((p.price - p.discount_price) / p.price * 100) DESC', 'p.discount_price ASC', 'p.title DESC']);
+                break;
+            case SLIDER_TABBED_SPECIAL:
+                $select
+                    ->where('p.is_special=:spec')
+                    ->bindValue('spec', 1);
+                break;
+            default:
+                return [];
+        }
+
+        $select
+            ->limit($config['limit'])
+            ->orderBy(['p.title DESC'])
+            ->groupBy(['p.id']);
+
+        if (isset($config['category']) && !empty($config['category']) && $config['category'] != -1) {
+            try {
+                $select->join(
+                    'INNER',
+                    AbstractPaymentController::TBL_CATEGORY . ' AS cat',
+                    'p.category_id=cat.id'
+                )
+                    ->where('p.category_id=:cat_id')
+                    ->bindValues([
+                        'cat_id' => $config['category'],
+                    ]);
+            } catch (\Aura\SqlQuery\Exception $e) {
+                return [];
+            }
+        }
+
+        return $model->select_it($select);
+    }
 }

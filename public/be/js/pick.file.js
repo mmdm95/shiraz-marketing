@@ -14,6 +14,38 @@ if (typeof jQuery == 'undefined') {
                 return fileName.split('.').pop();
             };
 
+            $.fn.pickFileExt = function (item) {
+                var self = $(item);
+
+                var modalOkClick = function (e) {
+                    var clickedFile = $('#modal_full').find('#table tr.selectable td.first a.name.image');
+
+                    if (clickedFile.length != 0) {
+                        var clickedFileBaseName = $.get_base_name($(clickedFile).attr('href')),
+                            clickedFileExt = $.get_extension($(clickedFile).attr('href'));
+
+                        if (clickedFile.length !== 0) {
+                            if ($.inArray(clickedFileExt, imgExts) != -1) {
+                                self.find('.media-body a.io-image-name').text(clickedFileBaseName);
+                                self.find('.media a img').attr('src',
+                                    baseUrl + $(clickedFile).attr('href'));
+                                self.find('.image-file').val($(clickedFile).attr('href'));
+                            } else {
+                                e.stopPropagation();
+                            }
+                        } else {
+                            e.stopPropagation();
+                        }
+                    } else {
+                        e.stopPropagation();
+                    }
+                };
+
+                $('#file-ok').off('click').on('click', function (e) {
+                    modalOkClick(e);
+                });
+            };
+
             function delete_slide_img(selector, e) {
                 e.stopPropagation();
 
@@ -63,35 +95,7 @@ if (typeof jQuery == 'undefined') {
             });
 
             $('.pick-file').off('click').on('click', function () {
-                var self = $(this);
-
-                var modalOkClick = function (e) {
-                    var clickedFile = $('#modal_full').find('#table tr.selectable td.first a.name.image');
-
-                    if (clickedFile.length != 0) {
-                        var clickedFileBaseName = $.get_base_name($(clickedFile).attr('href')),
-                            clickedFileExt = $.get_extension($(clickedFile).attr('href'));
-
-                        if (clickedFile.length !== 0) {
-                            if ($.inArray(clickedFileExt, imgExts) != -1) {
-                                $(self).find('.media-body a.io-image-name').text(clickedFileBaseName);
-                                $(self).find('.media a img').attr('src',
-                                    baseUrl + $(clickedFile).attr('href'));
-                                $(self).find('.image-file').val($(clickedFile).attr('href'));
-                            } else {
-                                e.stopPropagation();
-                            }
-                        } else {
-                            e.stopPropagation();
-                        }
-                    } else {
-                        e.stopPropagation();
-                    }
-                };
-
-                $('#file-ok').off('click').on('click', function (e) {
-                    modalOkClick(e);
-                });
+                $().pickFileExt(this);
             });
 
             $('.pick-file-video').off('click').on('click', function () {

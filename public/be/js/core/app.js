@@ -15,6 +15,15 @@ $(window).on('load', function () {
     $('body').removeClass('no-transitions');
 });
 
+var namespace = 'shiraz_marketing';
+var idGenerator = function (prefix) {
+    var elNum, rndEl;
+    do {
+        elNum = Math.floor(Math.random() * 10000000);
+        rndEl = $(document).find('#' + prefix + elNum).length;
+    } while (rndEl !== 0);
+    return prefix + elNum
+};
 
 $(function () {
 
@@ -609,17 +618,6 @@ $(function () {
         }, 100);
     }).resize();
 
-
-    // ========================================
-    //
-    // Other code
-    //
-    // ========================================
-
-
-    // Plugins
-    // -------------------------
-
     // Popover
     $('[data-popup="popover"]').popover({
         container: 'body'
@@ -630,273 +628,628 @@ $(function () {
         container: 'body'
     });
 
-    // Lazy loader (pictures, videos, etc.)
-    if ($.fn.lazy) {
-        $('.lazy').lazy({
-            effect: "fadeIn",
-            effectTime: 800,
-            threshold: 50,
-            // callback
-            afterLoad: function (element) {
-                $(element).css({'background': 'none'});
-            }
-        });
+
+    // ========================================
+    //
+    // Other code
+    //
+    // ========================================
+
+    var switcheryElements;
+
+    /**
+     * @param el
+     */
+    function removeImageFromPlaceholder(el) {
+        $(el)
+            .closest('.__file_picker_handler')
+            .removeClass('has-image')
+            .find('.img-placeholder-image')
+            .remove();
     }
 
-    if ($.fn.persianDatepicker) {
-        $('.myDatepickerWithEn').persianDatepicker({
-            "inline": false,
-            "format": "L",
-            "viewMode": "day",
-            "initialValue": true,
-            "minDate": 0,
-            "maxDate": 0,
-            "autoClose": false,
-            "position": "auto",
-            "onlyTimePicker": false,
-            "onlySelectOnDate": false,
-            "calendarType": "persian",
-            "inputDelay": 800,
-            "observer": true,
-            "calendar": {
-                "persian": {
-                    "locale": "fa",
-                    "showHint": true,
-                    "leapYearMode": "algorithmic"
-                },
-                "gregorian": {
-                    "locale": "en",
-                    "showHint": true
-                }
-            },
-            "navigator": {
-                "enabled": true,
-                "scroll": {
-                    "enabled": true
-                },
-                "text": {
-                    "btnNextText": "<",
-                    "btnPrevText": ">"
-                }
-            },
-            "toolbox": {
-                "enabled": true,
-                "calendarSwitch": {
-                    "enabled": true,
-                    "format": "MMMM"
-                },
-                "todayButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "امروز",
-                        "en": "Today"
-                    }
-                },
-                "submitButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "تایید",
-                        "en": "Submit"
-                    }
-                },
-                "text": {
-                    "btnToday": "امروز"
-                }
-            },
-            "timePicker": {
-                "enabled": false,
-                "step": 1,
-                "hour": {
-                    "enabled": true,
-                    "step": null
-                },
-                "minute": {
-                    "enabled": true,
-                    "step": null
-                },
-                "second": {
-                    "enabled": true,
-                    "step": null
-                },
-                "meridian": {
-                    "enabled": true
-                }
-            },
-            "dayPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY MMMM"
-            },
-            "monthPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY"
-            },
-            "yearPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY"
-            },
-            "responsive": true
-        });
+    function removeClonedElementEvent() {
+        $('.__clone_remover_btn')
+            .off('click.' + namespace)
+            .on('click.' + namespace, function (e) {
+                e.stopPropagation();
 
-        $('.myDatepicker').persianDatepicker({
-            "inline": false,
-            "format": "L",
-            "viewMode": "day",
-            "initialValue": true,
-            "minDate": 0,
-            "maxDate": 0,
-            "autoClose": false,
-            "position": "auto",
-            "onlyTimePicker": false,
-            "onlySelectOnDate": false,
-            "calendarType": "persian",
-            "inputDelay": 800,
-            "observer": true,
-            "calendar": {
-                "persian": {
-                    "locale": "fa",
-                    "showHint": true,
-                    "leapYearMode": "algorithmic"
-                },
-                "gregorian": {
-                    "locale": "en",
-                    "showHint": true
-                }
-            },
-            "navigator": {
-                "enabled": true,
-                "scroll": {
-                    "enabled": true
-                },
-                "text": {
-                    "btnNextText": "<",
-                    "btnPrevText": ">"
-                }
-            },
-            "toolbox": {
-                "enabled": true,
-                "calendarSwitch": {
-                    "enabled": false,
-                    "format": "MMMM"
-                },
-                "todayButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "امروز",
-                        "en": "Today"
-                    }
-                },
-                "submitButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "تایید",
-                        "en": "Submit"
-                    }
-                },
-                "text": {
-                    "btnToday": "امروز"
-                }
-            },
-            "timePicker": {
-                "enabled": false,
-                "step": 1,
-                "hour": {
-                    "enabled": true,
-                    "step": null
-                },
-                "minute": {
-                    "enabled": true,
-                    "step": null
-                },
-                "second": {
-                    "enabled": true,
-                    "step": null
-                },
-                "meridian": {
-                    "enabled": true
-                }
-            },
-            "dayPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY MMMM"
-            },
-            "monthPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY"
-            },
-            "yearPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY"
-            },
-            "responsive": true
-        });
+                $(this).parent().fadeOut(300, function () {
+                    $(this).remove();
+                });
+            });
+    }
 
-        var altDP = $('.myAltDatepicker');
-        $(altDP).each(function () {
-            var $this = $(this);
-            $this.persianDatepicker({
+    removeClonedElementEvent();
+
+    function afterCloneElement(copy) {
+        copy = $(copy);
+
+        removeClonedElementEvent();
+        //
+        $('.clear-img-val').off('click').on('click', function (e) {
+            e.stopPropagation();
+            resetImageToPlaceholder(this);
+        });
+        // reset all images to placeholder
+        copy.find('.clear-img-val').each(function () {
+            resetImageToPlaceholder(this);
+        });
+        //
+        $('.pick-file').off('click').on('click', function () {
+            if ($().pickFileExt) {
+                $().pickFileExt(this);
+            }
+        });
+        //
+        initializeAllPlugins();
+
+        if (copy.length) {
+            var switchery = copy.find('.form-check-input-switchery');
+            if (switchery.length) {
+                switchery.removeAttr('data-switchery').parent().find('.switchery').remove();
+                new Switchery(switchery.get(0));
+            }
+        }
+    }
+
+    function resetImageToPlaceholder(clearBtn) {
+        $(clearBtn).parent().parent().find('input').val('').end().parent()
+            .find('img').attr('src', baseUrl + 'public/be/images/placeholder.jpg');
+        $(clearBtn).parent().find('a.io-image-name').text('');
+    }
+
+    $('.__duplicator_btn').each(function (i, element) {
+        $(element).on('click.' + namespace, function (e) {
+            e.preventDefault();
+
+            var
+                container,
+                sample,
+                clearableElements,
+                removableElements,
+                removableClasses,
+                removableClassesForAll,
+                dynamicIdElements,
+                dynamicIdAltElements,
+                copy;
+
+            container = $(this).attr('data-container-element');
+            sample = $(this).attr('data-sample-element');
+            clearableElements = $(this).attr('data-clearable-elements');
+            if (clearableElements && JSON.parse(clearableElements)) {
+                clearableElements = JSON.parse(clearableElements);
+            }
+            removableElements = $(this).attr('data-removable-elements');
+            if (removableElements && JSON.parse(removableElements)) {
+                removableElements = JSON.parse(removableElements);
+            }
+            removableClasses = $(this).attr('data-removable-classes');
+            if (removableClasses && JSON.parse(removableClasses)) {
+                removableClasses = JSON.parse(removableClasses);
+            }
+            removableClassesForAll = $(this).attr('data-removable-classes-for-all');
+            if (removableClassesForAll && JSON.parse(removableClassesForAll)) {
+                removableClassesForAll = JSON.parse(removableClassesForAll);
+            }
+            dynamicIdElements = $(this).attr('data-dynamic-id-elements');
+            if (dynamicIdElements && JSON.parse(dynamicIdElements)) {
+                dynamicIdElements = JSON.parse(dynamicIdElements);
+            }
+            dynamicIdAltElements = $(this).attr('data-alt-field');
+            if (dynamicIdAltElements && JSON.parse(dynamicIdAltElements)) {
+                dynamicIdAltElements = JSON.parse(dynamicIdAltElements);
+            }
+
+            if (container && sample) {
+                container = $(container);
+                sample = $(sample);
+                if (container.length && sample.length) {
+                    copy = sample.clone(!!$(this).attr('data-deep-copy'));
+                    copy.removeAttr('id');
+
+                    // clear element value inside cloned element
+                    if (clearableElements) {
+                        var i, len, el;
+                        len = clearableElements.length;
+                        for (i = 0; i < len; ++i) {
+                            el = copy.find('[name="' + clearableElements[i] + '"]');
+                            if (el.length) {
+                                el.each(function (i, elem) {
+                                    if ($(elem).is(':radio')) {
+                                        el.attr('checked', false).prop('checked', false);
+                                        el.first().attr('checked', true).prop('checked', true);
+                                    } else if (($(elem).is('input') || $(elem).is('textarea')) && !$(elem).is(':checkbox')) {
+                                        $(elem).val('');
+                                    } else if ($(elem).is('select')) {
+                                        $(elem)
+                                            .prop('selectedIndex', 0);
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    // remove removable elements
+                    if (removableElements) {
+                        len = removableElements.length;
+                        for (i = 0; i < len; ++i) {
+                            if ($(removableElements[i]).length) {
+                                copy.find(removableElements[i]).remove();
+                            }
+                        }
+                    }
+
+                    // remove removable classes
+                    if (removableClasses) {
+                        len = removableClasses.length;
+                        for (i = 0; i < len; ++i) {
+                            copy.removeClass(removableClasses[i]);
+                        }
+                    }
+
+                    // remove removable classes for all elements in cloned element
+                    if (removableClassesForAll) {
+                        len = removableClassesForAll.length;
+                        for (i = 0; i < len; ++i) {
+                            copy.find('.' + removableClassesForAll[i]).removeClass(removableClassesForAll[i]);
+                        }
+                    }
+
+                    var rndId, cpyEl;
+                    // make dynamic id for some elements
+                    if (dynamicIdElements) {
+                        len = dynamicIdElements.length;
+                        for (i = 0; i < len; ++i) {
+                            cpyEl = copy.find('[name="' + dynamicIdElements[i] + '"]');
+                            rndId = idGenerator('custom');
+                            cpyEl.attr('id', rndId);
+                        }
+                    }
+
+                    // make dynamic id for some element's alt field
+                    if (dynamicIdAltElements) {
+                        len = dynamicIdAltElements.length;
+                        var altElem;
+                        for (i = 0; i < len; ++i) {
+                            cpyEl = copy.find('[name="' + dynamicIdAltElements[i] + '"]');
+                            altElem = $(cpyEl.attr('data-alt-field'));
+                            if (altElem.length) {
+                                rndId = idGenerator('custom');
+                                cpyEl.attr('data-alt-field', rndId);
+                                altElem.attr('id', rndId);
+                            }
+                        }
+                    }
+
+                    // append remove button if needed
+                    if ($(this).attr('data-add-remove')) {
+                        copy.append(
+                            $('<div class="__clone_remover_btn btn btn-danger" />')
+                                .append($('<i class="icon-trash" aria-hidden="true" />'))
+                        );
+                    }
+
+                    copy.find('.select2').remove();
+                    copy.find('.bootstrap-tagsinput').remove();
+
+                    container.append(copy);
+                    afterCloneElement(copy);
+                }
+            }
+        });
+    });
+
+    /**
+     * Instantiate switchery plugin with prevent multiple instantiation
+     */
+    function instantiateSwitchery() {
+        if (typeof Switchery !== 'undefined') {
+            // Initialize multiple switches
+            var elems = Array.prototype.slice.call(document.querySelectorAll('.form-check-input-switchery'));
+            elems.forEach(function (html) {
+                if (!$(html).attr('data-switchery')) {
+                    switcheryElements[html] = new Switchery(html);
+                }
+            });
+        }
+    }
+
+    function initializeAllPlugins() {
+        if ($().spectrum) {
+            var cps = $(".color-picker");
+            cps.each(function () {
+                var $this = $(this);
+                var parent = $this.closest('.modal');
+                var obj = {
+                    color: $this.attr('data-color') ? $this.attr('data-color') : "#2196f3",
+                    cancelText: "لغو",
+                    chooseText: "انتخاب",
+                    preferredFormat: "hex",
+                    showInput: true,
+                    palette: [],
+                    showPalette: true,
+                    maxSelectionSize: 5,
+                    clickoutFiresChange: false,
+                    showInitial: true,
+                };
+
+                if (parent.length) {
+                    obj['appendTo'] = parent;
+                }
+
+                $this.spectrum(obj)
+            });
+        }
+
+        // uniform initialize
+        if ($().uniform) {
+            $.uniform.restore(".form-check-input-styled");
+            $.uniform.restore(".form-input-styled");
+
+            // remove all of it first
+            do {
+                $('.form-check-input-styled').unwrap('span').unwrap('div');
+            }
+            while ($('.form-check-input-styled').closest('.uniform-checker').length > 0);
+            do {
+                $('.form-input-styled').unwrap('span').unwrap('div');
+            } while ($('.form-input-styled').closest('.uniform-checker').length > 0);
+
+            // Default initialization
+            $('.form-check-input-styled').uniform();
+
+            $('.form-input-styled').uniform({
+                fileButtonClass: 'action btn bg-pink-400',
+                fileButtonHtml: 'انتخاب فایل',
+                filesButtonHtml: 'انتخاب فایل',
+                fileDefaultHtml: 'هیچ فایلی انتخاب نشده است',
+                resetDefaultHtml: 'بازنشانی',
+            });
+        }
+
+        if ($.fn.persianDatepicker) {
+            $('.myDatepickerWithEn').each(function () {
+                var $this = $(this);
+                $this.persianDatepicker({
+                    "inline": false,
+                    "format": !!$this.attr('data-format') ? $this.attr('data-format') : 'L',
+                    "viewMode": "day",
+                    "initialValue": true,
+                    "minDate": 0,
+                    "maxDate": 0,
+                    "autoClose": false,
+                    "position": "auto",
+                    "onlyTimePicker": false,
+                    "onlySelectOnDate": false,
+                    "calendarType": "persian",
+                    "altFormat": 'X',
+                    "altField": $this.attr('data-alt-field') ? $this.attr('data-alt-field') : '',
+                    "inputDelay": 800,
+                    "observer": true,
+                    "calendar": {
+                        "persian": {
+                            "locale": "fa",
+                            "showHint": true,
+                            "leapYearMode": "algorithmic"
+                        },
+                        "gregorian": {
+                            "locale": "en",
+                            "showHint": true
+                        }
+                    },
+                    "navigator": {
+                        "enabled": true,
+                        "scroll": {
+                            "enabled": true
+                        },
+                        "text": {
+                            "btnNextText": "<",
+                            "btnPrevText": ">"
+                        }
+                    },
+                    "toolbox": {
+                        "enabled": true,
+                        "calendarSwitch": {
+                            "enabled": true,
+                            "format": "MMMM"
+                        },
+                        "todayButton": {
+                            "enabled": true,
+                            "text": {
+                                "fa": "امروز",
+                                "en": "Today"
+                            }
+                        },
+                        "submitButton": {
+                            "enabled": true,
+                            "text": {
+                                "fa": "تایید",
+                                "en": "Submit"
+                            }
+                        },
+                        "text": {
+                            "btnToday": "امروز"
+                        }
+                    },
+                    "timePicker": {
+                        "enabled": !!$this.attr('data-time'),
+                        "step": 1,
+                        "hour": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "minute": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "second": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "meridian": {
+                            "enabled": true
+                        }
+                    },
+                    "dayPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY MMMM"
+                    },
+                    "monthPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY"
+                    },
+                    "yearPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY"
+                    },
+                    "responsive": true
+                });
+            });
+
+            var altDP = $('.myAltDatepicker');
+            $(altDP).each(function () {
+                var $this = $(this);
+                $this.persianDatepicker({
+                    "inline": false,
+                    "format": !!$this.attr('data-format') ? $this.attr('data-format') : 'L',
+                    "viewMode": "day",
+                    "initialValue": true,
+                    "minDate": 0,
+                    "maxDate": 0,
+                    "autoClose": false,
+                    "position": "auto",
+                    "onlyTimePicker": false,
+                    "onlySelectOnDate": false,
+                    "calendarType": "persian",
+                    "altFormat": 'X',
+                    "altField": $this.attr('data-alt-field'),
+                    "inputDelay": 800,
+                    "observer": true,
+                    "calendar": {
+                        "persian": {
+                            "locale": "fa",
+                            "showHint": true,
+                            "leapYearMode": "algorithmic"
+                        },
+                        "gregorian": {
+                            "locale": "en",
+                            "showHint": true
+                        }
+                    },
+                    "navigator": {
+                        "enabled": true,
+                        "scroll": {
+                            "enabled": true
+                        },
+                        "text": {
+                            "btnNextText": "<",
+                            "btnPrevText": ">"
+                        }
+                    },
+                    "toolbox": {
+                        "enabled": true,
+                        "calendarSwitch": {
+                            "enabled": false,
+                            "format": "MMMM"
+                        },
+                        "todayButton": {
+                            "enabled": true,
+                            "text": {
+                                "fa": "امروز",
+                                "en": "Today"
+                            }
+                        },
+                        "submitButton": {
+                            "enabled": true,
+                            "text": {
+                                "fa": "تایید",
+                                "en": "Submit"
+                            }
+                        },
+                        "text": {
+                            "btnToday": "امروز"
+                        }
+                    },
+                    "timePicker": {
+                        "enabled": !!$this.attr('data-time'),
+                        "step": 1,
+                        "hour": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "minute": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "second": {
+                            "enabled": false,
+                            "step": null
+                        },
+                        "meridian": {
+                            "enabled": false
+                        }
+                    },
+                    "dayPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY MMMM"
+                    },
+                    "monthPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY"
+                    },
+                    "yearPicker": {
+                        "enabled": true,
+                        "titleFormat": "YYYY"
+                    },
+                    "responsive": true
+                });
+            });
+
+            var rtAll, rfAll;
+
+            rtAll = $(".range-to");
+            rfAll = $(".range-from");
+
+            rfAll.each(function (i) {
+                var to, from;
+                var rt, rf;
+
+                rt = rtAll.eq(i);
+                rf = $(this);
+
+                to = rt.persianDatepicker({
+                    inline: false,
+                    altField: rt.attr('data-alt-field'),
+                    format: !!rt.attr('data-format') ? rt.attr('data-format') : 'L',
+                    initialValue: true,
+                    onSelect: function (unix) {
+                        to.touched = true;
+                        if (from && from.options && from.options.maxDate != unix) {
+                            var cachedValue = from.getState().selected.unixDate;
+                            from.options = {maxDate: unix};
+                            if (from.touched) {
+                                from.setDate(cachedValue);
+                            }
+                        }
+                    },
+                    "minDate": 0,
+                    "maxDate": 0,
+                    "autoClose": true,
+                    "position": "auto",
+                    "onlyTimePicker": false,
+                    "onlySelectOnDate": false,
+                    "calendarType": "persian",
+                    "altFormat": 'X',
+                    "inputDelay": 800,
+                    "observer": true,
+                    "calendar": {
+                        "persian": {
+                            "locale": "fa",
+                            "showHint": true,
+                            "leapYearMode": "algorithmic"
+                        },
+                        "gregorian": {
+                            "locale": "en",
+                            "showHint": true
+                        }
+                    },
+                    "timePicker": {
+                        "enabled": !!rt.attr('data-time'),
+                        "step": 1,
+                        "hour": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "minute": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "second": {
+                            "enabled": false,
+                            "step": null
+                        },
+                        "meridian": {
+                            "enabled": false
+                        }
+                    }
+                });
+                from = rf.persianDatepicker({
+                    inline: false,
+                    altField: rf.attr('data-alt-field'),
+                    format: !!rf.attr('data-format') ? rf.attr('data-format') : 'L',
+                    initialValue: true,
+                    onSelect: function (unix) {
+                        from.touched = true;
+                        if (to && to.options && to.options.minDate != unix) {
+                            var cachedValue = to.getState().selected.unixDate;
+                            to.options = {minDate: unix};
+                            if (to.touched) {
+                                to.setDate(cachedValue);
+                            }
+                        }
+                    },
+                    "minDate": 0,
+                    "maxDate": 0,
+                    "autoClose": true,
+                    "position": "auto",
+                    "onlyTimePicker": false,
+                    "onlySelectOnDate": false,
+                    "calendarType": "persian",
+                    "altFormat": 'X',
+                    "inputDelay": 800,
+                    "observer": true,
+                    "calendar": {
+                        "persian": {
+                            "locale": "fa",
+                            "showHint": true,
+                            "leapYearMode": "algorithmic"
+                        },
+                        "gregorian": {
+                            "locale": "en",
+                            "showHint": true
+                        }
+                    },
+                    "timePicker": {
+                        "enabled": !!rf.attr('data-time'),
+                        "step": 1,
+                        "hour": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "minute": {
+                            "enabled": true,
+                            "step": null
+                        },
+                        "second": {
+                            "enabled": false,
+                            "step": null
+                        },
+                        "meridian": {
+                            "enabled": false
+                        }
+                    }
+                });
+            });
+
+
+            $('.myTimepicker').persianDatepicker({
                 "inline": false,
-                "format": !!$this.attr('data-format') ? $this.attr('data-format') : 'L',
-                "viewMode": "day",
+                "format": "H:m:s",
                 "initialValue": true,
-                "minDate": 0,
-                "maxDate": 0,
                 "autoClose": false,
                 "position": "auto",
-                "onlyTimePicker": false,
+                "onlyTimePicker": true,
                 "onlySelectOnDate": false,
                 "calendarType": "persian",
-                "altFormat": 'X',
-                "altField": $this.attr('data-alt-field'),
                 "inputDelay": 800,
                 "observer": true,
-                "calendar": {
-                    "persian": {
-                        "locale": "fa",
-                        "showHint": true,
-                        "leapYearMode": "algorithmic"
-                    },
-                    "gregorian": {
-                        "locale": "en",
-                        "showHint": true
-                    }
-                },
-                "navigator": {
-                    "enabled": true,
-                    "scroll": {
-                        "enabled": true
-                    },
-                    "text": {
-                        "btnNextText": "<",
-                        "btnPrevText": ">"
-                    }
-                },
                 "toolbox": {
-                    "enabled": true,
-                    "calendarSwitch": {
-                        "enabled": false,
-                        "format": "MMMM"
-                    },
-                    "todayButton": {
-                        "enabled": true,
-                        "text": {
-                            "fa": "امروز",
-                            "en": "Today"
-                        }
-                    },
-                    "submitButton": {
-                        "enabled": true,
-                        "text": {
-                            "fa": "تایید",
-                            "en": "Submit"
-                        }
-                    },
-                    "text": {
-                        "btnToday": "امروز"
-                    }
+                    "enabled": false
                 },
                 "timePicker": {
-                    "enabled": !!$this.attr('data-time'),
-                    "step": 1,
+                    "enabled": false,
+                    "step": "1",
                     "hour": {
                         "enabled": true,
                         "step": null
@@ -906,191 +1259,116 @@ $(function () {
                         "step": null
                     },
                     "second": {
-                        "enabled": false,
+                        "enabled": true,
                         "step": null
                     },
                     "meridian": {
                         "enabled": false
                     }
-                },
-                "dayPicker": {
-                    "enabled": true,
-                    "titleFormat": "YYYY MMMM"
-                },
-                "monthPicker": {
-                    "enabled": true,
-                    "titleFormat": "YYYY"
-                },
-                "yearPicker": {
-                    "enabled": true,
-                    "titleFormat": "YYYY"
                 },
                 "responsive": true
             });
-        });
+        }
 
-        var rtAll, rfAll;
+        // this must be after datatable
+        if ($().select2) {
+            var $this;
 
-        rtAll = $(".range-to");
-        rfAll = $(".range-from");
+            // Basic example
+            $('.form-control-select2').each(function () {
+                var obj, parent;
+                $this = $(this);
+                obj = {
+                    minimumResultsForSearch: Infinity,
+                };
+                parent = $this.closest('.modal');
+                if (parent.length) {
+                    obj['dropdownParent'] = parent;
+                }
+                if ($this.data('select2')) $this.select2("destroy");
+                $this.select2(obj);
+            });
 
-        rfAll.each(function (i) {
-            var to, from;
-            var rt, rf;
+            // With search
+            $('.form-control-select2-searchable').each(function () {
+                var obj, parent;
+                $this = $(this);
+                obj = {};
+                parent = $this.closest('.modal');
+                if (parent.length) {
+                    obj['dropdownParent'] = parent;
+                }
+                if ($this.data('select2')) $this.select2("destroy");
+                $this.select2(obj);
+            });
 
-            rt = rtAll.eq(i);
-            rf = $(this);
+            // Initialize
+            $('.dataTables_length select').each(function () {
+                var obj, parent;
+                $this = $(this);
+                obj = {
+                    minimumResultsForSearch: Infinity,
+                    dropdownAutoWidth: true,
+                    width: 'auto'
+                };
+                parent = $this.closest('.modal');
+                if (parent.length) {
+                    obj['dropdownParent'] = parent;
+                }
+                if ($this.data('select2')) $this.select2("destroy");
+                $this.select2(obj);
+            });
+        }
 
-            to = rt.persianDatepicker({
-                inline: false,
-                altField: rt.attr('data-alt-field'),
-                format: !!rt.attr('data-format') ? rt.attr('data-format') : 'L',
-                initialValue: true,
-                onSelect: function (unix) {
-                    to.touched = true;
-                    if (from && from.options && from.options.maxDate != unix) {
-                        var cachedValue = from.getState().selected.unixDate;
-                        from.options = {maxDate: unix};
-                        if (from.touched) {
-                            from.setDate(cachedValue);
-                        }
-                    }
-                },
-                "minDate": 0,
-                "maxDate": 0,
-                "autoClose": true,
-                "position": "auto",
-                "onlyTimePicker": false,
-                "onlySelectOnDate": false,
-                "calendarType": "persian",
-                "altFormat": 'X',
-                "inputDelay": 800,
-                "observer": true,
-                "calendar": {
-                    "persian": {
-                        "locale": "fa",
-                        "showHint": true,
-                        "leapYearMode": "algorithmic"
-                    },
-                    "gregorian": {
-                        "locale": "en",
-                        "showHint": true
-                    }
-                },
-                "timePicker": {
-                    "enabled": !!rt.attr('data-time'),
-                    "step": 1,
-                    "hour": {
-                        "enabled": true,
-                        "step": null
-                    },
-                    "minute": {
-                        "enabled": true,
-                        "step": null
-                    },
-                    "second": {
-                        "enabled": false,
-                        "step": null
-                    },
-                    "meridian": {
-                        "enabled": false
-                    }
+        if ($().tagsinput) {
+            $('.tags-input').each(function () {
+                var obj, maxTags, $this;
+                $this = $(this);
+                obj = {};
+
+                // check for max tags
+                maxTags = $this.attr('data-max-tags');
+                maxTags = maxTags && !isNaN(parseInt(maxTags, 10)) ? parseInt(maxTags, 10) : null;
+                if (maxTags) {
+                    obj['maxTags'] = maxTags;
+                }
+
+                if ($this.data('tagsinput')) $this.tagsinput("destroy");
+                setTimeout(function () {
+                    $this.tagsinput(obj);
+                }, 1);
+            });
+        }
+
+        // Lazy loader (pictures, videos, etc.)
+        if ($.fn.lazy) {
+            $('.lazy').lazy({
+                effect: "fadeIn",
+                effectTime: 800,
+                threshold: 50,
+                // callback
+                afterLoad: function (element) {
+                    $(element).css({'background': 'none'});
                 }
             });
-            from = rf.persianDatepicker({
-                inline: false,
-                altField: rf.attr('data-alt-field'),
-                format: !!rf.attr('data-format') ? rf.attr('data-format') : 'L',
-                initialValue: true,
-                onSelect: function (unix) {
-                    from.touched = true;
-                    if (to && to.options && to.options.minDate != unix) {
-                        var cachedValue = to.getState().selected.unixDate;
-                        to.options = {minDate: unix};
-                        if (to.touched) {
-                            to.setDate(cachedValue);
-                        }
-                    }
-                },
-                "minDate": 0,
-                "maxDate": 0,
-                "autoClose": true,
-                "position": "auto",
-                "onlyTimePicker": false,
-                "onlySelectOnDate": false,
-                "calendarType": "persian",
-                "altFormat": 'X',
-                "inputDelay": 800,
-                "observer": true,
-                "calendar": {
-                    "persian": {
-                        "locale": "fa",
-                        "showHint": true,
-                        "leapYearMode": "algorithmic"
-                    },
-                    "gregorian": {
-                        "locale": "en",
-                        "showHint": true
-                    }
-                },
-                "timePicker": {
-                    "enabled": !!rf.attr('data-time'),
-                    "step": 1,
-                    "hour": {
-                        "enabled": true,
-                        "step": null
-                    },
-                    "minute": {
-                        "enabled": true,
-                        "step": null
-                    },
-                    "second": {
-                        "enabled": false,
-                        "step": null
-                    },
-                    "meridian": {
-                        "enabled": false
-                    }
-                }
+        }
+
+        if ($().maxlength) {
+            // Basic example
+            $('.maxlength').maxlength();
+
+            $('.maxlength-placeholder').maxlength({
+                alwaysShow: true,
+                warningClass: 'text-success form-text',
+                limitReachedClass: 'text-danger form-text',
+                separator: ' از ',
+                preText: 'شما دارای ',
+                postText: ' کاراکتر هستید',
+                validate: true,
             });
-        });
+        }
 
-
-        $('.myTimepicker').persianDatepicker({
-            "inline": false,
-            "format": "H:m:s",
-            "initialValue": true,
-            "autoClose": false,
-            "position": "auto",
-            "onlyTimePicker": true,
-            "onlySelectOnDate": false,
-            "calendarType": "persian",
-            "inputDelay": 800,
-            "observer": true,
-            "toolbox": {
-                "enabled": false
-            },
-            "timePicker": {
-                "enabled": false,
-                "step": "1",
-                "hour": {
-                    "enabled": true,
-                    "step": null
-                },
-                "minute": {
-                    "enabled": true,
-                    "step": null
-                },
-                "second": {
-                    "enabled": true,
-                    "step": null
-                },
-                "meridian": {
-                    "enabled": false
-                }
-            },
-            "responsive": true
-        });
+        instantiateSwitchery();
     }
 
     if ($.fn.fancybox) {
@@ -1103,25 +1381,10 @@ $(function () {
         });
     }
 
-    if ($.fn.spectrum) {
-        var cps = $(".color-picker");
-        cps.each(function () {
-            var $this = $(this);
-
-            $this.spectrum({
-                color: $this.attr('data-color') ? $this.attr('data-color') : "#2196f3",
-                cancelText: "لغو",
-                chooseText: "انتخاب",
-                preferredFormat: "hex",
-                showInput: true
-            })
-        });
-    }
+    initializeAllPlugins();
 
     (function ($) {
         'use strict';
-
-        var namespace = 'shiraz_marketing';
 
         $(function () {
             $.fn.toggler = function () {

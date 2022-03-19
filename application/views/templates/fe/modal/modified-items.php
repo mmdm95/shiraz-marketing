@@ -23,8 +23,10 @@
                                 <div class="modal-product-item"
                                      title="<?= $item['title']; ?>">
                                     <div class="modal-product-item-img">
-                                        <img src="<?= base_url($item['image']); ?>"
-                                             alt="">
+                                        <?= $this->view('templates/fe/parser/image-placeholder', [
+                                            'url' => base_url($item['image']),
+                                            'alt' => '',
+                                        ], true); ?>
                                     </div>
                                     <p class="modal-product-item-title normal-line-height">
                                         <?= character_limiter($item['title'], 50); ?>

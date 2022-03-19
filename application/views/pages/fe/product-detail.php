@@ -48,14 +48,16 @@
                             <?php foreach ($product['gallery'] as $img): ?>
                                 <div>
                                     <a href="javascript:void(0);">
-                                        <img src="<?= base_url($img['image']); ?>" alt="" class="owl-thumb-image">
+                                        <img src="<?= base_url($img['image']); ?>"
+                                             alt="" class="owl-thumb-image">
                                     </a>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <div>
                                 <a href="javascript:void(0);">
-                                    <img src="<?= base_url($product['image']); ?>" alt="" class="owl-thumb-image">
+                                    <img src="<?= base_url($product['image']); ?>"
+                                         alt="" class="owl-thumb-image">
                                 </a>
                             </div>
                         <?php endif; ?>
@@ -322,8 +324,7 @@
                                             <i class="la la-image" aria-hidden="true"></i>
                                         </div>
                                         <a href="<?= base_url('product/detail/' . $related['id'] . '/' . $related['slug']); ?>">
-                                            <img src="<?= base_url($related['image']); ?>"
-                                                 alt="<?= $related['title']; ?>">
+                                            <img src="<?= base_url($related['image']); ?>" alt="<?= $related['title']; ?>">
                                         </a>
                                         <span class="card-location">
                                             <i class="la la-map-marker card-location-icon" aria-hidden="true"></i>
